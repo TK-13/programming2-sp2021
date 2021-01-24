@@ -1,10 +1,9 @@
-# Assignment -----------------------------------------------------------------------------------------------------
+# Assignment ------------------------------------------------------------------------------------
 # 1. Run this file and take the questionnaire.
-# 2. Add your questionnaire_responses.txt file to your git repo
+# 2. Add your questionnaire_responses.txt file to the Google Assignment submission
 # 3. Modify this file to ask Ms. Ifft at least three questions you would like to know about her.
-# 4. Add your modified version of this file to your git repo.
-# NOTE: if you have trouble adding the files to your git repo, don't worry! Just upload them to the Portal instead.
-# -----------------------------------------------------------------------------------------------------------------
+# 4. Add your modified version of this file to your Google Assignment submission.
+# ------------------------------------------------------------------------------------------------
 
 """
 This module asks the user a series of questions.
