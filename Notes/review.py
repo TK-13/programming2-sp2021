@@ -76,8 +76,24 @@ while number < 10:
 
 # lists
 
-# how to create a list
-# how to loop through a list
-# how to check if something is in a list
+my_list = [1, 4, 5, 6, "a", 4.4, True]
+for cat in my_list:
+    print(cat)
+
+class_list = ["Ryan", "Tk", "Alex", "Aaron"]
+bool("Steve" in class_list)
+
 
 # functions
+
+# default parameters don't have to be passed in, and will default to the value specified
+def function_name(x, y=1):
+    print(x+y)
+    # if no return value, the function will return None
+
+function_name(2, 3)
+
+def sum_two_numbers(x, y=1):
+    return x+y
+
+sum = sum_two_numbers(2, 3)
