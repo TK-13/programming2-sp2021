@@ -2,6 +2,7 @@ import random
 
 # ask the person for their choice (rock, paper, or scissors)
 # and validate that they chose a valid option
+#
 
 options = ["rock", "paper", "scissors"]
 moveP = False
