@@ -18,6 +18,7 @@ name = input("First, your name please: ")
 questionnaire_file.write("Name: " + name + "\n\n")
 
 # create and ask some questions; then print questions and answers to a file.
+# New questions changed here.
 questionnaire_simple_questions = [
     "What is your favorite season?",
     "Do you have any favorite TV shows or books?",
@@ -31,6 +32,7 @@ for question in questionnaire_simple_questions:
     questionnaire_file.write(answer + "\n\n\n")
 
 # ask last question
+# This was modified too
 last_question = "Are you a morning person, a night person, or something else?"
 last_question_dict = {
     "a": "morning person",
