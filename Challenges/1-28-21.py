@@ -4,15 +4,34 @@ Below, have the user enter a number and have your code generate the Fibonacci se
 If you complete that, also give them the option to input a number N, and generate the sequence to the Nth number.
 """
 
-# 0, 0, 1, 2,
+num = int(input("What number would you like your fibonacci sequence to go up to? "))
 
-# there was an attempt
+fib_1 = 0
+fib_2 = 1
 
-number = int(input("Enter a number: "))
-fibonacci = 0
-interval = 1
+print(fib_1)
+print(fib_2)
 
-for i in range(0, 10):
-    fibonacci += interval
-    print(fibonacci)
-    # interval += fibonacci
+while fib_2 + fib_1 < num:
+    print(fib_1 + fib_2)
+    temp_fib_1 = fib_1
+    fib_1 = fib_2
+    fib_2 += temp_fib_1
+
+
+n = int(input("How many fibonacci numbers would you like to see? "))
+
+fib_1 = 0
+fib_2 = 1
+
+if n >= 1:
+    print(fib_1)
+
+if n >= 2:
+    print(fib_2)
+
+for i in range(n-2):
+    print(fib_1 + fib_2)
+    temp_fib_1 = fib_1
+    fib_1 = fib_2
+    fib_2 += temp_fib_1
