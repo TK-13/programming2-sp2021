@@ -3,9 +3,10 @@ Below, create a function that takes two numbers as arguments and returns their s
 Do not assume that the user will do a good job of passing in numbers as arguments.
 """
 
-def sumthing():
+
+def sum_thing():
     b = input("Enter a number: ")
     c = input("Enter another number: ")
     print("The sum is", int(b) + int(c))
 
-sumthing()
+sum_thing()
