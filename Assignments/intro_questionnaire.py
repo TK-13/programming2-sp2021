@@ -10,7 +10,7 @@ This module asks the user a series of questions.
 When the user answers, the questions and answers are written to a file called questionnaire_responses.txt
 """
 
-print("\nWelcome to the Get to Know You Questionaire!\n")
+print("\nWelcome to the Get to Know You Questionnaire!\n")
 
 # open the file questionnaire_responses.txt in the same directory as this code, and add their name to it
 questionnaire_file = open('questionnaire_responses.txt', 'w')
