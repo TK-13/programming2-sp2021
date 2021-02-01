@@ -10,7 +10,6 @@ def play_game():
     player_1_done = False
 
     player_1_move = ""
-    player_2_move = ""
 
     score1 = 0
     score2 = 0
@@ -22,6 +21,7 @@ def play_game():
                 print("Please enter a valid move.")
                 continue
             else:
+                # noinspection PyUnusedLocal
                 player_1_done = True
                 break
         # have the computer randomly select rock, paper, or scissors

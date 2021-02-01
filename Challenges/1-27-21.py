@@ -9,4 +9,5 @@ def sum_thing():
     c = input("Enter another number: ")
     print("The sum is", int(b) + int(c))
 
+
 sum_thing()
