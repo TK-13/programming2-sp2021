@@ -1,29 +1,20 @@
 import random
 
 
-# ask the person for their choice (rock, paper, or scissors)
-# and validate that they chose a valid option
-#
-
 def play_game():
     options = ["rock", "paper", "scissors"]
-    player_1_done = False
-
-    player_1_move = ""
 
     score1 = 0
     score2 = 0
 
+    # asks the person for their choice (rock, paper, or scissors)
     for x in range(3):
-        while not player_1_done:
-            player_1_move = str(input("Choose your move (rock, paper, or scissors): ")).lower()
-            if player_1_move not in options:
-                print("Please enter a valid move.")
-                continue
-            else:
-                # noinspection PyUnusedLocal
-                player_1_done = True
-                break
+        player_1_move = str(input("Choose your move (rock, paper, or scissors): ")).lower()
+        # and validate that they chose a valid option
+        while player_1_move not in options:
+            print("Please enter a valid move.")
+            continue
+
         # have the computer randomly select rock, paper, or scissors
         player_2_move = random.choice(options)
 
@@ -31,8 +22,7 @@ def play_game():
         print("Player 1 chooses " + player_1_move)
         print("Player 2 chooses " + player_2_move)
 
-        # determine who the winner is
-        # display the winner
+        # determine who the winner is, and adds to the score of the winner
         if player_1_move == "rock":
             if player_2_move == "rock":
                 print("Tie!")
@@ -70,11 +60,15 @@ def play_game():
                 print()
                 score1 += 1
 
+        # display the winner, and their score
         print("Player 1 Score:", score1, "points.")
         print("Player 2 Score:", score2, "points.")
         print()
-        player_1_done = False
 
+        # "Inspect code" keeps saying this variable is not used. Trust me, it is.
+        player_1_move = ""
+
+    # One three rounds have been played, this determines who won the 'match'
     if score1 > score2:
         print("Player 1 Wins!")
         print()
@@ -85,8 +79,9 @@ def play_game():
         print("Tie!")
         print()
 
+    # Asks the human player if they want to play again. If they do, the game function is called. If not
+    # the program ends.
     play_again = input("Play again y/n? ").lower()
-
     if play_again == "y":
         play_game()
     else:
