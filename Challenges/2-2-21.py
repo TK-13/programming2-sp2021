@@ -5,4 +5,11 @@ If you finish that.... don't forget about leap years!
 Hint: there may be a library to help you out on this.
 """
 
-# erase this and write your code here!
+
+def days(years):
+    age = years * 365
+    print("You are " + str(age) + " days old.")
+
+
+enter = int(input("How old are you, in years? "))
+days(enter)
