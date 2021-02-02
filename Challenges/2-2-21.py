@@ -6,10 +6,12 @@ Hint: there may be a library to help you out on this.
 """
 
 
+# user's age in years to days
 def days(years):
     age = years * 365
     print("You are " + str(age) + " days old.")
 
 
+# asks user to enter their age
 enter = int(input("How old are you, in years? "))
 days(enter)
