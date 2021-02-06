@@ -1,12 +1,12 @@
 # import some text we'll use later
 import nltk
 
-nltk.download('gutenberg')
-nltk.download('genesis')
-nltk.download('inaugural')
-nltk.download('webtext')
-nltk.download('treebank')
-nltk.download('nps_chat')
+#nltk.download('gutenberg')
+#nltk.download('genesis')
+#nltk.download('inaugural')
+#nltk.download('webtext')
+#nltk.download('treebank')
+#nltk.download('nps_chat')
 from nltk.book import text6
 monty_python = list(text6)
 
@@ -149,13 +149,18 @@ print("First 75 elements of monty_python:", elements)
 # c) Make a list of the words in monty_python that are 12 or 13 characters long (2 pts)
 long_words = []
 for c in monty_python:
-    if len(c) == 12 or len(c) == 113 and c.lower() not in long_words:
+    if len(c) == 12 or len(c) == 13:
         long_words.append(c)
 for t in long_words:
     if long_words.count(t) > 0:
         long_words.remove(t)
+    elif long_words.count(t.lower) > 0:
+        long_words.remove(t.lower)
+    elif long_words.count(t.upper) > 0:
+        long_words.remove(t.upper)
 
 print("Words in monty_python that are 12-13 characters long:", long_words)
+print(long_words.count("BRIDGEKEEPER"))
 
 # d) Make a list of the lowercase version of the words in monty_python that appear in all caps (2 pts)
 
