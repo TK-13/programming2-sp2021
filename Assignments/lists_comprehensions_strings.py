@@ -1,5 +1,6 @@
 # import some text we'll use later
 import nltk
+
 nltk.download('gutenberg')
 nltk.download('genesis')
 nltk.download('inaugural')
@@ -13,6 +14,8 @@ monty_python = list(text6)
 from Assignments import number_list
 num_list = number_list.num_list
 print(num_list)
+print()
+print()
 
 # ____________________________________________________________________________________________________________________ #
 
@@ -22,37 +25,138 @@ print(num_list)
 my_family = ["Steven", "Julie", "Chantel", "Autumn", "Joel"]
 our_pets = ["Marshmallow", "Kitty", "Rylee", "Forrest", "Eleanor"]
 # Create a copy of our_pets, and add "Ainsley" to it (1 pt)
+pets2 = our_pets.copy()
+print("Original:", pets2)
+pets2.append("Ainsley")
+print("New: ", pets2)
+print()
+
+
 # Use two different list slicings to print ['Steven', 'Julie'] (1 pts)
+# Option 1:
+print(my_family[:2])
+
+# Option 2:
+print(my_family.count)
+# !!!!! come back to this !!!!!!
+
 # Merge the two lists together and store it in our_big_family (1 pt)
+our_big_family = my_family + pets2
+print("our_big_family: ", our_big_family)
+
 # Merge the two lists together in a way such that the merged list ends up in my_family (1 pt)
+my_family += pets2
+print("my_family: ", my_family)
+print()
+print()
 
 
 # PROBLEM 2 (List functions and methods - 8 pts)
 # Find and print the highest number in num_list (1 pt)
+print(num_list)
+high_test = 0
+for i in num_list:
+    if i > high_test:
+        high_test = i
+print("Highest number: ", high_test)
+
 # Find and print the lowest number in num_list (1 pt)
+low_test = 10000
+for i in num_list:
+    if i < low_test:
+        low_test = i
+print("Lowest number: ", low_test)
+
 # Find and print the average of num_list (2 pts)
+list_sum = 0
+for i in num_list:
+    list_sum += i
+print("Average of num_list: ", (list_sum / len(num_list)))
+
 # Remove the lowest number from num_list (2 pts)
+num_list.sort()
+print(num_list)
+num_list.pop(0)
+print(num_list)
+
 # Create and print a new list called top_ten which contains only the 10 highest numbers in num_list (2 pts)
+top_ten = []
+num_list.sort()
+num_list.reverse()
+print(num_list)
+
+for i in range(10):
+    top_ten.append(num_list[i])
+print("Top 10 highest values:", top_ten)
+print()
 
 
 # PROBLEM 3 (Using list comprehensions with numbers - 8 pts)
 # Use list comprehensions to do the following:
 # a) Make a list of numbers from 1 to 100 (2 pts)
+list_a = []
+for i in range(100):
+    list_a.append(int(i+1))
+print("List of numbers from 1 to 100: ", list_a)
+
 # b) Make a list of even numbers from 20 to 40 (2 pts)
+list_b = []
+for i in range(19, 42):
+    if i % 2 == 0:
+        list_b.append(i)
+print("Even #'s from 20 to 40: ", list_b)
+
 # c) Make a list of squares from 1 to 100 (1 ** 2 to 100 ** 2) (2 pts)
+list_c = []
+for i in range(100):
+    list_c.append(int((i+1) ** 2))
+print("List of squares from 1 to 100: ", list_c)
+
 # d) Make a list of all positive numbers in my_list below. (2 pts)
 my_list = [-77, -78, 82, 81, -40, 2, 62, 65, 74, 48, -37, -52, 90, -84, -79, -45, 47, 60, 35, -18]
-
+print("my_list:", my_list)
+list_d = []
+for i in my_list:
+    if i > 0:
+        list_d.append(i)
+print("Positive numbers in my_list:", list_d)
 
 # PROBLEM 4 (4 pts)
 # Find the number which appears most often in num_list?
+print("num_list:", num_list)
+count_test = 0
+most_often = 0
 
+for x in num_list:
+    if num_list.count(x) > count_test:
+        count_test = num_list.count(x)
+        most_often = x
+print("Number which appears most often in num_list:", most_often)
+print("Frequency:", count_test)
+print()
 
 # PROBLEM 5 (Text manipulation - 8 pts)
 # a) Create one string of the first 75 elements of monty_python separated by a space (2 pts)
+elements = ""
+for q in range(75):
+    elements += monty_python[q]
+    elements += " "
+print("First 75 elements of monty_python:", elements)
+
 # b) Using your string from part a) remove erroneous spaces before (and after) punctuation (2 pts)
+
 # Use list comprehensions to do the following with monty_python:
 # c) Make a list of the words in monty_python that are 12 or 13 characters long (2 pts)
+long_words = []
+for c in monty_python:
+    if len(c) == 12 or len(c) == 113 and c.lower() not in long_words:
+        long_words.append(c)
+for t in long_words:
+    if long_words.count(t) > 0:
+        long_words.remove(t)
+
+print("Words in monty_python that are 12-13 characters long:", long_words)
+
 # d) Make a list of the lowercase version of the words in monty_python that appear in all caps (2 pts)
 
 # ____________________________________________________________________________________________________________________ #
