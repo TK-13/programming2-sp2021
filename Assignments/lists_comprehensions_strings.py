@@ -22,6 +22,7 @@ print()
 # LISTS, LIST COMPREHENSIONS & STRING OPERATIONS (32 pts)
 
 # PROBLEM 1 (Basic list operations - 4 pts)
+print("PROBLEM 1 (Basic list operations - 4 pts)")
 my_family = ["Steven", "Julie", "Chantel", "Autumn", "Joel"]
 our_pets = ["Marshmallow", "Kitty", "Rylee", "Forrest", "Eleanor"]
 # Create a copy of our_pets, and add "Ainsley" to it (1 pt)
@@ -29,6 +30,7 @@ pets2 = our_pets.copy()
 print("Original:", pets2)
 pets2.append("Ainsley")
 print("New: ", pets2)
+print()
 print()
 
 
@@ -52,6 +54,7 @@ print()
 
 # PROBLEM 2 (List functions and methods - 8 pts)
 # Find and print the highest number in num_list (1 pt)
+print("PROBLEM 2 (List functions and methods - 8 pts)")
 print("Highest number in num_list", int(max(num_list)))
 
 # Find and print the lowest number in num_list (1 pt)
@@ -75,11 +78,13 @@ for r in range(10):
     top_ten.append(ten_copy[r])
 print("Top 10 highest values:", top_ten)
 print()
+print()
 
 
 # PROBLEM 3 (Using list comprehensions with numbers - 8 pts)
 # Use list comprehensions to do the following:
 # a) Make a list of numbers from 1 to 100 (2 pts)
+print("PROBLEM 3 (Using list comprehensions with numbers - 8 pts)")
 list_a = []
 for i in range(100):
     list_a.append(int(i+1))
@@ -109,6 +114,7 @@ print("Positive numbers in my_list:", list_d)
 
 # PROBLEM 4 (4 pts)
 # Find the number which appears most often in num_list?
+print("PROBLEM 4 (4 pts)")
 print("num_list:", num_list)
 count_test = 0
 most_often = 0
@@ -120,9 +126,11 @@ for x in num_list:
 print("Number which appears most often in num_list:", most_often)
 print("Frequency:", count_test)
 print()
+print()
 
 # PROBLEM 5 (Text manipulation - 8 pts)
 # a) Create one string of the first 75 elements of monty_python separated by a space (2 pts)
+print("PROBLEM 5 (Text manipulation - 8 pts)")
 elements = ""
 for q in range(75):
     elements += monty_python[q]
@@ -130,7 +138,11 @@ for q in range(75):
 print("First 75 elements of monty_python:", elements)
 
 # b) Using your string from part a) remove erroneous spaces before (and after) punctuation (2 pts)
-print("Finish B !!!")
+#print("Finish B !!!")
+for item in elements:
+    if item == " ":
+        elements.remove(item)
+print(elements)
 # Use list comprehensions to do the following with monty_python:
 # c) Make a list of the words in monty_python that are 12 or 13 characters long (2 pts)
 long_words = []
