@@ -1,12 +1,12 @@
 # import some text we'll use later
 import nltk
 
-#nltk.download('gutenberg')
-#nltk.download('genesis')
-#nltk.download('inaugural')
-#nltk.download('webtext')
-#nltk.download('treebank')
-#nltk.download('nps_chat')
+nltk.download('gutenberg')
+nltk.download('genesis')
+nltk.download('inaugural')
+nltk.download('webtext')
+nltk.download('treebank')
+nltk.download('nps_chat')
 from nltk.book import text6
 monty_python = list(text6)
 
@@ -37,8 +37,7 @@ print()
 print(my_family[:2])
 
 # Option 2:
-print(my_family.count)
-# !!!!! come back to this !!!!!!
+print(my_family[-5:-3])
 
 # Merge the two lists together and store it in our_big_family (1 pt)
 our_big_family = my_family + pets2
@@ -53,40 +52,27 @@ print()
 
 # PROBLEM 2 (List functions and methods - 8 pts)
 # Find and print the highest number in num_list (1 pt)
-print(num_list)
-high_test = 0
-for i in num_list:
-    if i > high_test:
-        high_test = i
-print("Highest number: ", high_test)
+print("Highest number in num_list", int(max(num_list)))
 
 # Find and print the lowest number in num_list (1 pt)
-low_test = 10000
-for i in num_list:
-    if i < low_test:
-        low_test = i
-print("Lowest number: ", low_test)
+print("Lowest number in num_list", int(min(num_list)))
 
 # Find and print the average of num_list (2 pts)
-list_sum = 0
-for i in num_list:
-    list_sum += i
-print("Average of num_list: ", (list_sum / len(num_list)))
+print("Average of num_list: ", (sum(num_list) / len(num_list)))
 
 # Remove the lowest number from num_list (2 pts)
-num_list.sort()
 print(num_list)
-num_list.pop(0)
+num_list.remove(min(num_list))
 print(num_list)
 
 # Create and print a new list called top_ten which contains only the 10 highest numbers in num_list (2 pts)
 top_ten = []
-num_list.sort()
-num_list.reverse()
-print(num_list)
+ten_copy = num_list.copy()
+ten_copy.sort()
+ten_copy.reverse()
 
-for i in range(10):
-    top_ten.append(num_list[i])
+for r in range(10):
+    top_ten.append(ten_copy[r])
 print("Top 10 highest values:", top_ten)
 print()
 
@@ -144,23 +130,17 @@ for q in range(75):
 print("First 75 elements of monty_python:", elements)
 
 # b) Using your string from part a) remove erroneous spaces before (and after) punctuation (2 pts)
-
+print("Finish B !!!")
 # Use list comprehensions to do the following with monty_python:
 # c) Make a list of the words in monty_python that are 12 or 13 characters long (2 pts)
 long_words = []
 for c in monty_python:
     if len(c) == 12 or len(c) == 13:
         long_words.append(c)
-for t in long_words:
-    if long_words.count(t) > 0:
-        long_words.remove(t)
-    elif long_words.count(t.lower) > 0:
-        long_words.remove(t.lower)
-    elif long_words.count(t.upper) > 0:
-        long_words.remove(t.upper)
+        if long_words.count(c) > 1:
+            long_words.remove(c)
 
 print("Words in monty_python that are 12-13 characters long:", long_words)
-print(long_words.count("BRIDGEKEEPER"))
 
 # d) Make a list of the lowercase version of the words in monty_python that appear in all caps (2 pts)
 
