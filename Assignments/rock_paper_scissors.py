@@ -8,12 +8,14 @@ def play_game():
     score2 = 0
 
     # asks the person for their choice (rock, paper, or scissors)
+    # Ms. Ifft: what if there are three ties? A while loop would be better.
     for x in range(3):
         player_1_move = str(input("Choose your move (rock, paper, or scissors): ")).lower()
         # and validate that they chose a valid option
         while player_1_move not in options:
             print("Please enter a valid move.")
             continue
+    # This could start an infinite loop
 
         # have the computer randomly select rock, paper, or scissors
         player_2_move = random.choice(options)
@@ -23,6 +25,8 @@ def play_game():
         print("Player 2 chooses " + player_2_move)
 
         # determine who the winner is, and adds to the score of the winner
+        # Ms. Ifft: I could have checked for a tie before line 26 by checking if
+        # player_1_move == player_2_move, to streamline the tie checks in if/elif branch.
         if player_1_move == "rock":
             if player_2_move == "rock":
                 print("Tie!")
@@ -87,6 +91,7 @@ def play_game():
     else:
         print("Bye!")
         print()
+    # Ms. Ifft: Validate the response.
 
 
 play_game()
