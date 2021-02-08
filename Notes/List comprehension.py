@@ -42,11 +42,13 @@ evens = [i for i in range(2, 11, 2)]
 print(evens)
 print()
 
+# (alex)
 n_squared = [(i, i**2) for i in range(10)]
 n_squared1 = [(i, j**2) for i in range(10) for j in range(i, i+1)]
 print(n_squared)
 print(n_squared1)
 print()
 
+# (aaron)
 evens2 = [i for i in range(1, 11) if i % 2 == 0]
 print(evens2)
