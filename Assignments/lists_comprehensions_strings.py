@@ -128,14 +128,35 @@ for q in range(75):
 print("First 75 elements of monty_python:", elements)
 
 # b) Using your string from part a) remove erroneous spaces before (and after) punctuation (2 pts)
-#print("Finish B !!!")
+# Note: I used this site to find the right methods: https://www.w3schools.com/python/python_ref_string.asp
+print()
+print("!!! Finish B !!! CITE SOURCE")
+print()
+'''
+for item in range(len(elements)):
+    if elements[item] == " " and elements[item-1] == "[":
+        elements[item] = ""
+'''
+
 for item in elements:
-    if item == " ":
-        elements.remove(item)
+    if item == "[ ":
+        item = "["
+    elif item == " ]":
+         item = "]"
+    elif item == " :":
+        item = " :"
+    elif item == " #":
+        item = "#"
+    elif item == " ,":
+        item = ","
+    elif item == " !":
+        item = "!"
+    elif item == " .":
+        item = "."
 print(elements)
+
 # Use list comprehensions to do the following with monty_python:
 # c) Make a list of the words in monty_python that are 12 or 13 characters long (2 pts)
-
 long_words = [word for word in monty_python if (len(word) == 12 or len(word) == 13)]
 print("Words in monty_python that are 12-13 characters long:", long_words)
 
