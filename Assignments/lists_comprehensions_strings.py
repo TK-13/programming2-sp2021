@@ -76,7 +76,7 @@ ten_copy.reverse()
 
 for r in range(10):
     top_ten.append(ten_copy[r])
-print("Top 10 highest values:", top_ten)
+print("Top 10 highest values in num_list:", top_ten)
 print()
 print()
 
@@ -85,31 +85,21 @@ print()
 # Use list comprehensions to do the following:
 # a) Make a list of numbers from 1 to 100 (2 pts)
 print("PROBLEM 3 (Using list comprehensions with numbers - 8 pts)")
-list_a = []
-for i in range(100):
-    list_a.append(int(i+1))
+list_a = [i for i in range(1, 101)]
 print("List of numbers from 1 to 100: ", list_a)
 
 # b) Make a list of even numbers from 20 to 40 (2 pts)
-list_b = []
-for i in range(19, 42):
-    if i % 2 == 0:
-        list_b.append(i)
+list_b = [ i for i in range(19, 42) if i % 2 == 0]
 print("Even #'s from 20 to 40: ", list_b)
 
 # c) Make a list of squares from 1 to 100 (1 ** 2 to 100 ** 2) (2 pts)
-list_c = []
-for i in range(100):
-    list_c.append(int((i+1) ** 2))
+list_c = [q**2 for q in range(1, 100)]
 print("List of squares from 1 to 100: ", list_c)
 
 # d) Make a list of all positive numbers in my_list below. (2 pts)
 my_list = [-77, -78, 82, 81, -40, 2, 62, 65, 74, 48, -37, -52, 90, -84, -79, -45, 47, 60, 35, -18]
 print("my_list:", my_list)
-list_d = []
-for i in my_list:
-    if i > 0:
-        list_d.append(i)
+list_d = [item for item in my_list if item > 0]
 print("Positive numbers in my_list:", list_d)
 
 # PROBLEM 4 (4 pts)
@@ -145,15 +135,12 @@ for item in elements:
 print(elements)
 # Use list comprehensions to do the following with monty_python:
 # c) Make a list of the words in monty_python that are 12 or 13 characters long (2 pts)
-long_words = []
-for c in monty_python:
-    if len(c) == 12 or len(c) == 13:
-        long_words.append(c)
-        if long_words.count(c) > 1:
-            long_words.remove(c)
 
+long_words = [word for word in monty_python if (len(word) == 12 or len(word) == 13)]
 print("Words in monty_python that are 12-13 characters long:", long_words)
 
 # d) Make a list of the lowercase version of the words in monty_python that appear in all caps (2 pts)
+all_caps = [char.lower() for char in monty_python if char != char.lower()]
+print("Words in monty_python in all-caps (made lowercase): ", all_caps)
 
 # ____________________________________________________________________________________________________________________ #
