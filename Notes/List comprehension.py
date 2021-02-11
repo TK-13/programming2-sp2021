@@ -7,11 +7,16 @@ squares = []
 for i in range(1, 11):
     squares.append(i**2)
 print(squares)
-
 # Comprehension
 squares = [i**2 for i in range(1, 11)]
-print(squares)
+print("Squares:", squares)
+divisible_by_2 = [i for i in squares if i%2 == 0]
+print("Squares divisible by two:", divisible_by_2)
+two_digit = [c for c in divisible_by_2 if len(str(i)) >= 2]
+print("Two-digit even squares:", two_digit)
 print()
+
+
 
 
 # List of all possible die rolls with two six-sided die, then without doubles
