@@ -11,12 +11,15 @@ import csv
 # RELATIVE -> ./test_file.txt or just test_file.txt
 
 # . = this directory and .. = parent directory
+# in notes, parent directory is Programming
 
 # ABSOLUTE -> /Users/bifft/PycharmProjects/programming2-sp2021/Resources/courses.txt
 # RELATIVE -> ../Resources/courses.txt
+#             parent folder >> resources >> courses.txt
 
 # TODO: show how refactor works with test_file.txt
-
+test = open("test_file.txt")
+# Right click: refactor >> move file: moves file to new directory, changes open() references
 
 # READING A TEXT FILE ------------------------------------------------
 
