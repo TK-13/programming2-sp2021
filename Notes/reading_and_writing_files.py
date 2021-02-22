@@ -18,28 +18,30 @@ import csv
 #             parent folder >> resources >> courses.txt
 
 # TODO: show how refactor works with test_file.txt
-test = open("test_file.txt")
+#test = open("test_file.txt")
 # Right click: refactor >> move file: moves file to new directory, changes open() references
 
 # READING A TEXT FILE ------------------------------------------------
 
-# you can only use read or readlines once...
-# then you will have to re-open the file
+# you can only use .read() or .readlines() once, then you will have to re-open the file. Like a typewriter;
+# you can't go backwards.
 
 # read the whole file into one string
-courses_file_for_read = open('../Resources/courses.txt')
-courses_content = courses_file_for_read.read()
-print(courses_content)
+courses_file_for_read = open('../Resources/courses.txt')        # opens file
+courses_content = courses_file_for_read.read()                  # reads contents into a variable
+print(courses_content)                                          # prints contents of file
 
 # read the file into a list, one list element for each line in the file
-courses_file_for_readlines = open('../Resources/courses.txt')
-courses = courses_file_for_readlines.readlines()
-print(courses)
-
+courses_file_for_readlines = open('../Resources/courses.txt')   # opens file
+courses = courses_file_for_readlines.readlines()                # makes each line an item in a list
+print(courses)                                                  # prints the list
+print(len(courses))
 
 # WRITING TO A TEXT FILE ----------------------------------------------
 
 # open a file in write or append mode
+# 'w' secondary argument sets to writing mode. Leaving blank defaults to reading mode. You can still read in
+# writing mode.
 
 names_file_for_writing = open('../Resources/names.txt', 'w')  # overrides whatever is currently in the file
 names_file_for_writing.write('Ms. Ifft\n')
