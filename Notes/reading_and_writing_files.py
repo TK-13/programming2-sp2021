@@ -81,7 +81,7 @@ names_file_for_appending.close()
 # reading the data into a list of lists
 roster_data = open('../Resources/roster.csv')
 reader = csv.reader(roster_data)
-roster_data_lists = list(reader)
+roster_data_lists = list(reader) # makes a list of lists by each row.
 print(roster_data_lists)
 roster_data.close()
 
