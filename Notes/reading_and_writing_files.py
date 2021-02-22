@@ -38,21 +38,26 @@ print(courses)                                                  # prints the lis
 print(len(courses))
 
 # WRITING TO A TEXT FILE ----------------------------------------------
+# https://docs.python.org/3/library/functions.html#open
 
 # open a file in write or append mode
 # 'w' secondary argument sets to writing mode. Leaving blank defaults to reading mode. You can still read in
-# writing mode.
+# read in writing mode.
 
-names_file_for_writing = open('../Resources/names.txt', 'w')  # overrides whatever is currently in the file
+# Write mode: overrides whatever is currently in the file
+names_file_for_writing = open('../Resources/names.txt', 'w')
 names_file_for_writing.write('Ms. Ifft\n')
 names_file_for_writing.write('Adrian\n')
 names_file_for_writing.write('Dale\n')
 names_file_for_writing.write('Lorenzo\n')
 names_file_for_writing.write('Rebecca\n')
 names_file_for_writing.write('Ryan\n')
-names_file_for_writing.close()
+names_file_for_writing.close()                                # Saves memory, good habit.
+# if you do not include \n, everything will be shoved together.
 
-names_file_for_appending = open('../Resources/names.txt', 'a')  # appends to the end of the file
+# open() can be used to create files that don't exist. (replace names with new)
+# Append mode: appends to the end of the file
+names_file_for_appending = open('../Resources/names.txt', 'a')
 names_file_for_appending.write('\n')
 names_file_for_appending.write('Aaron\n')
 names_file_for_appending.write('Alex\n')
@@ -60,11 +65,18 @@ names_file_for_appending.write('Ryan\n')
 names_file_for_appending.write('Tk\n')
 names_file_for_appending.close()
 
-
+'''
+'b' Binary mode: bytes are another type of python item. Useful for non-ascii characters 
+(mandarin, emoji)
+'x' Exclusive creation: won't overwrite if file already exists
+'+' redundant version of 'w' ?
+'''
 
 # https://automatetheboringstuff.com/2e/chapter16/
 
 # READING A CSV FILE (LISTS) ------------------------------------------
+# Comma-separated values (CSV). Ex: roster.csv. Can be opened in Excel as a spreadsheet.
+# vice-versa, Excel spreadsheets can be saved as a csv. Efficient for large amounts of data.
 
 # reading the data into a list of lists
 roster_data = open('../Resources/roster.csv')
