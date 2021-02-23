@@ -69,7 +69,7 @@ names_file_for_appending.close()
 'b' Binary mode: bytes are another type of python item. Useful for non-ascii characters 
 (mandarin, emoji)
 'x' Exclusive creation: won't overwrite if file already exists
-'+' redundant version of 'w' ?
+'+' Read and write
 '''
 
 # https://automatetheboringstuff.com/2e/chapter16/
@@ -111,7 +111,7 @@ output_file.close()
 
 
 # READING A CSV FILE (DICTS) ------------------------------------------
-
+# first row used to sort contents of following rows.
 class_data = open('my_output.csv')
 dict_reader = csv.DictReader(class_data)
 for row_dict in dict_reader:

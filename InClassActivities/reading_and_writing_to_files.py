@@ -8,7 +8,14 @@ Make sure the changes are saved back to courses.txt
 """
 
 # erase this and write your code here!
+courses_to_read = open('../Resources/courses.txt', "r")
+courses = courses_to_read.readlines()
+print(courses)
+for i in range(len(courses)):
+    if courses[i] == "Remotely Operated Vehicle Robotics" or courses[i] == "Robotics":
+        courses[i] == ""
 
+print(courses)
 
 
 """
