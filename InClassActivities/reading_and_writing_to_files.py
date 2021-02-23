@@ -8,15 +8,21 @@ Make sure the changes are saved back to courses.txt
 """
 
 # erase this and write your code here!
-courses_to_read = open('../Resources/courses.txt', "r")
-courses = courses_to_read.readlines()
-print(courses)
-for i in range(len(courses)):
-    if courses[i] == "Remotely Operated Vehicle Robotics" or courses[i] == "Robotics":
-        courses[i] == ""
 
-print(courses)
+original = open('../Resources/courses.txt', "r")
+read = original.readlines()
+print(read)
+new_courses = open('../Resources/courses2.txt', "w")
 
+for item in read:
+    if item != "Remotely Operated Vehicle Robotics\n" and item != "Robotics\n":
+        new_courses.write(str(item))
+
+new = open('../Resources/courses2.txt')
+reading_new = new.readlines()
+print(reading_new)
+original.close()
+new.close()
 
 """
 Activity 2 - separate tasks, then merge together

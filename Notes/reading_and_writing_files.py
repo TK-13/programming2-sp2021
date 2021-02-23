@@ -41,8 +41,7 @@ print(len(courses))
 # https://docs.python.org/3/library/functions.html#open
 
 # open a file in write or append mode
-# 'w' secondary argument sets to writing mode. Leaving blank defaults to reading mode. You can still read in
-# read in writing mode.
+# 'w' secondary argument sets to writing mode. Leaving blank defaults to reading mode.
 
 # Write mode: overrides whatever is currently in the file
 names_file_for_writing = open('../Resources/names.txt', 'w')
