@@ -64,3 +64,34 @@ from nltk.corpus import stopwords
 nltk.download('stopwords')
 stop_words = stopwords.words()
 
+# Used this: https://python-reference.readthedocs.io/en/latest/docs/str/rstrip.html
+
+transcript_b = open("/Users/tkmuro/PycharmProjects/tkProgramming/Assignments/FilesAndDictionaries/biden.txt")
+biden_read = transcript_b.read()
+punct_filtered = [item.strip(",.?!") for item in biden_read.split()]
+
+apostrophe_filtered = []
+for word in punct_filtered:
+    for letter in range(len(word)):
+        word = word.replace("'s", "").replace("'ve", "").replace("'ll", "").replace("'re", "").replace("'t", "").replace("'m", "")
+    apostrophe_filtered.append(word)
+
+stop_word_filtered = [word for word in apostrophe_filtered if word.lower() not in stop_words and word.lower() != '-']
+biden_list = [word.lower() for word in stop_word_filtered]
+print(biden_list)
+
+print()
+
+transcript_t = open("/Users/tkmuro/PycharmProjects/tkProgramming/Assignments/FilesAndDictionaries/trump.txt")
+trump_read = transcript_t.read()
+punct_filtered_t = [item.strip(",.?!") for item in trump_read.split()]
+
+apostrophe_filtered_t = []
+for word in punct_filtered_t:
+    for letter in range(len(word)):
+        word = word.replace("'s", "").replace("'ve", "").replace("'ll", "").replace("'re", "").replace("'t", "").replace("'m", "")
+    apostrophe_filtered_t.append(word)
+
+stop_word_filtered_t = [word for word in apostrophe_filtered_t if word.lower() not in stop_words and word.lower() != '-']
+trump_list = [word.lower() for word in stop_word_filtered_t]
+print(trump_list)
