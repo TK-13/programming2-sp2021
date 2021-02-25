@@ -87,14 +87,13 @@ print()
 
 transcript_t = open("/Users/tkmuro/PycharmProjects/tkProgramming/Assignments/FilesAndDictionaries/trump.txt")
 trump_read = transcript_t.read()
-punct_filtered_t = [item.strip(",.?!:") for item in trump_read.split()]
+punct_filtered_t = [item.strip().strip(",.?!:") for item in trump_read.split()]
+# the double .strip() was suggested by Ms. Ifft
 
 apostrophe_filtered_t = []
 for word in punct_filtered_t:
     for letter in range(len(word)):
-        word = word.replace("'s", "").replace("'ve", "").replace("'ll", "").replace("'re", "").replace("'t",
-                                                                                                       "").replace("'m",
-                                                                                                                   "")
+        word = word.replace("'s", "").replace("'ve", "").replace("'ll", "").replace("'re", "").replace("'t","").replace("'m","")
     apostrophe_filtered_t.append(word)
 
 stop_word_filtered_t = [word for word in apostrophe_filtered_t if
@@ -108,6 +107,8 @@ print("Trump list:", trump_list)
 print()
 
 from collections import Counter
+# Ms. Ifft: do it more manually, make dictionary and keep track.
+# reorder existing dictionary using counts... somehow. I can change it to not be a standard dictionary.
 
 biden_count = Counter(biden_list)
 print("Sorted Biden list, in descending order:", biden_count)
