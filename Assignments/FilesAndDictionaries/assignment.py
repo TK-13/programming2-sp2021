@@ -9,14 +9,14 @@ A common Python pattern to count objects, produce histograms, or update stats is
 For example, given a list of words, you can create a dictionary to store word counts and then iterate through the list of words, updating the dictionary count for each word each time you've seen it.
 '''
 
-
 # PSEUDO CODE
 # Get text from biden.txt and trump.txt and
 # split the transcripts into words - Use split and strip methods and store results in lists.
 # Remove the stop words from the transcripts by checking if the transcript words are in stop_words (8 pts)
+
 # Create dictionary objects to store the word counts
-# Iterate through the list/text of each speech and
-# update word counts on your dicts (7 pts)  {'word1': 5, 'word2': 2 ...}
+# Iterate through the list/text of each speech and update word counts on your dicts (7 pts)
+#    {'word1': 5, 'word2': 2 ...}
 # Sort words by counts in descending order (5 pts)  stackoverflow probably?
 # Create a text file with the following format:
 '''
@@ -61,6 +61,7 @@ us,25,2
 
 import nltk
 from nltk.corpus import stopwords
+
 nltk.download('stopwords')
 stop_words = stopwords.words()
 
@@ -73,25 +74,64 @@ punct_filtered = [item.strip(",.?!") for item in biden_read.split()]
 apostrophe_filtered = []
 for word in punct_filtered:
     for letter in range(len(word)):
-        word = word.replace("'s", "").replace("'ve", "").replace("'ll", "").replace("'re", "").replace("'t", "").replace("'m", "")
+        word = word.replace("'s", "").replace("'ve", "").replace("'ll", "").replace("'re", "").replace("'t",
+                                                                                                       "").replace("'m",
+                                                                                                                   "")
     apostrophe_filtered.append(word)
 
 stop_word_filtered = [word for word in apostrophe_filtered if word.lower() not in stop_words and word.lower() != '-']
 biden_list = [word.lower() for word in stop_word_filtered]
-print(biden_list)
+print("Biden list:", biden_list)
 
 print()
 
 transcript_t = open("/Users/tkmuro/PycharmProjects/tkProgramming/Assignments/FilesAndDictionaries/trump.txt")
 trump_read = transcript_t.read()
-punct_filtered_t = [item.strip(",.?!") for item in trump_read.split()]
+punct_filtered_t = [item.strip(",.?!:") for item in trump_read.split()]
 
 apostrophe_filtered_t = []
 for word in punct_filtered_t:
     for letter in range(len(word)):
-        word = word.replace("'s", "").replace("'ve", "").replace("'ll", "").replace("'re", "").replace("'t", "").replace("'m", "")
+        word = word.replace("'s", "").replace("'ve", "").replace("'ll", "").replace("'re", "").replace("'t",
+                                                                                                       "").replace("'m",
+                                                                                                                   "")
     apostrophe_filtered_t.append(word)
 
-stop_word_filtered_t = [word for word in apostrophe_filtered_t if word.lower() not in stop_words and word.lower() != '-']
+stop_word_filtered_t = [word for word in apostrophe_filtered_t if
+                        word.lower() not in stop_words and word.lower() != '-']
 trump_list = [word.lower() for word in stop_word_filtered_t]
-print(trump_list)
+print("Trump list:", trump_list)
+
+# For counting and sorting the words, I used this stack overflow discussion about the collections library.
+# https://stackoverflow.com/questions/4088265/sorted-word-frequency-count-using-python
+
+print()
+
+from collections import Counter
+
+biden_count = Counter(biden_list)
+print("Sorted Biden list, in descending order:", biden_count)
+
+trump_count = Counter(trump_list)
+print("Sorted Trump list, in descending order:", trump_count)
+
+
+'''
+# here's a sample of the original work i did, before consulting stack.
+# one thing i learned was how to sort lists using a function, which i attempted with sorting_function_b()
+# https://www.w3schools.com/python/ref_list_sort.asp
+
+biden_count = {}
+trump_count = {}
+
+
+def sorting_function_b(x):
+    return biden_list.count(x)
+
+
+for item in biden_list:
+    if item not in biden_count:
+        biden_count.update({item: biden_list.count(item)})
+
+print(biden_count)
+'''
