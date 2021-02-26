@@ -51,7 +51,8 @@ Write their answers and the correct answer to a file called answers.csv in the f
 User Answer,Correct Answer
 Sweden, Sweden
 Argentina, Colombia
-...
+'''
+
 
 
 TOGETHER:
@@ -78,3 +79,34 @@ function the same as it did with the list of lists.
 
 # erase this and write your code here!
 
+
+
+# Part 1 (alex)
+import csv
+countries_capitals = open('/Users/tkmuro/PycharmProjects/tkProgramming/Resources/countries_and_capitals.csv')
+reader = csv.reader(countries_capitals)
+dict_reader = list(csv.DictReader(countries_capitals))
+for item in dict_reader:
+    print(item)
+
+print(dict_reader[5]["Country"])
+
+#countries_capitals_list = list(reader)
+#countries_capitals_list.pop(0)
+
+# Part 2 (tk, but more collaborative)
+import random
+import pprint
+
+output_file = open('partner_activity.csv', 'w')
+output_writer = csv.writer(output_file)
+output_writer.writerow(['Country', 'Correct answer', 'User answer'])
+
+numbers = []
+for i in range(25):
+    number = random.randint(0, len(dict_reader))
+    while number in numbers:
+        number = random.randint(0, len(dict_reader))
+    user_answer = input("{0} is the capital of: ".format(dict_reader[number]["Capital"]))
+    output_writer.writerow([dict_reader[number]["Country"], dict_reader[number]["Capital"], str(user_answer)])
+    numbers.append(number)
