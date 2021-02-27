@@ -7,22 +7,16 @@ and Robotics, and replace them with a course called Engineering I: Introduction 
 Make sure the changes are saved back to courses.txt
 """
 
-# erase this and write your code here!
+original = open('/Users/tkmuro/PycharmProjects/tkProgramming/Resources/courses.txt', "r")
+read_original = original.readlines()
+print("Original Courses: ", read_original)
+appending_courses = open('/Users/tkmuro/PycharmProjects/tkProgramming/Resources/courses.txt', "w")
+for item in read_original:
+    if item != 'Remotely Operated Vehicle Robotics\n' and item != 'Robotics\n':
+        appending_courses.write(item)
+    if item == 'Robotics\n':
+        appending_courses.write('Engineering I: Introduction to Engineering\n')
 
-original = open('../Resources/courses.txt', "r")
-read = original.readlines()
-print(read)
-new_courses = open('../Resources/courses2.txt', "w")
-
-for item in read:
-    if item != "Remotely Operated Vehicle Robotics\n" and item != "Robotics\n":
-        new_courses.write(str(item))
-
-new = open('../Resources/courses2.txt')
-reading_new = new.readlines()
-print(reading_new)
-original.close()
-new.close()
 
 """
 Activity 2 - separate tasks, then merge together
@@ -51,8 +45,6 @@ Write their answers and the correct answer to a file called answers.csv in the f
 User Answer,Correct Answer
 Sweden, Sweden
 Argentina, Colombia
-'''
-
 
 
 TOGETHER:
@@ -74,11 +66,7 @@ For example:
 Although this is a structural change in your code, the functionality of your code should not change
 as a results of this modification. Please make all the necessary modifications for your code to 
 function the same as it did with the list of lists.
-
 """
-
-# erase this and write your code here!
-
 
 
 # Part 1 (alex)
@@ -91,12 +79,9 @@ for item in dict_reader:
 
 print(dict_reader[5]["Country"])
 
-#countries_capitals_list = list(reader)
-#countries_capitals_list.pop(0)
 
 # Part 2 (tk, but more collaborative)
 import random
-import pprint
 
 output_file = open('partner_activity.csv', 'w')
 output_writer = csv.writer(output_file)
