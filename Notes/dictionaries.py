@@ -16,7 +16,7 @@ for row_dict in dict_reader:
 """
 Question: From this print statement, what do you think a dictionary is?
 
-Answer: <insert your answer here>
+Answer: A dictionary is a way of reading csv's/sorting information by set categories.
 
 """
 
@@ -37,7 +37,9 @@ pprint(pet_dict)
 Question: What does pprint do? Why might you use it? What do you notice about key order, and
 what does that tell you?
 
-Answer: <insert your answer here>
+Answer: pprint prints dictionaries vertically, rather than horizontally like a normal print 
+statement. It seems to differentiate each line by the preestablished categories of the dictionary,
+and sorts them alphabetically.
 
 """
 
@@ -47,23 +49,34 @@ Answer: <insert your answer here>
 print("\n")
 print('pet_dict["Name"]:', pet_dict["Name"])
 
+
+print()
+my_dict = {}
+class_data = open('../Resources/roster.csv')
+dict_reader = csv.DictReader(class_data)
+for row_dict in dict_reader:
+    if row_dict["First Name"] == "TK":
+        my_dict = row_dict
+pprint(my_dict)
+
 """
 Question: Knowing this, how could you add code starting at line 15 to store the
 dictionary that corresponds to your information to a variable named my_dict?
 
 Answer: add your code above instead of answering here.
-
 """
 
 # let's see what happens when we try to access the Age of my pet
 # (feel free to comment this out later to not break your code--or fix it!)
 
-print('pet_dict["Age"]:', pet_dict["Age"])
+print()
+print('pet_dict["Age"]:', pet_dict.get("Age"))
 
 """
 Question: What happens, and what do you think it means?
 
-Answer: <insert your answer here>
+Answer: Because age isn't a specified category, there is no value associated with it, so python
+will throw an error.
 
 """
 
@@ -76,7 +89,9 @@ print(pet_dict.get("Age", "This key doesn't exist!!"))
 """
 Question: What do you think .get() does? What happens if we do or don't specify a second parameter?
 
-Answer: <insert your answer here>
+Answer: .get() seems similar to the try/except system, where it behaves like the code normally would
+without .get, but adds an extra countermeasure in case the code (or in this case, dictionary value access)
+doesn't work. Without a specified error message, it will just print "None."
 
 """
 
