@@ -1,4 +1,4 @@
-'''
+"""
 Inauguration Speeches (25 pts)
 This lab is largely review of: lists, comprehensions, and string methods.
 The new items here are reading and writing to files, and using a dictionary (dict).
@@ -7,7 +7,7 @@ Your job will be to find the 25 most common words in each speech (disregarding s
 Then you'll write your results to a txt file (see format below).
 A common Python pattern to count objects, produce histograms, or update stats is to make calls to a dictionary as you iterate through a list.
 For example, given a list of words, you can create a dictionary to store word counts and then iterate through the list of words, updating the dictionary count for each word each time you've seen it.
-'''
+"""
 
 # PSEUDO CODE
 # Get text from biden.txt and trump.txt and
@@ -67,72 +67,67 @@ stop_words = stopwords.words()
 
 # Used this: https://python-reference.readthedocs.io/en/latest/docs/str/rstrip.html
 
-transcript_b = open("/Users/tkmuro/PycharmProjects/tkProgramming/Assignments/FilesAndDictionaries/biden.txt")
-biden_read = transcript_b.read()
-punct_filtered = [item.strip(",.?!") for item in biden_read.split()]
 
-apostrophe_filtered = []
-for word in punct_filtered:
-    for letter in range(len(word)):
-        word = word.replace("'s", "").replace("'ve", "").replace("'ll", "").replace("'re", "").replace("'t",
-                                                                                                       "").replace("'m",
-                                                                                                                   "")
-    apostrophe_filtered.append(word)
+def filter(abs_path, name):
+    transcript = open(abs_path)
+    reading = transcript.read()
+    punct_filter = [item.strip("',.?!-") for item in reading.split()]
+    apostrophe_filter = []
+    for words in punct_filter:
+        for letters in range(len(words)):
+            words = words.replace("'s", "").replace("'ve", "").replace("'ll", "").replace("'re", "").replace("'t", "").replace("'m", "")
+        apostrophe_filter.append(words)
+    for item in apostrophe_filter:
+        if item.isnumeric():
+            apostrophe_filter.remove(item)
 
-stop_word_filtered = [word for word in apostrophe_filtered if word.lower() not in stop_words and word.lower() != '-']
-biden_list = [word.lower() for word in stop_word_filtered]
-print("Biden list:", biden_list)
+    stop_word_filter = [words for words in apostrophe_filter if words.lower() not in stop_words and words.lower() != '-']
+    global complete_list
+    complete_list = [words.lower() for words in stop_word_filter]
 
+    # print("{0} List:".format(name), complete_list)
+
+    # Appends each word and it's count to a dictionary, without redundant key entries.
+    tracking = []
+    counting_dictionary = {}
+    for item in complete_list:
+        if item not in tracking:
+            counting_dictionary[item] = complete_list.count(item)
+            tracking.append(item)
+
+    ''' For this section, I had to consult stackabuse
+    https://stackabuse.com/how-to-sort-dictionary-by-value-in-python/ '''
+    sorted_values = sorted(counting_dictionary.values())  # Sort the values
+    sorted_values.reverse()  # since the instructions call for descending order, the order of this
+    # list had to be reversed.
+    global sorted_dict
+    sorted_dict = {}
+    for i in sorted_values:
+        for k in counting_dictionary.keys():
+            if counting_dictionary[k] == i:
+                sorted_dict[k] = counting_dictionary[k]
+                # break
+                ''' this break value caused there to only be one key in sorted_dict with the associated
+                count, so that had to be removed. '''
+
+    print()
+    print(name, "Sorted Dictionary:")
+    for item in sorted_dict:
+        print(item, ":", sorted_dict[item])
+
+
+filter("/Users/tkmuro/PycharmProjects/tkProgramming/Assignments/FilesAndDictionaries/biden.txt", "Biden")
 print()
-
-transcript_t = open("/Users/tkmuro/PycharmProjects/tkProgramming/Assignments/FilesAndDictionaries/trump.txt")
-trump_read = transcript_t.read()
-punct_filtered_t = [item.strip().strip(",.?!:") for item in trump_read.split()]
-# the double .strip() was suggested by Ms. Ifft
-
-apostrophe_filtered_t = []
-for word in punct_filtered_t:
-    for letter in range(len(word)):
-        word = word.replace("'s", "").replace("'ve", "").replace("'ll", "").replace("'re", "").replace("'t","").replace("'m","")
-    apostrophe_filtered_t.append(word)
-
-stop_word_filtered_t = [word for word in apostrophe_filtered_t if
-                        word.lower() not in stop_words and word.lower() != '-']
-trump_list = [word.lower() for word in stop_word_filtered_t]
-print("Trump list:", trump_list)
-
-# For counting and sorting the words, I used this stack overflow discussion about the collections library.
-# https://stackoverflow.com/questions/4088265/sorted-word-frequency-count-using-python
-
 print()
+filter("/Users/tkmuro/PycharmProjects/tkProgramming/Assignments/FilesAndDictionaries/trump.txt", "Trump")
 
-from collections import Counter
-# Ms. Ifft: do it more manually, make dictionary and keep track.
-# reorder existing dictionary using counts... somehow. I can change it to not be a standard dictionary.
-
-biden_count = Counter(biden_list)
-print("Sorted Biden list, in descending order:", biden_count)
-
-trump_count = Counter(trump_list)
-print("Sorted Trump list, in descending order:", trump_count)
+# TODO: write the things to a file. Expectations above. Lol forgot physics homework.
 
 
-'''
-# here's a sample of the original work i did, before consulting stack.
-# one thing i learned was how to sort lists using a function, which i attempted with sorting_function_b()
-# https://www.w3schools.com/python/ref_list_sort.asp
-
-biden_count = {}
-trump_count = {}
-
-
-def sorting_function_b(x):
-    return biden_list.count(x)
-
-
-for item in biden_list:
-    if item not in biden_count:
-        biden_count.update({item: biden_list.count(item)})
-
-print(biden_count)
-'''
+"""
+Resources Used:
+https://docs.python.org/3/tutorial/datastructures.html?highlight=dictionary#dictionaries
+https://stackoverflow.com/questions/423379/using-global-variables-in-a-function
+https://docs.python.org/3/tutorial/datastructures.html#dictionaries
+https://stackabuse.com/how-to-sort-dictionary-by-value-in-python/
+"""
