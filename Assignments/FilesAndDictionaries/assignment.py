@@ -131,12 +131,16 @@ trump_sorted = sorted_dict
 #         print(trump_sorted[line])
 #         tally += 1
 
-for k, v in trump_sorted.items():
-    print(k, v)
+#print(trump_sorted.key(0))
 
 word_counts = open('/Users/tkmuro/PycharmProjects/tkProgramming/Assignments/FilesAndDictionaries/words.txt', 'w')
 
 word_counts.write("Top 25 Trump Words:\n")
+test_list = []
+test_list.append(trump_sorted)
+print(test_list)
+
+
 
 word_counts.write("\n")
 
