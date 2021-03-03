@@ -65,23 +65,33 @@ from nltk.corpus import stopwords
 nltk.download('stopwords')
 stop_words = stopwords.words()
 
+complete_list = []
+sorted_dict = {}
+
 # Used this: https://python-reference.readthedocs.io/en/latest/docs/str/rstrip.html
 
 
-def filter(abs_path, name):
+def thresh(abs_path, name):
     transcript = open(abs_path)
     reading = transcript.read()
-    punct_filter = [item.strip("', .?!-") for item in reading.split()]
+    punct_filter = [item.strip("', .?!- ") for item in reading.split()]
     apostrophe_filter = []
     for words in punct_filter:
         for letters in range(len(words)):
-            words = words.replace("'s", "").replace("'ve", "").replace("'ll", "").replace("'re", "").replace("'t", "").replace("'m", "")
+            words = words.replace("'s", "")\
+                .replace("'ve", "")\
+                .replace("'ll","")\
+                .replace("'re", "")\
+                .replace("'t", "")\
+                .replace("'m", "")\
+                .replace(" ", "")
         apostrophe_filter.append(words)
     for item in apostrophe_filter:
         if item.isnumeric():
             apostrophe_filter.remove(item)
 
-    stop_word_filter = [words for words in apostrophe_filter if words.lower() not in stop_words and words.lower() != '-']
+    stop_word_filter = [words for words in apostrophe_filter if
+                        words.lower() not in stop_words and words.lower() != '-']
     global complete_list
     complete_list = [words.lower() for words in stop_word_filter]
 
@@ -118,54 +128,43 @@ def filter(abs_path, name):
     '''
 
 
-filter("/Users/tkmuro/PycharmProjects/tkProgramming/Assignments/FilesAndDictionaries/biden.txt", "Biden")
+thresh("/Users/tkmuro/PycharmProjects/tkProgramming/Assignments/FilesAndDictionaries/biden.txt", "Biden")
 biden_sorted = sorted_dict
-filter("/Users/tkmuro/PycharmProjects/tkProgramming/Assignments/FilesAndDictionaries/trump.txt", "Trump")
+thresh("/Users/tkmuro/PycharmProjects/tkProgramming/Assignments/FilesAndDictionaries/trump.txt", "Trump")
 trump_sorted = sorted_dict
 
-# TODO: write the things to a file. Expectations above. Lol forgot physics homework.
+word_counts = open('/Users/tkmuro/PycharmProjects/tkProgramming/Assignments/FilesAndDictionaries/inaugural_counts.txt',
+                   'w')
 
-# tally = 0
-# for line in range(len(trump_sorted)):
-#     if line <= 25:
-#         print(trump_sorted[line])
-#         tally += 1
 
-#print(trump_sorted.key(0))
+def top_25(which_sorted):
+    key_list = []
+    value_list = []
+    for k, v in which_sorted.items():
+        key_list.append(k)
+        value_list.append(v)
 
-word_counts = open('/Users/tkmuro/PycharmProjects/tkProgramming/Assignments/FilesAndDictionaries/words.txt', 'w')
+    for i in range(25):
+        word_counts.write(str(i+1) + ". " + key_list[i] + " : " + str(value_list[i]) + "\n")
+
+
+def compare(target, comparison):
+    target_list = [item for item in target]
+    comp_list = [item for item in comparison]
+    print(target_list)
+    print(comp_list)
+
 
 word_counts.write("Top 25 Trump Words:\n")
-test_list = []
-test_list.append(trump_sorted)
-print(test_list)
-
-
-
+top_25(trump_sorted)
+word_counts.write("\n")
+word_counts.write("Top 25 Biden Words:\n")
+top_25(biden_sorted)
+word_counts.write("\n")
 word_counts.write("\n")
 
-word_counts.write("Top 25 Biden Words:\n")
-
-'''
-
-Top 25 Biden words:
-us: 25
-america: 17
-...
-
-Words in Trump, but not Biden:
-clinton
-bush
-obama
-...
-
-Words in Biden, but not Trump:
-vice-president
-harris
-speaker
-...
-'''
-
+word_counts.write("Words used by Trump, but not Biden:\n")
+compare(trump_sorted, biden_sorted)
 
 """
 Resources Used:
