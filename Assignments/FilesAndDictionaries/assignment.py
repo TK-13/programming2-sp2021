@@ -71,7 +71,7 @@ stop_words = stopwords.words()
 def filter(abs_path, name):
     transcript = open(abs_path)
     reading = transcript.read()
-    punct_filter = [item.strip("',.?!-") for item in reading.split()]
+    punct_filter = [item.strip("', .?!-") for item in reading.split()]
     apostrophe_filter = []
     for words in punct_filter:
         for letters in range(len(words)):
@@ -111,17 +111,56 @@ def filter(abs_path, name):
                 count, so that had to be removed. '''
 
     print()
+    '''
     print(name, "Sorted Dictionary:")
     for item in sorted_dict:
         print(item, ":", sorted_dict[item])
+    '''
 
 
 filter("/Users/tkmuro/PycharmProjects/tkProgramming/Assignments/FilesAndDictionaries/biden.txt", "Biden")
-print()
-print()
+biden_sorted = sorted_dict
 filter("/Users/tkmuro/PycharmProjects/tkProgramming/Assignments/FilesAndDictionaries/trump.txt", "Trump")
+trump_sorted = sorted_dict
 
 # TODO: write the things to a file. Expectations above. Lol forgot physics homework.
+
+# tally = 0
+# for line in range(len(trump_sorted)):
+#     if line <= 25:
+#         print(trump_sorted[line])
+#         tally += 1
+
+for k, v in trump_sorted.items():
+    print(k, v)
+
+word_counts = open('/Users/tkmuro/PycharmProjects/tkProgramming/Assignments/FilesAndDictionaries/words.txt', 'w')
+
+word_counts.write("Top 25 Trump Words:\n")
+
+word_counts.write("\n")
+
+word_counts.write("Top 25 Biden Words:\n")
+
+'''
+
+Top 25 Biden words:
+us: 25
+america: 17
+...
+
+Words in Trump, but not Biden:
+clinton
+bush
+obama
+...
+
+Words in Biden, but not Trump:
+vice-president
+harris
+speaker
+...
+'''
 
 
 """
