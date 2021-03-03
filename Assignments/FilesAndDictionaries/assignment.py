@@ -71,16 +71,16 @@ sorted_dict = {}
 # Used this: https://python-reference.readthedocs.io/en/latest/docs/str/rstrip.html
 
 
-def thresh(abs_path, name):
+def thresh(abs_path):
     transcript = open(abs_path)
     reading = transcript.read()
-    punct_filter = [item.strip("', .?!- ") for item in reading.split()]
+    punct_filter = [item.strip("', .?:!- ") for item in reading.split()]
     apostrophe_filter = []
     for words in punct_filter:
         for letters in range(len(words)):
             words = words.replace("'s", "")\
                 .replace("'ve", "")\
-                .replace("'ll","")\
+                .replace("'ll", "")\
                 .replace("'re", "")\
                 .replace("'t", "")\
                 .replace("'m", "")\
@@ -119,18 +119,11 @@ def thresh(abs_path, name):
                 # break
                 ''' this break value caused there to only be one key in sorted_dict with the associated
                 count, so that had to be removed. '''
-
     print()
-    '''
-    print(name, "Sorted Dictionary:")
-    for item in sorted_dict:
-        print(item, ":", sorted_dict[item])
-    '''
 
-
-thresh("/Users/tkmuro/PycharmProjects/tkProgramming/Assignments/FilesAndDictionaries/biden.txt", "Biden")
+thresh("/Users/tkmuro/PycharmProjects/tkProgramming/Assignments/FilesAndDictionaries/biden.txt")
 biden_sorted = sorted_dict
-thresh("/Users/tkmuro/PycharmProjects/tkProgramming/Assignments/FilesAndDictionaries/trump.txt", "Trump")
+thresh("/Users/tkmuro/PycharmProjects/tkProgramming/Assignments/FilesAndDictionaries/trump.txt")
 trump_sorted = sorted_dict
 
 word_counts = open('/Users/tkmuro/PycharmProjects/tkProgramming/Assignments/FilesAndDictionaries/inaugural_counts.txt',
@@ -151,8 +144,9 @@ def top_25(which_sorted):
 def compare(target, comparison):
     target_list = [item for item in target]
     comp_list = [item for item in comparison]
-    print(target_list)
-    print(comp_list)
+    for item in target_list:
+        if item not in comp_list:
+            word_counts.write(item + "\n")
 
 
 word_counts.write("Top 25 Trump Words:\n")
@@ -165,6 +159,10 @@ word_counts.write("\n")
 
 word_counts.write("Words used by Trump, but not Biden:\n")
 compare(trump_sorted, biden_sorted)
+word_counts.write("\n")
+word_counts.write("Words used by Biden, but not Trump:\n")
+compare(biden_sorted, trump_sorted)
+
 
 """
 Resources Used:
