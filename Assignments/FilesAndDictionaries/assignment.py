@@ -121,13 +121,13 @@ def thresh(abs_path):
                 count, so that had to be removed. '''
     print()
 
+
 thresh("/Users/tkmuro/PycharmProjects/tkProgramming/Assignments/FilesAndDictionaries/biden.txt")
 biden_sorted = sorted_dict
 thresh("/Users/tkmuro/PycharmProjects/tkProgramming/Assignments/FilesAndDictionaries/trump.txt")
 trump_sorted = sorted_dict
 
-word_counts = open('/Users/tkmuro/PycharmProjects/tkProgramming/Assignments/FilesAndDictionaries/inaugural_counts.txt',
-                   'w')
+word_counts = open('/Users/tkmuro/PycharmProjects/tkProgramming/Assignments/FilesAndDictionaries/inaugural_counts.txt', 'w')
 
 
 def top_25(which_sorted):

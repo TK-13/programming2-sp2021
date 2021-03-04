@@ -19,6 +19,15 @@ slogans = {
 }
 
 keys_to_extract = ["McDonald's", "Nike", "Toyota"]
+extracted = {}
 
 # insert your code here :)
 
+for key in slogans.keys():
+    if key in keys_to_extract:
+        print(key)
+        extracted[key] = slogans[key]
+        # slogans.pop(key)
+
+print(extracted)
+print(slogans)
