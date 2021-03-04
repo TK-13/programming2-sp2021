@@ -49,7 +49,7 @@ and sorts them alphabetically.
 print("\n")
 print('pet_dict["Name"]:', pet_dict["Name"])
 
-
+# My Code
 print()
 my_dict = {}
 class_data = open('../Resources/roster.csv')
@@ -107,7 +107,7 @@ print(pet_dict["Age"])
 """
 Question: What can you gather about the types of variables within a dictionary?
 
-Answer: <insert your answer here>
+Answer: The keys seem to have to be strings, but the associated values can be strings or integers.
 
 """
 
@@ -122,7 +122,9 @@ Question: What do you notice about the Age value(s) in the dict, and what does t
 about how many entries per key a dictionary can have? What might you do if you want to store
 multiple entries under one key?
 
-Answer: <insert your answer here>
+Answer: Dictionaries can only have one entry per key. If a key's value is re-declared as something else, it changes
+the original value rather than adding a new key. To store multiple entries under one key, we could probably use a list
+or even another dictionary.
 
 """
 
@@ -137,7 +139,37 @@ okay, you learned a lot! now complete the following steps:
 6. try out or add anything else to my_dict that would help you in understanding dictionaries
 """
 
-# erase this and insert your code for steps 1 through 5 here :)
+print()
+print()
+print("Step 1: ")
+print(my_dict)
+print()
+pprint(my_dict)
+
+print()
+print("Step 2:")
+print(my_dict["First Name"], my_dict["Last Name"])
+
+print()
+print("Step 3:")
+my_dict["Age"] = 18
+print(my_dict)
+
+print()
+print("Step 4:")
+my_dict["Age"] = 19
+print(my_dict)
+
+print()
+print("Step 5:")
+print(my_dict.get("Birthday", "That key does not exist. *insert joke here*"))
+
+print()
+print("Step 6:")
+my_dict["Favorite Animals"] = ["Red Panda", "Tardigrade", "Cat"]
+print("First favorite: ", my_dict["Favorite Animals"][0])
+for item in my_dict["Favorite Animals"]:
+    print(item)
 
 
 # the last thing we need to learn is how to iterate over dictionaries
@@ -147,22 +179,18 @@ print("\nIterating over dictionaries\n")
 
 for key in pet_dict:
     print(key, ":", pet_dict[key])
-
 print()
 
 for key in pet_dict.keys():
     print(key, ":", pet_dict[key])
-
 print()
 
 for value in pet_dict.values():
     print(value)
-
 print()
 
 for key, value in pet_dict.items():
     print(key, ":", value)
-
 print()
 
 
@@ -175,7 +203,3 @@ Answer: <insert your answer here>
 """
 
 # now write some code below to iterate over my_dict
-
-
-
-
