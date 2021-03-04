@@ -74,7 +74,8 @@ sorted_dict = {}
 def thresh(abs_path):
     transcript = open(abs_path)
     reading = transcript.read()
-    punct_filter = [item.strip("', .?:!- ") for item in reading.split()]
+    punct_filter = [item.strip("',.?:! ") for item in reading.split()]
+    print("punct: ", punct_filter)
     apostrophe_filter = []
     for words in punct_filter:
         for letters in range(len(words)):
@@ -89,11 +90,14 @@ def thresh(abs_path):
     for item in apostrophe_filter:
         if item.isnumeric():
             apostrophe_filter.remove(item)
+    print("apostrophes: ", apostrophe_filter)
 
     stop_word_filter = [words for words in apostrophe_filter if
                         words.lower() not in stop_words and words.lower() != '-']
+    print("stopwords: ", stop_word_filter)
     global complete_list
     complete_list = [words.lower() for words in stop_word_filter]
+    print("complete: ", complete_list)
 
     # print("{0} List:".format(name), complete_list)
 
@@ -124,12 +128,17 @@ def thresh(abs_path):
 
 thresh("/Users/tkmuro/PycharmProjects/tkProgramming/Assignments/FilesAndDictionaries/biden.txt")
 biden_sorted = sorted_dict
-thresh("/Users/tkmuro/PycharmProjects/tkProgramming/Assignments/FilesAndDictionaries/trump.txt")
-trump_sorted = sorted_dict
+# TODO: the dashes in Biden's speech are causing the 10 blankspaces. They're removed from the punct_filter, but now they're part of the word counts
 
-word_counts = open('/Users/tkmuro/PycharmProjects/tkProgramming/Assignments/FilesAndDictionaries/inaugural_counts.txt', 'w')
+# thresh("/Users/tkmuro/PycharmProjects/tkProgramming/Assignments/FilesAndDictionaries/trump.txt")
+# trump_sorted = sorted_dict
+
+print(biden_sorted)
+
+# word_counts = open('/Users/tkmuro/PycharmProjects/tkProgramming/Assignments/FilesAndDictionaries/inaugural_counts.txt', 'w')
 
 
+'''
 def top_25(which_sorted):
     key_list = []
     value_list = []
@@ -162,7 +171,7 @@ compare(trump_sorted, biden_sorted)
 word_counts.write("\n")
 word_counts.write("Words used by Biden, but not Trump:\n")
 compare(biden_sorted, trump_sorted)
-
+'''
 
 """
 Resources Used:
