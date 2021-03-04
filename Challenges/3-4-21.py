@@ -29,5 +29,6 @@ for key in slogans.keys():
         extracted[key] = slogans[key]
         # slogans.pop(key)
 
+
 print(extracted)
 print(slogans)
