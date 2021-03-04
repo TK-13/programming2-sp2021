@@ -66,6 +66,7 @@ dictionary that corresponds to your information to a variable named my_dict?
 Answer: add your code above instead of answering here.
 """
 
+
 # let's see what happens when we try to access the Age of my pet
 # (feel free to comment this out later to not break your code--or fix it!)
 
@@ -107,7 +108,7 @@ print(pet_dict["Age"])
 """
 Question: What can you gather about the types of variables within a dictionary?
 
-Answer: The keys seem to have to be strings, but the associated values can be strings or integers.
+Answer: The keys seem to need to be strings, but the associated values can be strings or integers.
 
 """
 
@@ -125,7 +126,6 @@ multiple entries under one key?
 Answer: Dictionaries can only have one entry per key. If a key's value is re-declared as something else, it changes
 the original value rather than adding a new key. To store multiple entries under one key, we could probably use a list
 or even another dictionary.
-
 """
 
 
@@ -177,18 +177,22 @@ for item in my_dict["Favorite Animals"]:
 
 print("\nIterating over dictionaries\n")
 
+# Iterates through every key in the dictionary.
 for key in pet_dict:
     print(key, ":", pet_dict[key])
 print()
 
+# Ditto, but maybe the search is more efficient?
 for key in pet_dict.keys():
     print(key, ":", pet_dict[key])
 print()
 
+# Iterates through all entry values in dictionary.
 for value in pet_dict.values():
     print(value)
 print()
 
+# Iterates through every key-value pair in the dictionary.
 for key, value in pet_dict.items():
     print(key, ":", value)
 print()
@@ -198,8 +202,23 @@ print()
 Question: What are the different ways for iterating over a dictionary, and when might each
 one be useful?
 
-Answer: <insert your answer here>
+Answer: Dictionaries can be iterated over by their keys, their values, or both. 
+
+Iterating over each key could be useful when you only need to know the sorting categories, maybe if you need to reset 
+all the values in a dictionary. 
+
+Alternatively, iterating over each value could be useful if you don't know/need the categories (not sure what scenario 
+would require that). 
+
+Using .items() to iterate through each key-value pair seems to be the most efficient option; even
+if you want to find a specific value and replace it, using .values() would't tell you which key contains the desired
+value, so you would have to use .items() or .keys().
 
 """
 
 # now write some code below to iterate over my_dict
+for k, v in my_dict.items():
+    if k == "Favorite Animals":
+        print("Their", k, "are", v)
+    else:
+        print("Their", k, "is", v)
