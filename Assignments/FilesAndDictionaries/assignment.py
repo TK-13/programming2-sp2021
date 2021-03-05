@@ -60,6 +60,7 @@ us,25,2
 # --------------------------------------------------------------------------------------------------
 
 import nltk
+import csv
 from nltk.corpus import stopwords
 
 nltk.download('stopwords')
@@ -86,6 +87,8 @@ def thresh(abs_path):
                 .replace("'t", "")\
                 .replace("'m", "")\
                 .replace(" ", "")
+        if words == "-":
+            punct_filter.remove(words)
         apostrophe_filter.append(words)
     for item in apostrophe_filter:
         if item.isnumeric():
@@ -109,7 +112,7 @@ def thresh(abs_path):
             counting_dictionary[item] = complete_list.count(item)
             tracking.append(item)
 
-    ''' For this section, I had to consult stackabuse
+    ''' For this section, I had to consult stackabuse, and modified their code a bit.
     https://stackabuse.com/how-to-sort-dictionary-by-value-in-python/ '''
     sorted_values = sorted(counting_dictionary.values())  # Sort the values
     sorted_values.reverse()  # since the instructions call for descending order, the order of this
@@ -128,17 +131,11 @@ def thresh(abs_path):
 
 thresh("/Users/tkmuro/PycharmProjects/tkProgramming/Assignments/FilesAndDictionaries/biden.txt")
 biden_sorted = sorted_dict
-# TODO: the dashes in Biden's speech are causing the 10 blankspaces. They're removed from the punct_filter, but now they're part of the word counts
-
-# thresh("/Users/tkmuro/PycharmProjects/tkProgramming/Assignments/FilesAndDictionaries/trump.txt")
-# trump_sorted = sorted_dict
-
-print(biden_sorted)
-
-# word_counts = open('/Users/tkmuro/PycharmProjects/tkProgramming/Assignments/FilesAndDictionaries/inaugural_counts.txt', 'w')
+thresh("/Users/tkmuro/PycharmProjects/tkProgramming/Assignments/FilesAndDictionaries/trump.txt")
+trump_sorted = sorted_dict
+word_counts = open('/Users/tkmuro/PycharmProjects/tkProgramming/Assignments/FilesAndDictionaries/inaugural_counts.txt', 'w')
 
 
-'''
 def top_25(which_sorted):
     key_list = []
     value_list = []
@@ -171,7 +168,7 @@ compare(trump_sorted, biden_sorted)
 word_counts.write("\n")
 word_counts.write("Words used by Biden, but not Trump:\n")
 compare(biden_sorted, trump_sorted)
-'''
+
 
 """
 Resources Used:
@@ -180,3 +177,16 @@ https://stackoverflow.com/questions/423379/using-global-variables-in-a-function
 https://docs.python.org/3/tutorial/datastructures.html#dictionaries
 https://stackabuse.com/how-to-sort-dictionary-by-value-in-python/
 """
+
+# Extra Credit
+print()
+counts_csv = open('/Users/tkmuro/PycharmProjects/tkProgramming/Assignments/FilesAndDictionaries/inaugural_counts.csv', 'w')
+writing_counts = csv.writer(counts_csv)
+writing_counts.writerow(['Word:', 'Biden Count', 'Trump Count'])
+
+# This doesn't work.
+combined_dict = biden_sorted + trump_sorted
+print(combined_dict)
+
+# for k, v in biden_sorted.items():
+#     writing_counts.writerow([k, v, ''])
