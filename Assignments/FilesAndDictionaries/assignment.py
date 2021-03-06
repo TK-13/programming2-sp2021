@@ -61,6 +61,7 @@ us,25,2
 
 import nltk
 import csv
+from pprint import pprint
 from nltk.corpus import stopwords
 
 nltk.download('stopwords')
@@ -129,11 +130,11 @@ def thresh(abs_path):
     print()
 
 
-thresh("/Users/tkmuro/PycharmProjects/tkProgramming/Assignments/FilesAndDictionaries/biden.txt")
+thresh("../FilesAndDictionaries/biden.txt")
 biden_sorted = sorted_dict
-thresh("/Users/tkmuro/PycharmProjects/tkProgramming/Assignments/FilesAndDictionaries/trump.txt")
+thresh("../FilesAndDictionaries/trump.txt")
 trump_sorted = sorted_dict
-word_counts = open('/Users/tkmuro/PycharmProjects/tkProgramming/Assignments/FilesAndDictionaries/inaugural_counts.txt', 'w')
+word_counts = open('../FilesAndDictionaries/inaugural_counts.txt', 'w')
 
 
 def top_25(which_sorted):
@@ -170,6 +171,35 @@ word_counts.write("Words used by Biden, but not Trump:\n")
 compare(biden_sorted, trump_sorted)
 
 
+
+# Extra Credit
+print()
+counts_csv = open('../FilesAndDictionaries/inaugural_counts.csv', 'w')
+writing_counts = csv.writer(counts_csv)
+writing_counts.writerow(['Word:', 'Biden Count', 'Trump Count', 'Both Count'])
+
+combined_dict = {}
+for k, v in biden_sorted.items():
+    combined_dict[k] = v
+for kt, vt in trump_sorted.items():
+    if kt not in combined_dict:
+        combined_dict[kt] = vt
+    else:
+        combined_dict[kt] += vt
+
+''' Reused the modified code from stackabuse. '''
+sorted_values = sorted(combined_dict.values())
+sorted_values.reverse()
+sorted_dict = {}
+for i in sorted_values:
+    for k in combined_dict.keys():
+        if combined_dict[k] == i:
+            sorted_dict[k] = combined_dict[k]
+
+for i in sorted_dict:
+    writing_counts.writerow([i, biden_sorted.get(i, 0), trump_sorted.get(i, 0), sorted_dict[i]])
+
+
 """
 Resources Used:
 https://docs.python.org/3/tutorial/datastructures.html?highlight=dictionary#dictionaries
@@ -177,16 +207,3 @@ https://stackoverflow.com/questions/423379/using-global-variables-in-a-function
 https://docs.python.org/3/tutorial/datastructures.html#dictionaries
 https://stackabuse.com/how-to-sort-dictionary-by-value-in-python/
 """
-
-# Extra Credit
-print()
-counts_csv = open('/Users/tkmuro/PycharmProjects/tkProgramming/Assignments/FilesAndDictionaries/inaugural_counts.csv', 'w')
-writing_counts = csv.writer(counts_csv)
-writing_counts.writerow(['Word:', 'Biden Count', 'Trump Count'])
-
-# This doesn't work.
-combined_dict = biden_sorted + trump_sorted
-print(combined_dict)
-
-# for k, v in biden_sorted.items():
-#     writing_counts.writerow([k, v, ''])
