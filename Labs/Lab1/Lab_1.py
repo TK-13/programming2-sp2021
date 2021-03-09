@@ -1,99 +1,37 @@
 from pprint import pprint
 import csv
 
-schedule_dict = {
-    "03/08/2021": [{"Event Name": "Comedy and Literature",
-                    "Start Time": "8:10",
-                    "End Time": "9:00"},
-                   {"Event Name": "Calculus",
-                    "Start Time": "10:05",
-                    "End Time": "10:55"},
-                   {"Event Name": "Programming II",
-                    "Start Time": "12:30",
-                    "End Time": "1:20"},
-                   {"Event Name": "Computer Animation",
-                    "Start Time": "2:25",
-                    "End Time": "3:15"},
-                   {"Event Name": "Senior Seminar",
-                    "Start Time": "3:20",
-                    "End Time": "4:10"}
-                   ],
-    "03/09/2021": [{"Event Name": "Programming II",
-                    "Start Time": "8:10",
-                    "End Time": "9:00"},
-                   {"Event Name": "Computer Animation",
-                    "Start Time": "10:05",
-                    "End Time": "10:55"},
-                   {"Event Name": "Calculus",
-                    "Start Time": "12:30",
-                    "End Time": "1:20"},
-                   {"Event Name": "Comedy and Literature",
-                    "Start Time": "1:25",
-                    "End Time": "2:15"}
-                   ],
-    "03/10/2021": [{"Event Name": "Gym D",
-                    "Start Time": "8:45",
-                    "End Time": "9:00"},
-                   {"Event Name": "Student Government",
-                    "Start Time": "10:00",
-                    "End Time": "10:45"},
-                   {"Event Name": "Graderoom",
-                    "Start Time": "1:05",
-                    "End Time": "1:45"},
-                   {"Event Name": "Advisory",
-                    "Start Time": "1:50",
-                    "End Time": "2:30"},
-                   {"Event Name": "Robotics",
-                    "Start Time": "3:45",
-                    "End Time": "4:35"}
-                   ],
-    "03/11/2021": [{"Event Name": "Calculus",
-                    "Start Time": "8:10",
-                    "End Time": "9:00"},
-                   {"Event Name": "Comedy and Literature",
-                    "Start Time": "9:05",
-                    "End Time": "9:55"},
-                   {"Event Name": "Advanced Topics in Physics",
-                    "Start Time": "11:00",
-                    "End Time": "11:50"},
-                   {"Event Name": "Computer Animation",
-                    "Start Time": "1:25",
-                    "End Time": "2:15"},
-                   {"Event Name": "Programming II",
-                    "Start Time": "2:25",
-                    "End Time": "3:20"}
-                   ],
-    "03/12/2021": [{"Event Name": "Computer Animation",
-                    "Start Time": "9:05",
-                    "End Time": "9:55"},
-                   {"Event Name": "Programming II",
-                    "Start Time": "11:00",
-                    "End Time": "11:50"},
-                   {"Event Name": "Comedy and Literature",
-                    "Start Time": "1:25",
-                    "End Time": "2:15"},
-                   {"Event Name": "Calculus",
-                    "Start Time": "2:25",
-                    "End Time": "3:20"}
-                   ]
-}
+schedule_reader = open('/Users/tkmuro/PycharmProjects/tkProgramming/Labs/Lab1/my_schedule.csv', 'r')
+dict_reader = csv.DictReader(schedule_reader)
+schedule_list = []
+for row in dict_reader:
+    # print(row)
+    schedule_list.append(row)
 
-#pprint(schedule_dict)
+# for i in schedule_list:
+#     print(i)
+#     print(type(i))
 
-schedule_csv = open('my_schedule.csv', 'w')
-writer = csv.writer(schedule_csv)
-writer.writerow(["Date", " Event", " Start Time", " End Time"])
-for k, v in schedule_dict.items():
-    for event in range(len(schedule_dict[k])):
-        writer.writerow([k, schedule_dict[k][event]["Event Name"], schedule_dict[k][event]["Start Time"], schedule_dict[k][event]["End Time"]])
-    writer.writerow("")
+# print(schedule_list[1])
+# for k, v in schedule_list[1].items():
+#     print(k, v)
+
+def conflict_check(date, time):
+    for row in range(len(schedule_list)):
+        if schedule_list[row]['Date'] == str(date):
+            if schedule_list[row]['Start Time'] == time:
+                print("That time is not available.")
+            else:
+                print("That time is open.")
+
+# date = input("What row do you want to check? ")
+# check_time = input("What time do you want to check? ")
+# if schedule_list[int(date)]['Start Time'] == check_time:
+#     print("No")
+# else:
+#     print("Yes")
+# print(schedule_list[0]['Start Time'])
+# print(dict_reader["03/08/2021"])
 
 
-# schedule_reader = open('/Users/tkmuro/PycharmProjects/tkProgramming/Labs/Lab1/my_schedule.csv', 'r')
-# dict_reader = csv.DictReader(schedule_reader)
-for k, v in schedule_dict.items():
-    for event in range(len(schedule_dict[k])):
-        print(k, schedule_dict[k][event]["Event Name"], schedule_dict[k][event]["Start Time"], schedule_dict[k][event]["End Time"])
-
-
-# conflict_check('my_schedule.csv')
+conflict_check('03/08/2021', '8:10')
