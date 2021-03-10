@@ -6,6 +6,8 @@ dict_reader = csv.DictReader(schedule_reader)
 schedule_list = list(csv.DictReader(schedule_reader))
 
 print("Check 1 ", schedule_list)
+for j in range(len(schedule_list)):
+    print(j, schedule_list[j]["Start Time"])
 
 new_start = ""
 conflict_list = []
@@ -13,15 +15,22 @@ conflict_list = []
 
 def conflict_check(date):
     global conflict_list
+    removed_tally = 0
     for i in range(len(schedule_list)):
-        start_time = schedule_list[i]['Start Time']
+        start_time = schedule_list[i - removed_tally]['Start Time']
         conflict_list.append(start_time)
-        if schedule_list[i]['Date'] == str(date):
+        if schedule_list[i - removed_tally]['Date'] == str(date):
             if conflict_list.count(start_time) >= 2:
                 print("{0} is not available.".format(start_time))
+                print("Events during {0}: ".format(start_time))
                 res_not_done = True
+                for w in range(len(schedule_list)):
+                    if schedule_list[w - removed_tally]['Date'] == str(date) and conflict_list.count(schedule_list[w - removed_tally]['Start Time']) >= 2:
+                        print(schedule_list[w - removed_tally]['Event'])
+
                 while res_not_done:
-                    reschedule = input("Would you like to cancel or reschedule {0}? (r/c) ".format(schedule_list[i]['Event']))
+                    target_event = input("Which event would you like to change? ")
+                    reschedule = input("Would you like to cancel or reschedule {0}? (r/c) ".format(target_event))
                     if reschedule.lower() == "r":
                         res_not_done = False
                         global new_start
@@ -29,27 +38,21 @@ def conflict_check(date):
                         new_start = input("New start time: ")
                         schedule_list[i]["Start Time"] = new_start
                         new_end = input("New end time: ")
-                        schedule_list[i]["End Time"] = new_end
+                        schedule_list[i - removed_tally]["End Time"] = new_end
                         break
                     elif reschedule.lower() == "c":
                         res_not_done = False
-                        schedule_list[i].remove()
+                        print(schedule_list[i - removed_tally])
+                        crosshair = schedule_list.index(target_event) # TODO: this doesn't work. How can I work backwards from target_event to the list index containing the correct dictionary?
+                        schedule_list.remove(crosshair)
+                        removed_tally += 1
 
 
 print("Check 2 ", schedule_list)
 
-# date = input("What row do you want to check? ")
-# check_time = input("What time do you want to check? ")
-# if schedule_list[int(date)]['Start Time'] == check_time:
-#     print("No")
-# else:
-#     print("Yes")
-# print(schedule_list[0]['Start Time'])
-# print(dict_reader["03/08/2021"])
 
 conflict_check('03/08/2021')
-# print(schedule_list)
-# print(new_start)
+
 
 schedule_csv = open('/Users/tkmuro/PycharmProjects/tkProgramming/Labs/Lab1/my_schedule.csv', 'w')
 writer = csv.writer(schedule_csv)
