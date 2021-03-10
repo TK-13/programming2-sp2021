@@ -5,9 +5,9 @@ schedule_reader = open('/Users/tkmuro/PycharmProjects/tkProgramming/Labs/Lab1/my
 dict_reader = csv.DictReader(schedule_reader)
 schedule_list = list(csv.DictReader(schedule_reader))
 
-print("Check 1 ", schedule_list)
-for j in range(len(schedule_list)):
-    print(j, schedule_list[j]["Start Time"])
+# print("Check 1 ", schedule_list)
+# for j in range(len(schedule_list)):
+#     print(j, schedule_list[j]["Start Time"])
 
 new_start = ""
 conflict_list = []
@@ -46,13 +46,27 @@ def conflict_check(date):
                         crosshair = schedule_list.index(target_event) # TODO: this doesn't work. How can I work backwards from target_event to the list index containing the correct dictionary?
                         schedule_list.remove(crosshair)
                         removed_tally += 1
+                        
+
+def days_events(date):
+    print("On {0}, you have the following events: ".format(date))
+    for d in range(len(schedule_list)):
+        if schedule_list[d]['Date'] == str(date):
+            print("   {0} at {1}.".format(schedule_list[d]['Event'], schedule_list[d]['Start Time']))
 
 
-print("Check 2 ", schedule_list)
+def next_three(date, current_time):
+    print("Your next three events are: ")
+    for d in range(len(schedule_list)):
+        if schedule_list[d]['Date'] == str(date):
+            print("   {0} at {1}.".format(schedule_list[d]['Event'], schedule_list[d]['Start Time']))
 
 
-conflict_check('03/08/2021')
+next_three_date = input("What is today's date? ")
+next_three_time = input("What is the current time? ")
+next_three(next_three_date, next_three_date)
 
+# conflict_check('03/08/2021')
 
 schedule_csv = open('/Users/tkmuro/PycharmProjects/tkProgramming/Labs/Lab1/my_schedule.csv', 'w')
 writer = csv.writer(schedule_csv)
