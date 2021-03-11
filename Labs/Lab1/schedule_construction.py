@@ -1,5 +1,9 @@
 import csv
 
+
+''' This file will create the starter schedule, which can then be manipulated as necessary. I had to make it a separate
+file because, whenever I ran this code in Lab_1.py, the schedule_list would just be blank. '''
+
 schedule_dict = {
     "03/08/2021": [{"Event Name": "Comedy and Literature",
                     "Start Time": "08:10",
