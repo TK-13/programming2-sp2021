@@ -62,15 +62,24 @@ def next_three(date, current_time):
             print("   {0} at {1}.".format(schedule_list[d]['Event'], schedule_list[d]['Start Time']))
 
 
-next_three_date = input("What is today's date? ")
-next_three_time = input("What is the current time? ")
-next_three(next_three_date, next_three_date)
+# next_three_date = input("What is today's date? ")
+# next_three_time = input("What is the current time? ")
+# next_three(next_three_date, next_three_date)
 
 # conflict_check('03/08/2021')
 
-schedule_csv = open('/Users/tkmuro/PycharmProjects/tkProgramming/Labs/Lab1/my_schedule.csv', 'w')
+print(schedule_list[5]["Event"])
+print(schedule_list)
+print()
+test_time = "09:20"
+for item in range(len(schedule_list)):
+    if schedule_list[item]['Date'] == '03/08/2021':
+        print(schedule_list[item])
+
+'''schedule_csv = open('/Users/tkmuro/PycharmProjects/tkProgramming/Labs/Lab1/my_schedule.csv', 'w')
 writer = csv.writer(schedule_csv)
 writer.writerow(["Date", "Event", "Start Time", "End Time"])
 for x in range(len(schedule_list)):
     # print(schedule_list[x]["Event"])
     writer.writerow([schedule_list[x]["Date"], schedule_list[x]["Event"], schedule_list[x]["Start Time"], schedule_list[x]["End Time"]])
+'''
