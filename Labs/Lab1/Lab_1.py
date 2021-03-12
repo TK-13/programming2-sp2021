@@ -1,4 +1,5 @@
 import csv
+from time import sleep
 
 schedule_reader = open('/Users/tkmuro/PycharmProjects/tkProgramming/Labs/Lab1/my_schedule.csv', 'r')
 dict_reader = csv.DictReader(schedule_reader)
@@ -6,15 +7,15 @@ schedule_list = list(csv.DictReader(schedule_reader))
 ''' The section above uses the csv module to read from my_schedule.csv, and appends each sub-dictionary (the data for 
 each day) to schedule_list. '''
 
+
 # Globals
 new_start = ""
+new_end = ""
 conflict_list = []
 removed_tally = 0
-new_end = ""
 
 
 # This function takes user input, loops if the input is not in the list of valid answers, and returns their answer.
-# not super necessary, but I wanted to consolidate and make the taking-user-input process uniform and less tedious.
 def user_input(message, param_list):
     user_entry = ""
     while user_entry not in param_list:
@@ -28,47 +29,42 @@ def conflict_check(date):
     global conflict_list
     global removed_tally
     event_names = []
-    # event_names = [schedule_list[n]["Event"] for n in range(len(schedule_list))]
-    # print(event_names)
     print()
     for i in range(len(schedule_list)):
         start_time = schedule_list[i - removed_tally]['Start Time']
         conflict_list.append(start_time)
         if schedule_list[i - removed_tally]['Date'] == str(date):
             if conflict_list.count(start_time) >= 2:
-                print()
-                print("{0} is not available.".format(start_time))
+                print("\n{0} is not available.".format(start_time))
                 print("Events during {0}: ".format(start_time))
                 for w in range(len(schedule_list)):
                     if schedule_list[w - removed_tally]['Date'] == str(date) and conflict_list.count(schedule_list[w - removed_tally]['Start Time']) >= 2:
                         print(schedule_list[w - removed_tally]['Event'])
                         event_names.append(schedule_list[w - removed_tally]['Event'])
-                target_event = ""
-                while target_event not in event_names:
-                    target_event = input("Which event would you like to change? ")
+                target_event = user_input("Which event would you like to change? ", event_names)
+
                 # Stylistically: there should be separate functions for rescheduling and cancelling.
-                reschedule = ""
-                while reschedule.lower() != 'r' or reschedule.lower() != 'c':
-                    reschedule = input("Would you like to cancel or reschedule {0}? (r/c) ".format(target_event))
-                    if reschedule.lower() == "r":
-                        global new_start
-                        global new_end
-                        new_start = input("New start time: ")
-                        schedule_list[i]["Start Time"] = new_start
-                        new_end = input("New end time: ")
-                        schedule_list[i - removed_tally]["End Time"] = new_end
-                        conflict_list.clear()
-                        break
-                    elif reschedule.lower() == "c":
-                        print(schedule_list[i - removed_tally])
-                        target_in_list = schedule_list.index(target_event)  # TODO: this doesn't work. How can I work backwards from target_event to the list index containing the correct dictionary?
-                        schedule_list.remove(target_in_list)
-                        removed_tally += 1
-                        conflict_list.clear()
+                reschedule = user_input("Would you like to cancel or reschedule {0}? (r/c) ", ['r', 'c'])
+                if reschedule.lower() == "r":  # check if entered new start time conflicts with something else.
+                    global new_start
+                    global new_end
+                    new_start = input("New start time: ")
+                    schedule_list[i]["Start Time"] = new_start
+                    new_end = input("New end time: ")
+                    schedule_list[i - removed_tally]["End Time"] = new_end
+                    conflict_list.clear()
+                    event_names.clear()
+                    break
+                elif reschedule.lower() == "c":
+                    cancel_v1(date, target_event, False)
+                    print("{0} has been cancelled on {1}.".format(target_event, date))
+                    removed_tally += 1
+                    conflict_list.clear()
+                    event_names.clear()
 
 
 # this is a basic cancellation system. It actually works.
-def cancel_v2(date, name, time):  # this one works
+def cancel_v1(date, name, time):  # this one works
     global removed_tally
     for i in range(len(schedule_list)):
         start_time = schedule_list[i - removed_tally]['Start Time']
@@ -78,7 +74,7 @@ def cancel_v2(date, name, time):  # this one works
                 del schedule_list[i - removed_tally]
                 removed_tally += 1
                 print("post-function: ", removed_tally)
-            elif start_time == str(time):
+            elif start_time == str(time) and str(time):
                 del schedule_list[i - removed_tally]
                 removed_tally += 1
                 print("post-function: ", removed_tally)
@@ -136,6 +132,7 @@ def days_events(date):
     for d in range(len(schedule_list)):
         if schedule_list[d]['Date'] == str(date):
             print("   {0} at {1}.".format(schedule_list[d]['Event'], schedule_list[d]['Start Time']))
+            sleep(0.5)
             ''' advice from  Ms. Ifft: I could add duration. if i want, I can try to use python date-time to make 
             these into a format that's helpful. Don't try until done with everything.'''
 
@@ -161,11 +158,8 @@ def days_events(date):
 
 ''' Testing Zone '''
 # conflict_check('03/08/2021')
-# days_events('03/08/2021')
-
-
-cancel(True, 'name, ', "03/08/2021", "dummy conflict 2", "14:25")
-# cancel_v2('03/08/2021', 'dummy conflict', '8:10')
+days_events('03/08/2021')
+# cancel(True, 'name, ', "03/08/2021", "dummy conflict 2", "14:25")
 
 
 # Updating the CSV: this section rewrites the contents of schedule_list (which has been modified by each of these
