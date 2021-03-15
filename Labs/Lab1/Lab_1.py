@@ -1,7 +1,7 @@
 import csv
 from time import sleep
 
-schedule_reader = open('/Users/tkmuro/PycharmProjects/tkProgramming/Labs/Lab1/my_schedule.csv', 'r')
+schedule_reader = open('./my_schedule.csv', 'r')
 dict_reader = csv.DictReader(schedule_reader)
 schedule_list = list(csv.DictReader(schedule_reader))
 ''' The section above uses the csv module to read from my_schedule.csv, and appends each sub-dictionary (the data for 
@@ -9,8 +9,6 @@ each day) to schedule_list. '''
 
 
 # Globals
-new_start = ""
-new_end = ""
 conflict_list = []
 removed_tally = 0
 
@@ -42,25 +40,48 @@ def conflict_check(date):
                         print(schedule_list[w - removed_tally]['Event'])
                         event_names.append(schedule_list[w - removed_tally]['Event'])
                 target_event = user_input("Which event would you like to change? ", event_names)
-
-                # Stylistically: there should be separate functions for rescheduling and cancelling.
-                reschedule = user_input("Would you like to cancel or reschedule {0}? (r/c) ", ['r', 'c'])
-                if reschedule.lower() == "r":  # check if entered new start time conflicts with something else.
-                    global new_start
-                    global new_end
-                    new_start = input("New start time: ")
-                    schedule_list[i]["Start Time"] = new_start
-                    new_end = input("New end time: ")
-                    schedule_list[i - removed_tally]["End Time"] = new_end
+                choice = user_input("Would you like to cancel or reschedule {0}? (r/c) ".format(target_event), ['r', 'c'])
+                if choice.lower() == "r":  # check if entered new start time conflicts with something else.
+                    reschedule(i)
+                    print("{0} has been rescheduled.".format(target_event, date))
                     conflict_list.clear()
                     event_names.clear()
                     break
-                elif reschedule.lower() == "c":
+                elif choice.lower() == "c":
                     cancel_v1(date, target_event, False)
-                    print("{0} has been cancelled on {1}.".format(target_event, date))
                     removed_tally += 1
                     conflict_list.clear()
                     event_names.clear()
+
+
+# In progress, currently doesn't work.
+def reschedule(location, date, name, time):  # can it work on its own?
+    global removed_tally
+    if location:
+        if schedule_list[location - removed_tally]['Date'] == str(date):
+            if schedule_list[location - removed_tally]['Event'] == str(name) or schedule_list[location - removed_tally]['Start Time'] == str(time):
+                new_date = input("New date: ")
+                schedule_list[location]["Date"] = new_date
+                new_start = input("New start time: ")
+                schedule_list[location]["Start Time"] = new_start
+                new_end = input("New end time: ")
+                schedule_list[location - removed_tally]["End Time"] = new_end
+    else:
+        for i in range(len(schedule_list)):
+            start_time = schedule_list[i - removed_tally]['Start Time']
+            event_title = schedule_list[i - removed_tally]['Event']
+            place = i - removed_tally
+            if schedule_list[i - removed_tally]['Date'] == str(date):
+                if event_title == str(name) or start_time == str(time):
+                    new_date = input("New date: ")
+                    schedule_list[place]["Date"] = new_date
+                    new_start = input("New start time: ")
+                    schedule_list[place]["Start Time"] = new_start
+                    new_end = input("New end time: ")
+                    schedule_list[place]["End Time"] = new_end
+    # If i have time, validate that the inputs are in the right format (m/d/y).
+    # Even just check that there are two slashes, right length, stuff like that. Could be more specific if
+    # for commercial use.
 
 
 # this is a basic cancellation system. It actually works.
@@ -78,6 +99,7 @@ def cancel_v1(date, name, time):  # this one works
                 del schedule_list[i - removed_tally]
                 removed_tally += 1
                 print("post-function: ", removed_tally)
+            print("{0} has been cancelled on {1}.".format(name, date))
 
 
 # This is a more nuanced event cancellation system, which asks the user whether they want to default to the entered
@@ -85,6 +107,10 @@ def cancel_v1(date, name, time):  # this one works
 # another function, like conflict_check). It also asks the user whether they want to cancel an event (on the specified
 # date), by it's name versus its' start time.
 # Currently, it's a hot mess.
+
+# A good idea. Break it down into more functions for clarity. make some parameters have defaults (date, name, and time can
+# have defaults, which should work if user enters nothing. date = None, name = None, check "if name" to see if
+# user passed in something. When someone reads that, they automatically realize it could do more than one thing.
 def cancel(user_entry_mode, name_v_time_mode, date, name, time):  # this one does not work
     global removed_tally
     valid_dates = [schedule_list[r]["Date"] for r in range(len(schedule_list))]
@@ -111,6 +137,8 @@ def cancel(user_entry_mode, name_v_time_mode, date, name, time):  # this one doe
                     removed_tally += 1
                     print("post-function: ", removed_tally)
     else:
+        cancel_v1(date, name, time)
+
         for i in range(len(schedule_list)):
             start_time = schedule_list[i - removed_tally]['Start Time']
             event_title = schedule_list[i - removed_tally]['Event']
@@ -123,6 +151,8 @@ def cancel(user_entry_mode, name_v_time_mode, date, name, time):  # this one doe
                     del schedule_list[i-removed_tally]
                     removed_tally += 1
                     print("post-function: ", removed_tally)
+
+                    # Make more compact.
                         
 
 # This function prints all the events on a certain date, with the event name and start time formatted for
@@ -158,13 +188,15 @@ def days_events(date):
 
 ''' Testing Zone '''
 # conflict_check('03/08/2021')
-days_events('03/08/2021')
-# cancel(True, 'name, ', "03/08/2021", "dummy conflict 2", "14:25")
+# days_events('03/08/2021')
+# cancel_v1("03/08/2021", "dummy conflict 2", "14:25")
+# cancel(False, 'name', "03/08/2021", "dummy conflict", "14:25")
+reschedule(None, "03/08/2021", "dummy conflict", "08:10")
 
 
 # Updating the CSV: this section rewrites the contents of schedule_list (which has been modified by each of these
 # functions), back to my_schedule.csv.
-schedule_csv = open('/Users/tkmuro/PycharmProjects/tkProgramming/Labs/Lab1/my_schedule.csv', 'w')
+schedule_csv = open('./my_schedule.csv', 'w')
 writer = csv.writer(schedule_csv)
 writer.writerow(["Date", "Event", "Start Time", "End Time"])
 for x in range(len(schedule_list)):

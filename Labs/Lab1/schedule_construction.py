@@ -11,6 +11,9 @@ schedule_dict = {
                     {"Event Name": "dummy conflict",
                     "Start Time": "08:10",
                     "End Time": "09:00"},
+                    {"Event Name": "dummy conflict b",
+                    "Start Time": "08:10",
+                    "End Time": "09:00"},
                    {"Event Name": "Calculus",
                     "Start Time": "10:05",
                     "End Time": "10:55"},
@@ -87,7 +90,7 @@ schedule_dict = {
                    ]
 }
 
-schedule_csv = open('/Users/tkmuro/PycharmProjects/tkProgramming/Labs/Lab1/my_schedule.csv', 'w')
+schedule_csv = open('my_schedule.csv', 'w')
 writer = csv.writer(schedule_csv)
 writer.writerow(["Date", "Event", "Start Time", "End Time"])
 for k, v in schedule_dict.items():
