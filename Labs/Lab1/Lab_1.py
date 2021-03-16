@@ -1,12 +1,11 @@
 import csv
 from time import sleep
 
+''' The section above uses the csv module to read from my_schedule.csv, and appends each sub-dictionary (the data for 
+each day) to schedule_list. '''
 schedule_reader = open('./my_schedule.csv', 'r')
 dict_reader = csv.DictReader(schedule_reader)
 schedule_list = list(csv.DictReader(schedule_reader))
-''' The section above uses the csv module to read from my_schedule.csv, and appends each sub-dictionary (the data for 
-each day) to schedule_list. '''
-
 
 # Globals
 conflict_list = []
@@ -191,7 +190,43 @@ def days_events(date):
 # days_events('03/08/2021')
 # cancel_v1("03/08/2021", "dummy conflict 2", "14:25")
 # cancel(False, 'name', "03/08/2021", "dummy conflict", "14:25")
-reschedule(None, "03/08/2021", "dummy conflict", "08:10")
+# reschedule(None, "03/08/2021", "dummy conflict", "08:10")
+
+# for i in range(len(schedule_list)):
+#     for k, v in schedule_list[i].items():
+#         if schedule_list[i]["Date"] == '03/08/2021':
+#             print(k, v)
+#             conflict_check_dict[schedule_list[i]["Start Time"]] = i
+#     print()
+# print(conflict_check_dict)
+
+
+def conflict_check_2(date):
+    conflict_check_dict = {}
+    index_list = []
+    time_list = []
+    for c in range(len(schedule_list)):
+        if schedule_list[c]["Date"] == date:
+            if schedule_list[c]["Start Time"] not in time_list:
+                print(schedule_list[c]["Start Time"])
+                time_list.append(schedule_list[c]["Start Time"])
+            if schedule_list[c]["Start Time"] in time_list:
+                index_list.append(schedule_list.index(schedule_list[c]))
+
+            conflict_check_dict[schedule_list[c]["Start Time"]] = index_list
+
+    for k, v in conflict_check_dict.items():
+        print(k, v)
+
+
+# conflict_check_2('03/08/2021')
+
+
+# print()
+# for i in schedule_list:
+#     print(i)
+#     print(schedule_list.index(i))
+
 
 
 # Updating the CSV: this section rewrites the contents of schedule_list (which has been modified by each of these
