@@ -35,17 +35,21 @@ def conflict_check(date):
                 print("\n{0} is not available.".format(start_time))
                 print("Events during {0}: ".format(start_time))
                 for w in range(len(schedule_list)):
-                    if schedule_list[w - removed_tally]['Date'] == str(date) and conflict_list.count(schedule_list[w - removed_tally]['Start Time']) >= 2:
+                    if schedule_list[w - removed_tally]['Date'] == str(date) and conflict_list.count(
+                            schedule_list[w - removed_tally]['Start Time']) >= 2:
                         print(schedule_list[w - removed_tally]['Event'])
                         event_names.append(schedule_list[w - removed_tally]['Event'])
                 target_event = user_input("Which event would you like to change? ", event_names)
-                choice = user_input("Would you like to cancel or reschedule {0}? (r/c) ".format(target_event), ['r', 'c'])
+                choice = user_input("Would you like to cancel or reschedule {0}? (r/c) ".format(target_event),
+                                    ['r', 'c'])
+
                 if choice.lower() == "r":  # check if entered new start time conflicts with something else.
-                    reschedule(i)
+                    reschedule(i, date, target_event, start_time)
                     print("{0} has been rescheduled.".format(target_event, date))
                     conflict_list.clear()
                     event_names.clear()
                     break
+
                 elif choice.lower() == "c":
                     cancel_v1(date, target_event, False)
                     removed_tally += 1
@@ -54,33 +58,37 @@ def conflict_check(date):
 
 
 # In progress, currently doesn't work.
-def reschedule(location, date, name, time):  # can it work on its own?
+def reschedule(location, date, name, s_time):  # can it work on its own?
     global removed_tally
-    if location:
-        if schedule_list[location - removed_tally]['Date'] == str(date):
-            if schedule_list[location - removed_tally]['Event'] == str(name) or schedule_list[location - removed_tally]['Start Time'] == str(time):
+    if not name and not s_time:
+        for j in range(len(schedule_list)):
+            if schedule_list[j - removed_tally]['Date'] == str(date):
                 new_date = input("New date: ")
-                schedule_list[location]["Date"] = new_date
+                schedule_list[j]["Date"] = new_date
                 new_start = input("New start time: ")
-                schedule_list[location]["Start Time"] = new_start
+                schedule_list[j]["Start Time"] = new_start
                 new_end = input("New end time: ")
-                schedule_list[location - removed_tally]["End Time"] = new_end
+                schedule_list[j - removed_tally]["End Time"] = new_end
     else:
-        for i in range(len(schedule_list)):
-            start_time = schedule_list[i - removed_tally]['Start Time']
-            event_title = schedule_list[i - removed_tally]['Event']
-            place = i - removed_tally
-            if schedule_list[i - removed_tally]['Date'] == str(date):
-                if event_title == str(name) or start_time == str(time):
-                    new_date = input("New date: ")
-                    schedule_list[place]["Date"] = new_date
-                    new_start = input("New start time: ")
-                    schedule_list[place]["Start Time"] = new_start
-                    new_end = input("New end time: ")
-                    schedule_list[place]["End Time"] = new_end
-    # If i have time, validate that the inputs are in the right format (m/d/y).
-    # Even just check that there are two slashes, right length, stuff like that. Could be more specific if
-    # for commercial use.
+        if schedule_list[location]['Date'] == str(date):
+            schedule_list[location]["Date"] = date
+            schedule_list[location]["Start Time"] = s_time
+            new_end = input("New end time: ")
+            schedule_list[location - removed_tally]["End Time"] = new_end
+
+
+''' def sub_reschedule(abcde, date, time, name):
+    # if not date and not time and not name:
+    #     if schedule_list[abcde - removed_tally]['Date'] == str(date):
+    #         if schedule_list[abcde - removed_tally]['Event'] == str(name) or schedule_list[abcde - removed_tally]['Start Time'] == str(time):
+    if not date and not time and not name:
+        new_date = input("New date: ")
+        schedule_list[abcde]["Date"] = new_date
+        new_start = input("New start time: ")
+        schedule_list[abcde]["Start Time"] = new_start
+        new_end = input("New end time: ")
+        schedule_list[abcde - removed_tally]["End Time"] = new_end
+    else: '''
 
 
 # this is a basic cancellation system. It actually works.
@@ -132,7 +140,7 @@ def cancel(user_entry_mode, name_v_time_mode, date, name, time):  # this one doe
                     removed_tally += 1
                     print("post-function: ", removed_tally)
                 elif start_time == str(time) and name_v_time_mode == 'time':
-                    del schedule_list[i-removed_tally]
+                    del schedule_list[i - removed_tally]
                     removed_tally += 1
                     print("post-function: ", removed_tally)
     else:
@@ -147,12 +155,12 @@ def cancel(user_entry_mode, name_v_time_mode, date, name, time):  # this one doe
                     removed_tally += 1
                     print("post-function: ", removed_tally)
                 elif start_time == str(time) and name_v_time_mode == 'time':
-                    del schedule_list[i-removed_tally]
+                    del schedule_list[i - removed_tally]
                     removed_tally += 1
                     print("post-function: ", removed_tally)
 
                     # Make more compact.
-                        
+
 
 # This function prints all the events on a certain date, with the event name and start time formatted for
 # easy reading.
@@ -184,13 +192,14 @@ def days_events(date):
 #         print("found")
 '''
 
-
 ''' Testing Zone '''
+
+
 # conflict_check('03/08/2021')
 # days_events('03/08/2021')
 # cancel_v1("03/08/2021", "dummy conflict 2", "14:25")
 # cancel(False, 'name', "03/08/2021", "dummy conflict", "14:25")
-# reschedule(None, "03/08/2021", "dummy conflict", "08:10")
+reschedule(None, "03/08/2021", "dummy conflict", "08:10")
 
 # for i in range(len(schedule_list)):
 #     for k, v in schedule_list[i].items():
@@ -208,26 +217,69 @@ def conflict_check_2(date):
     for c in range(len(schedule_list)):
         if schedule_list[c]["Date"] == date:
             if schedule_list[c]["Start Time"] not in time_list:
-                print(schedule_list[c]["Start Time"])
+                # print(schedule_list[c]["Start Time"])
                 time_list.append(schedule_list[c]["Start Time"])
             if schedule_list[c]["Start Time"] in time_list:
                 index_list.append(schedule_list.index(schedule_list[c]))
 
-            conflict_check_dict[schedule_list[c]["Start Time"]] = index_list
+            for t in time_list:
+                conflict_check_dict[t] = index_list
+
+        # index_list.clear()
+            # if schedule_list[c]["Start Time"] in time_list:
+            #     index_list.append(schedule_list.index(schedule_list[c]))
+
+            # conflict_check_dict[schedule_list[c]["Start Time"]] = index_list
 
     for k, v in conflict_check_dict.items():
         print(k, v)
+    print("Time list: ", time_list)
+    print("Index list: ", index_list)
 
 
 # conflict_check_2('03/08/2021')
 
+'''
+times = []
+indexes = []
+
+for r in range(len(schedule_list)):
+    if schedule_list[r]["Date"] == '03/08/2021':
+        # print(schedule_list[r])
+        if schedule_list[r]["Start Time"] not in times:
+            times.append(schedule_list[r]["Start Time"])
+        for ts in times:
+            if schedule_list[r]["Start Time"] == ts:
+                indexes.append(schedule_list.index(schedule_list[r]))
+            conflict_check_
+
+
+for r in range(len(schedule_list)):
+    if schedule_list[r]["Date"] == '03/08/2021':
+        for ts in times:
+            if schedule_list[r]["Start Time"] == ts:
+                indexes.append(schedule_list.index(schedule_list[r]))
+
+print(times)
+print()
+print(indexes)
+
+print()
+
+
+def mini(place):
+    print("name: ", schedule_list[place]['Event'])
+    print("time: ", schedule_list[place]["Start Time"])
+    print("index: ", schedule_list.index(schedule_list[place]))
+
+
+mini(1)
 
 # print()
 # for i in schedule_list:
 #     print(i)
 #     print(schedule_list.index(i))
-
-
+'''
 
 # Updating the CSV: this section rewrites the contents of schedule_list (which has been modified by each of these
 # functions), back to my_schedule.csv.
@@ -235,4 +287,5 @@ schedule_csv = open('./my_schedule.csv', 'w')
 writer = csv.writer(schedule_csv)
 writer.writerow(["Date", "Event", "Start Time", "End Time"])
 for x in range(len(schedule_list)):
-    writer.writerow([schedule_list[x]["Date"], schedule_list[x]["Event"], schedule_list[x]["Start Time"], schedule_list[x]["End Time"]])
+    writer.writerow([schedule_list[x]["Date"], schedule_list[x]["Event"], schedule_list[x]["Start Time"],
+                     schedule_list[x]["End Time"]])
