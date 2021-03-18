@@ -35,8 +35,7 @@ def conflict_check(date):
                 print("\n{0} is not available.".format(start_time))
                 print("Events during {0}: ".format(start_time))
                 for w in range(len(schedule_list)):
-                    if schedule_list[w - removed_tally]['Date'] == str(date) and conflict_list.count(
-                            schedule_list[w - removed_tally]['Start Time']) >= 2:
+                    if schedule_list[w - removed_tally]['Date'] == str(date) and conflict_list.count(schedule_list[w - removed_tally]['Start Time']) >= 2:
                         print(schedule_list[w - removed_tally]['Event'])
                         event_names.append(schedule_list[w - removed_tally]['Event'])
                 target_event = user_input("Which event would you like to change? ", event_names)
@@ -44,37 +43,78 @@ def conflict_check(date):
                                     ['r', 'c'])
 
                 if choice.lower() == "r":  # check if entered new start time conflicts with something else.
-                    reschedule(i, date, target_event, start_time)
+                    reschedule(i)
                     print("{0} has been rescheduled.".format(target_event, date))
                     conflict_list.clear()
                     event_names.clear()
-                    break
 
                 elif choice.lower() == "c":
-                    cancel_v1(date, target_event, False)
+                    cancel_v1(date, target_event)
                     removed_tally += 1
                     conflict_list.clear()
                     event_names.clear()
 
 
-# In progress, currently doesn't work.
-def reschedule(location, date, name, s_time):  # can it work on its own?
-    global removed_tally
-    if not name and not s_time:
-        for j in range(len(schedule_list)):
-            if schedule_list[j - removed_tally]['Date'] == str(date):
-                new_date = input("New date: ")
-                schedule_list[j]["Date"] = new_date
-                new_start = input("New start time: ")
-                schedule_list[j]["Start Time"] = new_start
-                new_end = input("New end time: ")
-                schedule_list[j - removed_tally]["End Time"] = new_end
+def book(date="", name="", start="20", end=""):
+    events_in_day = []
+    if not date and not name and start == "20" and not end:
+        date = input("New event date: ")
+        name = input("New event title: ")
+
+        while start[0] == "2" or start == "no":  # This prevents the user from starting events after 8:00 pm
+            start = input("New event start time: ")
+            if start[0] == "2":
+                print("Please do not schedule events after 20:00")
+                print()
+            continue
+
+        end = input("New event end time: ")  # I couldn't do a duration system, sorry.
+        for d in range(len(schedule_list)):
+            if schedule_list[d]["Date"] == str(date):
+                insert_point = d
+                events_in_day.append(schedule_list[d])
+        schedule_list.insert(insert_point-1, {'Date': date, 'Event': name, 'Start Time': start, 'End Time': end})
     else:
-        if schedule_list[location]['Date'] == str(date):
-            schedule_list[location]["Date"] = date
-            schedule_list[location]["Start Time"] = s_time
-            new_end = input("New end time: ")
-            schedule_list[location - removed_tally]["End Time"] = new_end
+        schedule_list.append({'Date': date, 'Event': name, 'Start Time': start, 'End Time': end})
+
+
+# In progress, currently doesn't work.
+def reschedule(location, date=None, name=False, s_time=None):  # can it work on its own?
+    global removed_tally
+    if location:
+        reschedule_manual(location)
+    else:
+        for j in range(len(schedule_list)):
+            if schedule_list[j]["Date"] == date:
+                if schedule_list[j]["Event"] == name:
+                    reschedule_manual(j)
+                # elif schedule_list[j]["Start Time"] == s_time:
+                #     print(conflict_list)
+                #     target = input("Which event do you want to alter at {0}? ".format(s_time))
+                #     if schedule_list[j]["Event"] == target:
+                #         new_date = input("New date: ")
+                #         schedule_list[j]["Date"] = new_date
+                #         new_start = input("New start time: ")
+                #         schedule_list[j]["Start Time"] = new_start
+                #         new_end = input("New end time: ")
+                #         schedule_list[j - removed_tally]["End Time"] = new_end
+
+
+def reschedule_manual(place):
+    new_date = input("New date: ")
+    schedule_list[place]["Date"] = new_date
+    new_start = input("New start time: ")
+    schedule_list[place]["Start Time"] = new_start
+    new_end = input("New end time: ")
+    schedule_list[place - removed_tally]["End Time"] = new_end
+
+    '''
+    if schedule_list[location]['Date'] == str(date):
+        schedule_list[location]["Date"] = date
+        schedule_list[location]["Start Time"] = s_time
+        new_end = input("New end time: ")
+        schedule_list[location - removed_tally]["End Time"] = new_end
+    '''
 
 
 ''' def sub_reschedule(abcde, date, time, name):
@@ -92,7 +132,7 @@ def reschedule(location, date, name, s_time):  # can it work on its own?
 
 
 # this is a basic cancellation system. It actually works.
-def cancel_v1(date, name, time):  # this one works
+def cancel_v1(date, name, time=False):  # this one works
     global removed_tally
     for i in range(len(schedule_list)):
         start_time = schedule_list[i - removed_tally]['Start Time']
@@ -101,12 +141,10 @@ def cancel_v1(date, name, time):  # this one works
             if event_title == str(name):
                 del schedule_list[i - removed_tally]
                 removed_tally += 1
-                print("post-function: ", removed_tally)
             elif start_time == str(time) and str(time):
                 del schedule_list[i - removed_tally]
                 removed_tally += 1
-                print("post-function: ", removed_tally)
-            print("{0} has been cancelled on {1}.".format(name, date))
+    print("{0} has been cancelled on {1}.".format(name, date))
 
 
 # This is a more nuanced event cancellation system, which asks the user whether they want to default to the entered
@@ -194,12 +232,17 @@ def days_events(date):
 
 ''' Testing Zone '''
 
+# for i in range(len(schedule_list)):
+#     print(schedule_list[i])
+
+book()
+book("03/08/2021", 'Manual', "50000", "201050")
 
 # conflict_check('03/08/2021')
 # days_events('03/08/2021')
 # cancel_v1("03/08/2021", "dummy conflict 2", "14:25")
 # cancel(False, 'name', "03/08/2021", "dummy conflict", "14:25")
-reschedule(None, "03/08/2021", "dummy conflict", "08:10")
+# reschedule(None, "03/08/2021", "dummy conflict b", "08:10")
 
 # for i in range(len(schedule_list)):
 #     for k, v in schedule_list[i].items():
