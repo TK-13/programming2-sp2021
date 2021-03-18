@@ -49,7 +49,7 @@ schedule_dict = {
                    {"Event Name": "Student Government",
                     "Start Time": "10:00",
                     "End Time": "10:45"},
-                   {"Event Name": "Graderoom",
+                   {"Event Name": "Grade room",
                     "Start Time": "13:05",
                     "End Time": "13:45"},
                    {"Event Name": "Advisory",
