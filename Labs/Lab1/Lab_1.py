@@ -112,13 +112,11 @@ def conflict_check(date):
                 target_event = user_input("Which event would you like to change? ", event_names)
                 choice = user_input("Would you like to cancel or reschedule {0}? (r/c) ".format(target_event),
                                     ['r', 'c'])
-
                 if choice.lower() == "r":  # check if entered new start time conflicts with something else.
                     reschedule(i)
                     print("{0} has been rescheduled.".format(target_event, date))
                     conflict_list.clear()
                     event_names.clear()
-
                 elif choice.lower() == "c":
                     cancel(date, target_event)
                     removed_tally += 1
