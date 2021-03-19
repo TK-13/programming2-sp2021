@@ -17,5 +17,19 @@ Steps:
 import matplotlib.pyplot as plt
 import numpy as np
 
+# np.linspace() Gives 100 values, equally distributed, between 0 and 2. Range, but with floats.
 x_values = np.linspace(0, 2, 100)
+y_linear = [x for x in x_values]
+y_squares = [x**2 for x in x_values]
+y_cubes = [x**3 for x in x_values]
 
+plt.plot(x_values, y_linear, label='Linear', c="green")
+plt.plot(x_values, y_squares, label='Squares', c="orange")
+plt.plot(x_values, y_cubes, label='Cubes', c="blue")
+
+plt.title('Simple Plot')
+plt.xlabel('Xs')
+plt.ylabel('Ys')
+plt.legend()
+
+plt.show()

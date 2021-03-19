@@ -1,5 +1,6 @@
 import matplotlib.pyplot as plt
 
+'''
 plt.figure(1)  # create a new window/plot
 
 plt.plot([120, 40, 10, 0], label="line 1")  # plot y against the index
@@ -28,3 +29,21 @@ plt.axis([0, 11, 0, 120])  # [xmin, xmax, ymin, ymax]
 plt.legend()
 
 plt.show()  # opens the window/plot
+'''
+
+
+xs = [1, 14, 26, 32]
+ys = [10, 27, 32, 106]
+
+x1s = [x for x in range(1, 101)]
+y1s = [(y**3) for y in x1s]
+plt.title('Title')
+plt.xlabel('x label')
+plt.ylabel('y label')
+
+plt.plot(xs, ys, label='plot 1', marker="o", markeredgecolor='red', lw=10)
+plt.plot(x1s, y1s,
+         label='plot 2', drawstyle='steps', marker="4", ms=20,
+         markeredgecolor='purple', snap=True, lw=5)
+
+plt.show()
