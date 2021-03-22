@@ -30,6 +30,7 @@ plt.plot(x_values, y_cubes, label='Cubes', c="blue")
 plt.title('Simple Plot')
 plt.xlabel('Xs')
 plt.ylabel('Ys')
+plt.xticks(rotation=75)  # Tilts x-axis labels.
 plt.legend()
 
 plt.show()
