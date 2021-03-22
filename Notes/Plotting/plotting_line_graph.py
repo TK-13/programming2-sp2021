@@ -25,7 +25,7 @@ visitors = [int(library[month.upper()]) for month in list_of_months]
 print(visitors)
 
 # plot months against number of visitors
-plt.figure(1, tight_layout=True)
+plt.figure(1, tight_layout=True) # tight_layout makes everything fit in figure
 plt.plot(list_of_months, visitors, color="blue", label=library_name)
 
 # establish plot characteristics in plt.plot
