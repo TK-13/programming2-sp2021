@@ -37,6 +37,7 @@ rail_data = populate("rail")
 paratransit_data = populate("paratransit")
 total_data = populate("total")
 all_y_list = [bus_data, paratransit_data, rail_data, total_data]
+# idea: make this a loop. Populate each list using a list of the parameters.
 
 
 # 3  Make a line plot of rail usage for the last 15 years of data.  (year on x axis, and ridership on y) (3pts)
@@ -63,7 +64,7 @@ plt.ylabel('Usage')
 
 # 7  Add a legend to show data represented by each of the three lines. (3pts)
 plt.legend()
-
+# See plot_in_range function for label assignments necessary for legend.
 plt.show()
 
 
