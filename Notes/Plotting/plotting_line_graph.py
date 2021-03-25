@@ -5,7 +5,8 @@ import matplotlib.pyplot as plt
 # open the csv file
 library_data = open("../../Resources/libraries_visitors_by_location_2019.csv")
 library_data = csv.DictReader(library_data)
-list_of_months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
+list_of_months = ["January", "February", "March", "April", "May", "June",
+                  "July", "August", "September", "October", "November", "December"]
 
 # read the contents into lists
 library_data = list(library_data)

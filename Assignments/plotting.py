@@ -26,7 +26,7 @@ total_data = []
 all_y_list = [years, bus_data, paratransit_data, rail_data, total_data]
 
 
-def populate(parameter):
+def populate(parameter):  # This is borrowed a bit from Alex's suggestions on plotting_line_graph
     target_list = [int(cta_data[i][parameter]) for i in range(len(cta_data))]
     return target_list
 
@@ -45,6 +45,7 @@ def plot_in_range(data_list, start, label_name):
     plt.plot([year for year in years[start:]], [d for d in data_list[start:]], label=label_name)
 
 
+plt.figure(1)
 plot_in_range(rail_data, 15, "Rails")
 
 
@@ -63,8 +64,7 @@ plt.ylabel('Usage')
 
 
 # 7  Add a legend to show data represented by each of the three lines. (3pts)
-plt.legend()
-# See plot_in_range function for label assignments necessary for legend.
+plt.legend()  # See plot_in_range function for label assignments necessary for legend.
 plt.show()
 
 
