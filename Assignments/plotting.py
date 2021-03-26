@@ -18,26 +18,10 @@ cta_data_open.close()
 
 
 # 2  Retrieve the bus, rail, and total data for the last 15 years from the csv file. (5pts)
-years = []
-bus_data = []
-rail_data = []
-paratransit_data = []
-total_data = []
-all_y_list = [years, bus_data, paratransit_data, rail_data, total_data]
-
-
-def populate(parameter):  # This is borrowed a bit from Alex's suggestions on plotting_line_graph
-    target_list = [int(cta_data[i][parameter]) for i in range(len(cta_data))]
-    return target_list
-
-
-years = populate("year")
-bus_data = populate("bus")
-rail_data = populate("rail")
-paratransit_data = populate("paratransit")
-total_data = populate("total")
-all_y_list = [bus_data, paratransit_data, rail_data, total_data]
-# idea: make this a loop. Populate each list using a list of the parameters.
+years = [int(cta_data[i]["year"]) for i in range(len(cta_data))]
+bus_data = [int(cta_data[i]["bus"]) for i in range(len(cta_data))]
+rail_data = [int(cta_data[i]["rail"]) for i in range(len(cta_data))]
+total_data = [int(cta_data[i]["total"]) for i in range(len(cta_data))]
 
 
 # 3  Make a line plot of rail usage for the last 15 years of data.  (year on x axis, and ridership on y) (3pts)
