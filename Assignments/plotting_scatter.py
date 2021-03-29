@@ -11,8 +11,6 @@ Chicago requires that all buildings over 50000 square feet in the city comply wi
 The dataset at the link above is that data from 2015 to 2018.
 We will use this data to look at schools.  We will visualize the efficiency of schools by scatter plot.
 We expect that the more square footage (sqft) a school is, the more greenhouse gas (ghg) emission it will produce.
-Challenge (for fun):
-An efficient school would have a large ratio of sqft to ghg.
 It would also be interesting to know where Parker lies on this graph???  Let's find out.
 
 Make a scatterplot which does the following:
@@ -24,7 +22,7 @@ Make a scatterplot which does the following:
 - Create a best fit line for schools shown. (5pts)
 
 
-Extra Credit: Add a significant feature to your graph that helps tell the story of your data.  (feel free to use methods from matplotlib.org). (10pts)
+Extra Credit: Add a significant feature to your graph that helps tell the story of your data.  (feel free to use methods from matplotlib.org). (5pts)
 
 Note: With extra credit you will earn you a max of 31pts (100%) for the assignment.
 Maybe you can try one of the following or think up your own:
