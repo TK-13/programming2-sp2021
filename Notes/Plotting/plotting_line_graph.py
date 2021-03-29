@@ -88,7 +88,7 @@ print(y_values)
 
 plt.figure(1, tight_layout=True)
 plt.ylabel("Library Name")
-plt.xlabel("Total Yearly Visitors")
+plt.xlabel("Visitors YTD")
 plt.title("Top 10 Most Popular Libraries")
 plt.barh(y_values, x_values)
 plt.yticks(rotation=30)
