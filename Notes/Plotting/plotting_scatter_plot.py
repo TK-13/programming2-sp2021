@@ -4,10 +4,11 @@ import numpy as np
 
 # open csv file and reading through it
 data = open("../../Resources/insurance.csv")
-data = csv.DictReader(data)
+data_reader = csv.DictReader(data)
+data.close()
 
 # separate the csv values into more usable lists
-data = list(data)
+data = list(data_reader)
 # x = [int(person['age']) for person in data]
 # y_smoker = [float(person['charges']) for person in data if person['smoker'] == 'yes']
 # y_nonsmoker = [float(person['charges']) for person in data if person['smoker'] == 'no']
