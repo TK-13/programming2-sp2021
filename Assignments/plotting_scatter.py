@@ -1,5 +1,6 @@
 import csv
 import matplotlib.pyplot as plt
+import numpy as np
 
 """
 Greenhouse gas emissions (GHG) vs. square footage for all school buildings in Chicago
@@ -27,7 +28,6 @@ Maybe you can try one of the following or think up your own:
 - Make schools in top 10 percent of GHG Intensity show in green.
 - Make schools in bottom 10 percent GHG Intesity show in red.
 - Add colleges and universities (use a different marker type)
-
 """
 
 # Make a scatterplot which does the following:
@@ -42,35 +42,37 @@ y_key = "Total GHG Emissions (Metric Tons CO2e)"
 x = []
 y = []
 
-plt.figure(1, tight_layout=True)
+plt.figure(1)
 
 # - Data includes ONLY data for K-12 Schools. (4pts)
 # - Data includes ONLY data for 2018 reporting. (4pts)
 school_data = [row for row in data if
                row["Primary Property Type"] == "K-12 School" and
-               row["Data Year"] == "2018"]
+               row["Data Year"] == "2018" and
+               row[y_key] != '' and row[x_key] != '']
 
 # x, y = [ row["x_key"] for row in data if row["Primary Property Type"] == "K-12 School" and row["Data Year"] == "2018", row["y_key"] for row in data if row["Primary Property Type"] == "K-12 School" and row["Data Year"] == "2018"]
 
-# for row in school_data:
-#     print(row)
-
 for i in range(len(school_data)):
-    x.append(school_data[i][x_key])
-    y.append(school_data[i][y_key])
+    x.append(float(school_data[i][x_key]))
+    y.append(float(school_data[i][y_key]))
+
 
 # - Label x and y axis and give appropriate title. (3pts)
-# TODO: why is everything so linear, and not spread out?
 plt.scatter(x, y, s=1)
 plt.xlabel(x_key)
-plt.xlabel(y_key)
-# plt.axis([0, 800000, 0, 8000])  # [xmin, xmax, ymin, ymax]
+plt.ylabel(y_key)
 plt.title("2018 Greenhouse Gas Emissions for K-12 Chicago Schools")
 
 
-# - Annotate Francis W. Parker. (5pts) TODO: is this correct? better way to do this, using school data?
-plt.annotate("Francis W. Parker", xy=("233000", "2947.9"))
+# - Annotate Francis W. Parker. (5pts)
+plt.annotate("Francis W. Parker", xy=(233000, 2947.9))
 
 # - Create a best fit line for schools shown. (5pts)
+p = np.polyfit(x, y, 1)
+m, b = p
+xs_best_fit = [i for i in range(int(max(x)))]
+ys_best_fit = [m*x + b for x in xs_best_fit]
+plt.plot(xs_best_fit, ys_best_fit, color='black')
 
 plt.show()
