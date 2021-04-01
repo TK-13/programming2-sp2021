@@ -1,10 +1,10 @@
 import folium
 
-map = folium.Map(location=[50.075539, 14.437800], zoom_start=9)
+map = folium.Map(location=[41.9227, -87.6379], zoom_start=9)
 
-folium.Marker(location=[50.087811, 14.420460],
-              popup="Prague Castle",
-              icon=folium.Icon(color="green", icon="flag", prefix="fa")
+folium.Marker(location=[41.9227, -87.6379],
+              popup="Parker",
+              icon=folium.Icon(color="blue", icon="times", prefix="fa")
               ).add_to(map)
 
 """

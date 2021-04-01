@@ -30,7 +30,7 @@ Maybe you can try one of the following or think up your own:
 - Add colleges and universities (use a different marker type)
 """
 
-# Make a scatterplot which does the following:
+# Make a scatter plot which does the following:
 # - Scatter plot the Total Greenhouse gas (GHG) Emissions (y-axis), versus building square footage (x-axis) (10pts)
 data_raw = open("/Users/tkmuro/PycharmProjects/tkProgramming/Resources/Chicago_Energy_Benchmarking.csv")
 data_reader = csv.DictReader(data_raw)
