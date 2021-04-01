@@ -1,7 +1,10 @@
 import folium
 
+# https://python-visualization.github.io/folium/quickstart.html#
+
 map = folium.Map(location=[50.075539, 14.437800], zoom_start=9)
 
+# placing a marker on the map
 folium.Marker(location=[50.087811, 14.420460],
               popup="Prague Castle",
               icon=folium.Icon(color="green", icon="flag", prefix="fa")
