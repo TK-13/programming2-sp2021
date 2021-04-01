@@ -9,6 +9,7 @@ data_reader = csv.DictReader(data_raw)
 data = list(data_reader)
 data_raw.close()
 
+
 names = []
 lat_long = []
 for i in data:
