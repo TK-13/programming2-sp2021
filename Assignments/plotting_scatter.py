@@ -41,6 +41,8 @@ x_key = "Gross Floor Area - Buildings (sq ft)"
 y_key = "Total GHG Emissions (Metric Tons CO2e)"
 x = []
 y = []
+x_u = []
+y_u = []
 
 plt.figure(1)
 
@@ -51,19 +53,15 @@ school_data = [row for row in data if
                row["Data Year"] == "2018" and
                row[y_key] != '' and row[x_key] != '']
 
-# x, y = [ row["x_key"] for row in data if row["Primary Property Type"] == "K-12 School" and row["Data Year"] == "2018", row["y_key"] for row in data if row["Primary Property Type"] == "K-12 School" and row["Data Year"] == "2018"]
-
 for i in range(len(school_data)):
     x.append(float(school_data[i][x_key]))
     y.append(float(school_data[i][y_key]))
-
 
 # - Label x and y axis and give appropriate title. (3pts)
 plt.scatter(x, y, s=1)
 plt.xlabel(x_key)
 plt.ylabel(y_key)
 plt.title("2018 Greenhouse Gas Emissions for K-12 Chicago Schools")
-
 
 # - Annotate Francis W. Parker. (5pts)
 plt.annotate("Francis W. Parker", xy=(233000, 2947.9))
@@ -74,5 +72,44 @@ m, b = p
 xs_best_fit = [i for i in range(int(max(x)))]
 ys_best_fit = [m*x + b for x in xs_best_fit]
 plt.plot(xs_best_fit, ys_best_fit, color='black')
+
+# Annotated labels (school name) for the 3 highest and 3 lowest GHG Intensities.
+ymax = 0
+ymin = 1000000
+max_list = []
+min_list = []
+for school in school_data:
+    if float(school[y_key]) > float(ymax):
+        ymax = school[y_key]
+        max_list.append(school)
+    elif float(school[y_key]) < float(ymin):
+        ymin = school[y_key]
+        min_list.append(school)
+
+max_list = max_list[-3:]
+min_list = min_list[-3:]
+
+for item in max_list:
+    plt.annotate("High: " + item["Property Name"], xy=(float(item[x_key]), float(item[y_key])))
+for item in min_list:
+    plt.annotate("Low: " + item["Property Name"], xy=(float(item[x_key]), float(item[y_key])))
+
+# Add colleges and universities (use a different marker type)
+# Note: I made a new figure for College/University data, because having them both on the same graph made the school
+# data hard to read.
+plt.figure(2)
+univ_data = [row for row in data if
+               row["Primary Property Type"] == "College/University" and
+               row["Data Year"] == "2018" and
+               row[y_key] != '' and row[x_key] != '']
+
+for i in range(len(univ_data)):
+    x_u.append(float(univ_data[i][x_key]))
+    y_u.append(float(univ_data[i][y_key]))
+
+plt.scatter(x_u, y_u, s=1, marker="*", color="green")
+plt.xlabel(x_key)
+plt.ylabel(y_key)
+plt.title("2018 Greenhouse Gas Emissions for Colleges and Universities")
 
 plt.show()
