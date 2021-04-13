@@ -30,8 +30,6 @@ Maybe you can try one of the following or think up your own:
 - Add colleges and universities (use a different marker type)
 """
 
-# Make a scatter plot which does the following:
-# - Scatter plot the Total Greenhouse gas (GHG) Emissions (y-axis), versus building square footage (x-axis) (10pts)
 data_raw = open("/Users/tkmuro/PycharmProjects/tkProgramming/Resources/Chicago_Energy_Benchmarking.csv")
 data_reader = csv.DictReader(data_raw)
 data = list(data_reader)
@@ -44,36 +42,49 @@ y = []
 x_u = []
 y_u = []
 
-plt.figure(1)
 
-# - Data includes ONLY data for K-12 Schools. (4pts)
-# - Data includes ONLY data for 2018 reporting. (4pts)
-school_data = [row for row in data if
-               row["Primary Property Type"] == "K-12 School" and
+# Req 6. Create a best fit line for schools shown. (5pts)
+def best_fit(x_in, y_in):
+    p = np.polyfit(x_in, y_in, 1)
+    m, b = p
+    xs_best_fit = [i for i in range(int(max(x_in)))]
+    ys_best_fit = [m * x + b for x in xs_best_fit]
+    plt.plot(xs_best_fit, ys_best_fit, color='black')
+
+
+# Req 1. Scatter plot the Total Greenhouse gas (GHG) Emissions (y-axis), versus building square footage (x-axis) (10pts)
+def scatter(input_data, marker, color, title):
+    for i in range(len(input_data)):
+        x.append(float(input_data[i][x_key]))
+        y.append(float(input_data[i][y_key]))
+
+    # Req 4. Label x and y axis and give appropriate title. (3pts)
+    plt.scatter(x, y, s=1, marker=marker, color=color)
+    plt.xlabel(x_key)
+    plt.ylabel(y_key)
+    plt.title(title)
+
+    best_fit(x, y)
+
+
+# Req 2. Data includes ONLY data for K-12 Schools. (4pts)
+# Req 3. Data includes ONLY data for 2018 reporting. (4pts)
+def filtered_data(property):
+    new_list = [row for row in data if
+               row["Primary Property Type"] == property and
                row["Data Year"] == "2018" and
                row[y_key] != '' and row[x_key] != '']
+    return new_list
 
-for i in range(len(school_data)):
-    x.append(float(school_data[i][x_key]))
-    y.append(float(school_data[i][y_key]))
 
-# - Label x and y axis and give appropriate title. (3pts)
-plt.scatter(x, y, s=1)
-plt.xlabel(x_key)
-plt.ylabel(y_key)
-plt.title("2018 Greenhouse Gas Emissions for K-12 Chicago Schools")
+plt.figure(1)
+school_data = filtered_data("K-12 School")
+scatter(school_data, 'o', 'blue', "2018 Greenhouse Gas Emissions for K-12 Chicago Schools")
 
-# - Annotate Francis W. Parker. (5pts)
+# Req 5. Annotate Francis W. Parker. (5pts)
 plt.annotate("Francis W. Parker", xy=(233000, 2947.9))
 
-# - Create a best fit line for schools shown. (5pts)
-p = np.polyfit(x, y, 1)
-m, b = p
-xs_best_fit = [i for i in range(int(max(x)))]
-ys_best_fit = [m*x + b for x in xs_best_fit]
-plt.plot(xs_best_fit, ys_best_fit, color='black')
-
-# Annotated labels (school name) for the 3 highest and 3 lowest GHG Intensities.
+# EC. Annotated labels (school name) for the 3 highest and 3 lowest GHG Intensities.
 ymax = 0
 ymin = 1000000
 max_list = []
@@ -94,22 +105,12 @@ for item in max_list:
 for item in min_list:
     plt.annotate("Low: " + item["Property Name"], xy=(float(item[x_key]), float(item[y_key])))
 
+
 # Add colleges and universities (use a different marker type)
 # Note: I made a new figure for College/University data, because having them both on the same graph made the school
 # data hard to read.
 plt.figure(2)
-univ_data = [row for row in data if
-               row["Primary Property Type"] == "College/University" and
-               row["Data Year"] == "2018" and
-               row[y_key] != '' and row[x_key] != '']
-
-for i in range(len(univ_data)):
-    x_u.append(float(univ_data[i][x_key]))
-    y_u.append(float(univ_data[i][y_key]))
-
-plt.scatter(x_u, y_u, s=1, marker="*", color="green")
-plt.xlabel(x_key)
-plt.ylabel(y_key)
-plt.title("2018 Greenhouse Gas Emissions for Colleges and Universities")
+univ_data = filtered_data("College/University")
+scatter(univ_data, "*", 'green', "2018 Greenhouse Gas Emissions for Colleges and Universities")
 
 plt.show()
