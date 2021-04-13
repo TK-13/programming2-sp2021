@@ -100,8 +100,16 @@ for school in school_data:
 max_list = max_list[-3:]
 min_list = min_list[-3:]
 
-for item in max_list:
-    plt.annotate("High: " + item["Property Name"], xy=(float(item[x_key]), float(item[y_key])))
+for item in max_list:  # Abbreviates certain names. Didn't want to mess with the CSV directly.
+    if item["Property Name"] == "High School/ Middle School/ Sunny and Kovler Gym/ Belfield, Judd, Blaine Hall":
+        plt.annotate("High: Belfield/Judd/Blaine Hall", xy=(float(item[x_key]), float(item[y_key])))
+    elif item["Property Name"] == "LaneTechHS-CPS":
+        plt.annotate("High: Lane Tech", xy=(float(item[x_key]), float(item[y_key])))
+    else:
+        plt.annotate("High: " + item["Property Name"],xy=(float(item[x_key]), float(item[y_key])))
+
+# xytext=(float(item[x_key])+1000, float(item[y_key]))
+
 for item in min_list:
     plt.annotate("Low: " + item["Property Name"], xy=(float(item[x_key]), float(item[y_key])))
 
