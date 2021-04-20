@@ -26,5 +26,26 @@ for i in conflict_dataset:
         country_names.append(i["CountryName"])
         total_events.append(i["TotalEvents"])
 
-for s in suicide_dataset:
-    if
+plt.figure(0, tight_layout=True)
+
+x_vals = [x for x in country_names]
+y_vals = [y for y in total_events]
+
+plt.bar(x_vals, y_vals)
+plt.xticks(rotation=75)
+# plt.yticks(rotation=75)
+
+
+plt.show()
+
+
+# for s in suicide_dataset:
+#     print(s['year'])
+
+# suicide_data = {}
+# c_names = []
+# suicide_rates = []
+# for s in suicide_dataset:
+#     if s['country'] not in c_names:
+#         c_names.append(s['country'])
+# print(c_names)
