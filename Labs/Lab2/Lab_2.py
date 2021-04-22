@@ -45,10 +45,22 @@ my_dict {
 #         years.append(yr["year"])
 # years.sort()
 
-# 2021:
 country_names = []
 total_events = []
 total_years = []
+
+
+# This function compiles a chronological list of the total events of the specified country. This is used to efficiently
+# populate the event information for each country.
+def populate_events(country):
+    year_tracker = []
+    events = []
+    for i in conflict_dataset:
+        if i["CountryName"] == country and i["Year"] not in year_tracker:
+            events.append(int(i["TotalEvents"]))
+            year_tracker.append(i["Year"])
+    return events
+
 
 conflict_dict = {}
 for i in conflict_dataset:
@@ -60,14 +72,14 @@ for i in conflict_dataset:
     if i["CountryName"] not in country_names:
         country_names.append(i["CountryName"])
         key = str(i["CountryName"])
-        value = int(i["TotalEvents"])
         conflict_dict[key] = {
+            "Years": total_years,
             "Suicides": [],
-            "Events": total_events
+            "Events": populate_events(key)
         }
 
 for k, v in conflict_dict.items():
-    print(k, v)
+    print(k, "\n", v)
 
 # plt.figure(0, tight_layout=True)
 #
