@@ -38,8 +38,17 @@ def read_data(path):
     return file
 
 
+# Borrowed this function from Lab 1 for users to select a country to graph.
+def user_input(message, param_list):
+    user_entry = ""
+    while user_entry not in param_list:
+        user_entry = input(message)
+    return user_entry
+
+
 # Using read_data() to read the respective datasets into dictionaries
 new_suicide_dataset = read_data("/Users/tkmuro/PycharmProjects/tkProgramming/Labs/Lab2/Age-standardized suicide rates.csv")
+coordinate_dataset = read_data("/Users/tkmuro/PycharmProjects/tkProgramming/Labs/Lab2/countries.csv")
 conflict_dataset = read_data("/Users/tkmuro/PycharmProjects/tkProgramming/Labs/Lab2/gdelt_processor_friendly.csv")
 # The 'processor friendly' version only has data beyond the year 2000, since that's roughly the range of the suicide
 # data. This way, the program can spend less time looking through all 176k lines of the original dataset, while still
@@ -90,7 +99,8 @@ for i in new_suicide_dataset:
 #     print(k, "\n", v)
 
 plt.figure(0, tight_layout=True)
-target = "China"
+# target = "China"
+target = user_input("Select a country: ", country_names)
 x_key = 'Years'
 y_key_1 = 'Suicide Rates'
 y_key_2 = 'Events'
@@ -101,11 +111,12 @@ x_vals = [x for x in country_dict[target][x_key]]
 y1_vals = [y for y in country_dict[target][y_key_1]]
 y2_vals = [y for y in country_dict[target][y_key_2]]
 
-plt.plot(x_vals, y1_vals, color="red")
-plt.plot(x_vals, y2_vals, color="blue")
+# plt.plot(x_vals, y1_vals, color="red", label='Suicide Rates')
+plt.plot(x_vals, y2_vals, color="blue", label='Total Events')
 plt.title('Simple Plot')
 plt.xlabel(x_key)
-plt.ylabel("Placeholder")
+plt.ylabel("Total Events (10^6)")
+plt.legend()
 # plt.xticks(rotation=75, size=5)
 # plt.yticks(size=5)
 
