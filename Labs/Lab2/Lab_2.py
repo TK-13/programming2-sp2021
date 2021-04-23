@@ -99,23 +99,21 @@ for i in new_suicide_dataset:
 #     print(k, "\n", v)
 
 plt.figure(0, tight_layout=True)
-# target = "China"
+print(country_names)
 target = user_input("Select a country: ", country_names)
+
 x_key = 'Years'
 y_key_1 = 'Suicide Rates'
 y_key_2 = 'Events'
-
-print(country_dict[target][y_key_1])
-
 x_vals = [x for x in country_dict[target][x_key]]
-y1_vals = [y for y in country_dict[target][y_key_1]]
+y1_vals = [y*(10**4) for y in country_dict[target][y_key_1]]
 y2_vals = [y for y in country_dict[target][y_key_2]]
 
-# plt.plot(x_vals, y1_vals, color="red", label='Suicide Rates')
+plt.plot(x_vals, y1_vals, color="red", label='Suicide Rates')
 plt.plot(x_vals, y2_vals, color="blue", label='Total Events')
 plt.title('Simple Plot')
 plt.xlabel(x_key)
-plt.ylabel("Total Events (10^6)")
+plt.ylabel("Total Events (10^6)\nand Suicide Rates (10^6 for easy viewing)")
 plt.legend()
 # plt.xticks(rotation=75, size=5)
 # plt.yticks(size=5)
