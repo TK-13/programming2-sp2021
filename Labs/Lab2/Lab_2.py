@@ -7,7 +7,7 @@ import folium
 country_names = []
 total_events = []
 total_years = [2000, 2010, 2015, 2016]
-center_coordinates = [37.5131, 122.1204]
+center_coordinates = [0, 0]
 
 
 # This function compiles a chronological list of the total events of the specified country. This is used to efficiently
@@ -49,6 +49,10 @@ def user_input(message, param_list):
     return user_entry
 
 
+def rate_of_change(country, key):
+    return float((country_dict[country][key][3] - country_dict[country][key][0]) / 16)
+
+
 # Using read_data() to read the respective datasets into dictionaries
 new_suicide_dataset = read_data("/Users/tkmuro/PycharmProjects/tkProgramming/Labs/Lab2/Age-standardized suicide rates.csv")
 coordinate_dataset = read_data("/Users/tkmuro/PycharmProjects/tkProgramming/Labs/Lab2/countries.csv")
@@ -88,6 +92,8 @@ my_dict {
 
 
 # Making Dictionaries for each country, all nested within an overall dictionary.
+# TODO: The datasets have slightly different names for some countries, and others lack data entirely in
+#  gdelt. Figure out how to filter; start by comparing the country names for each with lists. Look at internet users.
 country_dict = {}
 for i in new_suicide_dataset:
     if i["Country"] not in country_names:
@@ -99,55 +105,72 @@ for i in new_suicide_dataset:
             "Events": populate_events(key)
         }
 
+for k, r in country_dict.items():
+    if country_dict[k]['Events'] == []:
+        print(k, r)
+        # country_dict.pop(k)
+
 # for k, v in country_dict.items():
 #     print(k, "\n", v)
 
 # Graphing suicide rates and total conflicts over time for any arbitrary country. Graphing 2 types of data
 # for every country would be a nightmare, so I had to go one at a time.
-plt.figure(0, tight_layout=True)
-print(country_names)
-target = user_input("Select a country: ", country_names)
+proceed_graphing = user_input("\nGraph a country's data? [y/n]: ", ['y', 'n'])
+if proceed_graphing:
+    plt.figure(0, tight_layout=True)
+    print(country_names)
+    target = user_input("Select a country: ", country_names)
 
-x_key = 'Years'
-y_key_1 = 'Suicide Rates'
-y_key_2 = 'Events'
-x_values = [x for x in country_dict[target][x_key]]
-y1_values = [y * (10 ** 4) for y in country_dict[target][y_key_1]]
-# Suicide rates are multiplied like so for easier reading on the graph. Otherwise it looked horizontal.
-# consider not manipulating the data.
-y2_values = [y for y in country_dict[target][y_key_2]]
+    x_key = 'Years'
+    y_key_1 = 'Suicide Rates'
+    y_key_2 = 'Events'
+    x_values = [x for x in country_dict[target][x_key]]
+    y1_values = [y * (10 ** 4) for y in country_dict[target][y_key_1]]
+    # Suicide rates are multiplied like so for easier reading on the graph. Otherwise it looked horizontal.
+    # consider not manipulating the data.
+    y2_values = [y for y in country_dict[target][y_key_2]]
 
-plt.plot(x_values, y1_values, color="red", label='Suicide Rates')
-plt.plot(x_values, y2_values, color="blue", label='Total Events')
-plt.title('Suicide Rates and Total Events of ' + target + ' over Time')
-plt.xlabel(x_key)
-plt.ylabel("Total Events (10^6) and\nSuicide Rates (10^4 for easy viewing)")
-plt.legend()
-# plt.xticks(rotation=75, size=5)
-# plt.yticks(size=5)
-plt.show()
+    plt.plot(x_values, y1_values, color="red", label='Suicide Rates')
+    plt.plot(x_values, y2_values, color="blue", label='Total Events')
+    plt.title('Suicide Rates and Total Events of ' + target + ' over Time')
+    plt.xlabel(x_key)
+    plt.ylabel("Total Events (10^6) and\nSuicide Rates (10^4 for easy viewing)")
+    plt.legend()
+    plt.show()
+
+
+# print(country_names)
+# print(country_dict["Bolivia (Plurinational State of)"])
 
 # Finding correlation between conflict and suicides
 # for every country:
+# for country in country_names:
+#     if country != "Bahamas" and country != 'Bolivia (Plurinational State of)':
+#         rate_of_change_suicides = rate_of_change(country, "Suicide Rates")
+#         rate_of_change_conflicts = rate_of_change(country, "Events")
+#         print(country, rate_of_change_suicides, rate_of_change_conflicts)
+
 # find overall change in conflicts, suicides
 # the smaller the difference, the bigger the radius
 # the greater the difference, the smaller the radius (correlation)
 
 # Mapping correlation between conflict and suicides geographically.
-circle_map = folium.Map(location=center_coordinates, zoom_start=2)
-for place in place_list:
-    if place['latitude'] != "" and place['longitude'] != "":
-        place['latitude'] = float(place['latitude'])
-        place['longitude'] = float(place['longitude'])
+proceed_map = user_input("\nMap correlation? [y/n]: ", ['y', 'n'])
+if proceed_map:
+    circle_map = folium.Map(location=center_coordinates, zoom_start=2)
+    for place in place_list:
+        if place['latitude'] != "" and place['longitude'] != "":
+            place['latitude'] = float(place['latitude'])
+            place['longitude'] = float(place['longitude'])
 
-    coordinates = (place['latitude'], place['longitude'])
+        coordinates = (place['latitude'], place['longitude'])
 
-    folium.CircleMarker(
-        radius=100,
-        location=coordinates,
-        popup=place['name'],
-        color="crimson",
-        fill=False,
-    ).add_to(circle_map)
+        folium.CircleMarker(
+            radius=100,
+            location=coordinates,
+            popup=place['name'],
+            color="crimson",
+            fill=False,
+        ).add_to(circle_map)
 
-circle_map.save('my_map.html')
+    circle_map.save('my_map.html')
