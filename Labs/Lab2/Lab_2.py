@@ -56,7 +56,6 @@ def rate_of_change(country, key):
 # Using read_data() to read the respective datasets into dictionaries
 new_suicide_dataset = read_data("/Users/tkmuro/PycharmProjects/tkProgramming/Labs/Lab2/Age-standardized suicide rates.csv")
 coordinate_dataset = read_data("/Users/tkmuro/PycharmProjects/tkProgramming/Labs/Lab2/countries.csv")
-place_list = read_data("/Users/tkmuro/PycharmProjects/tkProgramming/Labs/Lab2/countries.csv")
 conflict_dataset = read_data("/Users/tkmuro/PycharmProjects/tkProgramming/Labs/Lab2/gdelt_processor_friendly.csv")
 # The 'processor friendly' version only has data beyond the year 2000, since that's roughly the range of the suicide
 # data. This way, the program can spend less time looking through all 176k lines of the original dataset, while still
@@ -96,9 +95,10 @@ my_dict {
 #  gdelt. Figure out how to filter; start by comparing the country names for each with lists. Look at internet users.
 country_dict = {}
 for i in new_suicide_dataset:
-    if i["Country"] not in country_names:
-        country_names.append(i["Country"])
-        key = str(i["Country"])
+    name = i["Country"]
+    if name not in country_names:
+        country_names.append(name)
+        key = str(name)
         country_dict[key] = {
             "Years": total_years,
             "Suicide Rates": populate_suicides(key),
@@ -158,7 +158,7 @@ if proceed_graphing:
 proceed_map = user_input("\nMap correlation? [y/n]: ", ['y', 'n'])
 if proceed_map:
     circle_map = folium.Map(location=center_coordinates, zoom_start=2)
-    for place in place_list:
+    for place in coordinate_dataset:
         if place['latitude'] != "" and place['longitude'] != "":
             place['latitude'] = float(place['latitude'])
             place['longitude'] = float(place['longitude'])
