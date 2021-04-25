@@ -49,17 +49,30 @@ def user_input(message, param_list):
     return user_entry
 
 
+# This function finds the average rate of change of a value (whether that's suicide rate or conflicts) from
+# 2000 to 2016. Although crude, it was my best idea for determining whether the data correlated.
+# If I have time, I could try taking instantaneous rate of change for each year, to see if the conflicts and
+# suicides have similar slopes yearly.
 def rate_of_change(country, key):
     return float((country_dict[country][key][3] - country_dict[country][key][0]) / 16)
+
+
+# Developed in the dataset_sorting file, this function sorts through a target dataset and changes the value of
+# the specified key (usually, a unique country name like "Bahamas, The" is replaced with "Bahamas", to match
+# the country list
+def country_rename(target_dataset, key, target_name, replacement_name):
+    for row in target_dataset:
+        if row[key] == target_name:
+            row[key] = replacement_name
 
 
 # Using read_data() to read the respective datasets into dictionaries
 new_suicide_dataset = read_data("/Users/tkmuro/PycharmProjects/tkProgramming/Labs/Lab2/Age-standardized suicide rates.csv")
 coordinate_dataset = read_data("/Users/tkmuro/PycharmProjects/tkProgramming/Labs/Lab2/countries.csv")
 conflict_dataset = read_data("/Users/tkmuro/PycharmProjects/tkProgramming/Labs/Lab2/gdelt_processor_friendly.csv")
-# The 'processor friendly' version only has data beyond the year 2000, since that's roughly the range of the suicide
-# data. This way, the program can spend less time looking through all 176k lines of the original dataset, while still
-# having to sort through and find the right values, as it normally would.
+# The 'processor friendly' version only has data beyond the year 2000, since that's roughly the range of
+# the suicide data. This way, the program can spend less time looking through all 176k lines of the original
+# dataset, while still having to sort through and find the right values, as it normally would.
 
 
 '''
@@ -89,10 +102,68 @@ my_dict {
 }
 '''
 
+# Renaming:
+# All renames have to happen before the dictionary is made, so the key in the suicides dataset (and subsequently
+# the country names list) matches the key in the conflict dataset).
+# The target_list and replacement_list generation probably could have been automated with some loops and string
+# parsing, but I didn't have time to look into that.
+target_list = ['Bahamas',
+               'Bolivia (Plurinational State of)',
+               'Brunei Darussalam',
+               "Congo",
+               "Democratic Republic of the Congo",
+               'Cabo Verde',
+               "Côte d'Ivoire",
+               'Czechia',
+               'Iran (Islamic Republic of)',
+               "Lao People's Democratic Republic",
+               'Syrian Arab Republic',
+               'Eswatini',
+               "United Kingdom of Great Britain and Northern Ireland",
+               'United Republic of Tanzania',
+               'United States of America',
+               "Venezuela (Bolivarian Republic of)",
+               "Viet Nam",
+               'Gambia',
+               'Micronesia (Federated States of)',
+               "Democratic People's Republic of Korea",
+               "Republic of Korea",
+               "Republic of Moldova",
+               "Republic of North Macedonia",
+               "Russian Federation"]  # The names of certain countries within the suicide dataset
+
+replacement_list = ['Bahamas, The',
+                    'Bolivia',
+                    "Brunei",
+                    "Congo, Democratic Republic of the",
+                    "Congo, Democratic Republic of the",
+                    'Cape Verde',
+                    "Cote d'Ivoire",
+                    'Czech Republic',
+                    'Iran',
+                    "Laos",
+                    'Syria',
+                    "Swaziland",
+                    "United Kingdom",
+                    "Tanzania",
+                    "United States",
+                    "Venezuela",
+                    "Vietnam",
+                    "Gambia, The",
+                    "Micronesia, Federated States of",
+                    "Korea, North",
+                    "Korea, North",
+                    "Moldova",
+                    "Macedonia",
+                    "Russia"]  # The name of that same country within the gdelt dataset.
+
+for r in range(len(target_list)):
+    country_rename(new_suicide_dataset, 'Country', target_list[r], replacement_list[r])
+# extra line for the Democratic Republic of Congo because it had two names in gdelt too. --__--
+country_rename(conflict_dataset, 'CountryName', 'Congo, Republic of the', 'Congo, Democratic Republic of the')
+
 
 # Making Dictionaries for each country, all nested within an overall dictionary.
-# TODO: The datasets have slightly different names for some countries, and others lack data entirely in
-#  gdelt. Figure out how to filter; start by comparing the country names for each with lists. Look at internet users.
 country_dict = {}
 for i in new_suicide_dataset:
     name = i["Country"]
@@ -106,7 +177,7 @@ for i in new_suicide_dataset:
         }
 
 for k, r in country_dict.items():
-    if country_dict[k]['Events'] == []:
+    if not country_dict[k]['Events']:
         print(k, r)
         # country_dict.pop(k)
 
@@ -116,7 +187,7 @@ for k, r in country_dict.items():
 # Graphing suicide rates and total conflicts over time for any arbitrary country. Graphing 2 types of data
 # for every country would be a nightmare, so I had to go one at a time.
 proceed_graphing = user_input("\nGraph a country's data? [y/n]: ", ['y', 'n'])
-if proceed_graphing:
+if proceed_graphing == 'y':
     plt.figure(0, tight_layout=True)
     print(country_names)
     target = user_input("Select a country: ", country_names)
@@ -156,7 +227,7 @@ if proceed_graphing:
 
 # Mapping correlation between conflict and suicides geographically.
 proceed_map = user_input("\nMap correlation? [y/n]: ", ['y', 'n'])
-if proceed_map:
+if proceed_map == 'y':
     circle_map = folium.Map(location=center_coordinates, zoom_start=2)
     for place in coordinate_dataset:
         if place['latitude'] != "" and place['longitude'] != "":
