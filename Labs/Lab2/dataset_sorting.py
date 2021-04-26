@@ -31,25 +31,25 @@ countries_coords = read_country_names(coordinate_dataset, 'name')
 print()
 
 # Filtering
-# gdelt_not_in_suicides = []
-# gdelt_not_in_coords = []
-# dunce_list = []
-# for country in countries_gdelt:
-#     if country in countries_suicide and country in countries_coords:
-#         print(country, " confirmed.")
-#         print()
-#     elif country not in countries_suicide:
-#         gdelt_not_in_suicides.append(country)
-#     elif country not in countries_coords:
-#         gdelt_not_in_coords.append(country)
-#     else:
-#         print('!!! ', country, " is weird !!!")
-#         dunce_list.append(country)
+gdelt_not_in_suicides = []
+gdelt_not_in_coords = []
+dunce_list = []
+for country in countries_gdelt:
+    if country in countries_suicide and country in countries_coords:
+        print(country, " confirmed.")
+        print()
+    elif country not in countries_suicide:
+        gdelt_not_in_suicides.append(country)
+    elif country not in countries_coords:
+        gdelt_not_in_coords.append(country)
+    else:
+        print('!!! ', country, " is weird !!!")
+        dunce_list.append(country)
 
-# print()
-# print("gdelt not in coords:")
-# for x in gdelt_not_in_coords:
-#     print(x)
+print()
+print("gdelt not in coords:")
+for x in gdelt_not_in_coords:
+    print(x)
 
 
 def country_rename(target_dataset, key, target_name, replacement_name):
@@ -59,13 +59,13 @@ def country_rename(target_dataset, key, target_name, replacement_name):
 
 
 # Attempt 1
-for row in conflict_dataset:
-    if row['CountryName'] == "Bahamas, The":
-        print(row)
-
-print()
-
-country_rename(conflict_dataset, 'CountryName', 'Bahamas, The', 'Bahamas')
+# for row in conflict_dataset:
+#     if row['CountryName'] == "Bahamas, The":
+#         print(row)
+#
+# print()
+#
+# country_rename(conflict_dataset, 'CountryName', 'Bahamas, The', 'Bahamas')
 
 
 # for row in conflict_dataset:
@@ -73,16 +73,16 @@ country_rename(conflict_dataset, 'CountryName', 'Bahamas, The', 'Bahamas')
 #         row['CountryName'] = "Bahamas"
 
 # Attempt 2
-for row in conflict_dataset:
-    if row['CountryName'] == "Bahamas":
-        print(row)
+# for row in conflict_dataset:
+#     if row['CountryName'] == "Bahamas":
+#         print(row)
 
 # for row in new_suicide_dataset:
 #     if row['Country'] == 'Bahamas':
 #         print(row)
 
 '''
-Fixable gdelt not in coords:
+Fixable gdelt not in suicides:
 Bahamas, The - Bahamas
 Bolivia - Bolivia (Plurinational State of)
 Brunei - Brunei Darussalam

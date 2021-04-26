@@ -15,20 +15,20 @@ center_coordinates = [0, 0]
 def populate_events(country):
     year_tracker = []
     events = []
-    for i in conflict_dataset:
-        if i["CountryName"] == country and int(i['Year']) in total_years and i["Year"] not in year_tracker:
-            events.append(int(i["TotalEvents"]))
-            year_tracker.append(i["Year"])
+    for c in conflict_dataset:
+        if c["CountryName"] == country and int(c['Year']) in total_years and c["Year"] not in year_tracker:
+            events.append(int(c["TotalEvents"]))
+            year_tracker.append(c["Year"])
     return events
 
 
 # This function returns a chronological list of the suicide rates of the specified country.
 def populate_suicides(country):
     suicide_rates = []
-    for i in new_suicide_dataset:
-        if i["Country"] == country and i["Sex"] == " Both sexes":
+    for s in new_suicide_dataset:
+        if s["Country"] == country and s["Sex"] == " Both sexes":
             for t in total_years:
-                suicide_rates.append(float(i[str(t)]))
+                suicide_rates.append(float(s[str(t)]))
     return suicide_rates
 
 
@@ -161,6 +161,8 @@ for r in range(len(target_list)):
     country_rename(new_suicide_dataset, 'Country', target_list[r], replacement_list[r])
 # extra line for the Democratic Republic of Congo because it had two names in gdelt too. --__--
 country_rename(conflict_dataset, 'CountryName', 'Congo, Republic of the', 'Congo, Democratic Republic of the')
+print("Anomalous countries renamed.")
+print()
 
 
 # Making Dictionaries for each country, all nested within an overall dictionary.
@@ -173,19 +175,86 @@ for i in new_suicide_dataset:
         country_dict[key] = {
             "Years": total_years,
             "Suicide Rates": populate_suicides(key),
-            "Events": populate_events(key)
+            "Events": populate_events(key),
+            "Coordinates": (0, 0),
+            "Difference": 0.0
         }
+print("Dictionaries made.")
+print()
 
+# Finding correlation between conflict and suicides for every country, and adds to dictionary.
+for country in country_names:
+    delta_suicides = rate_of_change(country, "Suicide Rates")
+    delta_conflicts = rate_of_change(country, "Events")
+    difference = abs(delta_conflicts - delta_suicides)
+    # print(country, delta_suicides, delta_conflicts, difference)
+    country_dict[country]['Difference'] = difference
+print("Difference in rate of change data added.")
+print()
+
+# Adding coordinate data to dictionary. Country names were confirmed to align in dataset_sorting.
+for place in coordinate_dataset:
+    if place['latitude'] != "" and place['longitude'] != "":
+        place['latitude'] = float(place['latitude'])
+        place['longitude'] = float(place['longitude'])
+
+        coordinates = (place['latitude'], place['longitude'])
+        if place['name'] in country_names:
+            country_dict[place['name']]['Coordinates'] = coordinates
+print("Coordinate data added.")
+print()
+
+print(country_dict["Togo"]["Difference"])
+
+
+# Checks if any countries in the dictionary lack Event data.
 for k, r in country_dict.items():
     if not country_dict[k]['Events']:
         print(k, r)
-        # country_dict.pop(k)
 
-# for k, v in country_dict.items():
-#     print(k, "\n", v)
+
+# Mapping correlation between conflict and suicides geographically.
+proceed_map = user_input("\nMap correlation? [y/n]: ", ['y', 'n'])
+if proceed_map == 'y':
+    circle_map = folium.Map(location=center_coordinates, zoom_start=2)
+    for place in country_dict:
+        # if place['latitude'] != "" and place['longitude'] != "":
+        #     place['latitude'] = float(place['latitude'])
+        #     place['longitude'] = float(place['longitude'])
+        #
+        # coordinates = (place['latitude'], place['longitude'])
+
+        dummy_radius = ((country_dict[place]['Difference']) / 10)
+        dummy_color = "crimson"
+        # msg = (place +
+        #        ": \nSuicide rate: " + str(country_dict[place]['Suicide Rates']) +
+        #        "\nTotal Events: " + str(country_dict[place]['Events']))
+        msg = (place + " " + str(country_dict[place]['Difference']))
+
+        if float(dummy_radius) < 600:
+            dummy_color = "orange"
+        elif float(dummy_radius) < 500:
+            dummy_color = "green"
+        elif float(dummy_radius) > 800:
+            dummy_radius = 2
+            msg = (place + "\nDifference too large to show.")
+
+        folium.CircleMarker(
+            radius=dummy_radius,
+            location=(country_dict[place]['Coordinates']),
+            popup=msg,
+            color=dummy_color,
+            fill=False,
+        ).add_to(circle_map)
+
+    circle_map.save('my_map.html')
+
 
 # Graphing suicide rates and total conflicts over time for any arbitrary country. Graphing 2 types of data
 # for every country would be a nightmare, so I had to go one at a time.
+# I put this graph second in order so that, once the user has reviewed the global data, they can then look
+# at the graph for a particular country of their choosing.
+print(country_names)
 proceed_graphing = user_input("\nGraph a country's data? [y/n]: ", ['y', 'n'])
 if proceed_graphing == 'y':
     plt.figure(0, tight_layout=True)
@@ -208,40 +277,3 @@ if proceed_graphing == 'y':
     plt.ylabel("Total Events (10^6) and\nSuicide Rates (10^4 for easy viewing)")
     plt.legend()
     plt.show()
-
-
-# print(country_names)
-# print(country_dict["Bolivia (Plurinational State of)"])
-
-# Finding correlation between conflict and suicides
-# for every country:
-# for country in country_names:
-#     if country != "Bahamas" and country != 'Bolivia (Plurinational State of)':
-#         rate_of_change_suicides = rate_of_change(country, "Suicide Rates")
-#         rate_of_change_conflicts = rate_of_change(country, "Events")
-#         print(country, rate_of_change_suicides, rate_of_change_conflicts)
-
-# find overall change in conflicts, suicides
-# the smaller the difference, the bigger the radius
-# the greater the difference, the smaller the radius (correlation)
-
-# Mapping correlation between conflict and suicides geographically.
-proceed_map = user_input("\nMap correlation? [y/n]: ", ['y', 'n'])
-if proceed_map == 'y':
-    circle_map = folium.Map(location=center_coordinates, zoom_start=2)
-    for place in coordinate_dataset:
-        if place['latitude'] != "" and place['longitude'] != "":
-            place['latitude'] = float(place['latitude'])
-            place['longitude'] = float(place['longitude'])
-
-        coordinates = (place['latitude'], place['longitude'])
-
-        folium.CircleMarker(
-            radius=100,
-            location=coordinates,
-            popup=place['name'],
-            color="crimson",
-            fill=False,
-        ).add_to(circle_map)
-
-    circle_map.save('my_map.html')
