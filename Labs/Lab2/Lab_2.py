@@ -10,6 +10,9 @@ total_years = [2000, 2010, 2015, 2016]
 center_coordinates = [0, 0]
 
 
+# Describe intentions in comments, not implementation.
+
+
 # This function compiles a chronological list of the total events of the specified country. This is used to efficiently
 # populate the event information for each country.
 def populate_events(country):
@@ -75,33 +78,6 @@ conflict_dataset = read_data("/Users/tkmuro/PycharmProjects/tkProgramming/Labs/L
 # dataset, while still having to sort through and find the right values, as it normally would.
 
 
-'''
-Example:
-my_dict = {
-    "USA": {
-        "Years": [2018, 2019, ...],
-        "Suicide Rates": [1.4, 6.7, ...],
-        "Event Numbers": [50, 67, ...]
-    },
-    "Brazil": {
-        "Years": [2018, 2019, ...],
-        "Suicide Rates": [1.4, 6.7, ...],
-        "Event Numbers": [50, 67, ...]
-        }
-    }
-}
-
-my_dict {
-    2018: {
-        "USA": {
-        "Suicide Rate": 1.4,
-        "Num Events": 5
-    },
-    "Brazil": {
-        }
-}
-'''
-
 # Renaming:
 # All renames have to happen before the dictionary is made, so the key in the suicides dataset (and subsequently
 # the country names list) matches the key in the conflict dataset).
@@ -157,6 +133,33 @@ replacement_list = ['Bahamas, The',
                     "Macedonia",
                     "Russia"]  # The name of that same country within the gdelt dataset.
 
+'''
+Example:
+my_dict = {
+    "USA": {
+        "Years": [2018, 2019, ...],
+        "Suicide Rates": [1.4, 6.7, ...],
+        "Event Numbers": [50, 67, ...]
+    },
+    "Brazil": {
+        "Years": [2018, 2019, ...],
+        "Suicide Rates": [1.4, 6.7, ...],
+        "Event Numbers": [50, 67, ...]
+        }
+    }
+}
+
+my_dict {
+    2018: {
+        "USA": {
+        "Suicide Rate": 1.4,
+        "Num Events": 5
+    },
+    "Brazil": {
+        }
+}
+'''
+
 for r in range(len(target_list)):
     country_rename(new_suicide_dataset, 'Country', target_list[r], replacement_list[r])
 # extra line for the Democratic Republic of Congo because it had two names in gdelt too. --__--
@@ -204,8 +207,6 @@ for place in coordinate_dataset:
 print("Coordinate data added.")
 print()
 
-print(country_dict["Togo"]["Difference"])
-
 
 # Checks if any countries in the dictionary lack Event data.
 for k, r in country_dict.items():
@@ -225,18 +226,20 @@ if proceed_map == 'y':
         # coordinates = (place['latitude'], place['longitude'])
 
         dummy_radius = ((country_dict[place]['Difference']) / 10)
-        dummy_color = "crimson"
+        dummy_color = "orange"
         # msg = (place +
         #        ": \nSuicide rate: " + str(country_dict[place]['Suicide Rates']) +
         #        "\nTotal Events: " + str(country_dict[place]['Events']))
         msg = (place + " " + str(country_dict[place]['Difference']))
 
-        if float(dummy_radius) < 600:
-            dummy_color = "orange"
-        elif float(dummy_radius) < 500:
+        # TODO: fix colors.
+        if country_dict[place]['Difference'] <= 1000.0:
+            dummy_color = "yellow"
+        if country_dict[place]['Difference'] <= 500.0:
             dummy_color = "green"
-        elif float(dummy_radius) > 800:
+        if country_dict[place]['Difference'] >= 4000.0:
             dummy_radius = 2
+            dummy_color = "crimson"
             msg = (place + "\nDifference too large to show.")
 
         folium.CircleMarker(
