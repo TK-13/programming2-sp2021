@@ -69,6 +69,22 @@ def country_rename(target_dataset, key, target_name, replacement_name):
             row[key] = replacement_name
 
 
+# This function is supposed to make two graphs for the target country; suicide rates over time, and total conflicts
+# over time.
+def graph(figure_no, target_country, x_key, y_key, color):
+    plt.figure(figure_no, tight_layout=True)
+    x_values = [x for x in country_dict[target_country][x_key]]
+    y_values = [y for y in country_dict[target_country][y_key]]
+
+    # TODO: normalize y axis. Possible to make events as percentages. How much of the total occurred over each year?
+    #  Y scale from 0 to 100. Percent change?
+    # check units of suicide data.
+
+    plt.plot(x_values, y_values, color=color)
+    plt.title(y_key + ' of ' + target_country + ' over Time')
+    plt.ylabel(y_key)
+
+
 # Using read_data() to read the respective datasets into dictionaries
 new_suicide_dataset = read_data("/Users/tkmuro/PycharmProjects/tkProgramming/Labs/Lab2/Age-standardized suicide rates.csv")
 coordinate_dataset = read_data("/Users/tkmuro/PycharmProjects/tkProgramming/Labs/Lab2/countries.csv")
@@ -221,17 +237,19 @@ if proceed_map == 'y':
     for place in country_dict:
         dummy_radius = ((country_dict[place]['Difference']) / 10)
         dummy_color = "orange"
-        # msg = (place +
-        #        ": \nSuicide rate: " + str(country_dict[place]['Suicide Rates']) +
-        #        "\nTotal Events: " + str(country_dict[place]['Events']))
-        msg = (place + " " + str(country_dict[place]['Difference']))
+        msg = (place +
+               ": \nSuicide rate: " + str(country_dict[place]['Suicide Rates']) +
+               "\nTotal Events: " + str(country_dict[place]['Events']))
 
-        # TODO: fix colors.
-        if country_dict[place]['Difference'] <= 1000.0:
+        # This section is supposed to color code the circle marker for each country, by how great the difference is
+        # in rate of change of suicide rates vs conflicts. The smaller the difference, the darker the color.
+        # This just makes it easier to identify which regions have particularly strong correlation.
+        # Countries with massive distances are replaced by a red dot, to avoid overcrowding the map.
+        if country_dict[place]['Difference'] <= 600.0:
             dummy_color = "yellow"
         if country_dict[place]['Difference'] <= 500.0:
             dummy_color = "green"
-        if country_dict[place]['Difference'] >= 4000.0:
+        if country_dict[place]['Difference'] >= 1000.0:
             dummy_radius = 2
             dummy_color = "crimson"
             msg = (place + "\nDifference too large to show.")
@@ -253,29 +271,9 @@ if proceed_map == 'y':
 # at the graph for a particular country of their choosing.
 proceed_graphing = user_input("\nGraph a country's data? [y/n]: ", ['y', 'n'])
 if proceed_graphing == 'y':
-    plt.figure(0, tight_layout=True)
     print(country_names)
     target = user_input("Select a country: ", country_names)
+    graph(0, target, 'Years', 'Suicide Rates', 'red')
+    graph(1, target, 'Years', 'Events', 'blue')
 
-    x_key = 'Years'
-    y_key_1 = 'Suicide Rates'
-    y_key_2 = 'Events'
-    x_values = [x for x in country_dict[target][x_key]]
-    y1_values = [y * (10 ** 4) for y in country_dict[target][y_key_1]]
-    # Suicide rates are multiplied like so for easier reading on the graph. Otherwise it looked horizontal.
-    # consider not manipulating the data.
-
-    # y2_values = [y for y in country_dict[target][y_key_2]]
-    # TODO: normalize y axis. Possible to make events as percentages. How much of the total occurred over each year?
-    # Y scale from 0 to 100. Percent change?
-    # check units of suicide data.
-
-    # maybe just make 2 figures, and compare visually.
-
-    plt.plot(x_values, y1_values, color="red", label='Suicide Rates')
-    # plt.plot(x_values, y2_values, color="blue", label='Total Events')
-    plt.title('Suicide Rates and Total Events of ' + target + ' over Time')
-    plt.xlabel(x_key)
-    plt.ylabel("Total Events (10^6) and\nSuicide Rates (10^4 for easy viewing)")
-    plt.legend()
     plt.show()
