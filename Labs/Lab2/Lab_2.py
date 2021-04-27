@@ -31,7 +31,7 @@ def populate_suicides(country):
     for s in new_suicide_dataset:
         if s["Country"] == country and s["Sex"] == " Both sexes":
             for t in total_years:
-                suicide_rates.append(float(s[str(t)]))
+                suicide_rates.append(float(s[str(t)]))  # does it have to be specified as string?
     return suicide_rates
 
 
@@ -219,12 +219,6 @@ proceed_map = user_input("\nMap correlation? [y/n]: ", ['y', 'n'])
 if proceed_map == 'y':
     circle_map = folium.Map(location=center_coordinates, zoom_start=2)
     for place in country_dict:
-        # if place['latitude'] != "" and place['longitude'] != "":
-        #     place['latitude'] = float(place['latitude'])
-        #     place['longitude'] = float(place['longitude'])
-        #
-        # coordinates = (place['latitude'], place['longitude'])
-
         dummy_radius = ((country_dict[place]['Difference']) / 10)
         dummy_color = "orange"
         # msg = (place +
@@ -250,14 +244,13 @@ if proceed_map == 'y':
             fill=False,
         ).add_to(circle_map)
 
-    circle_map.save('my_map.html')
+    circle_map.save('lab2_map.html')
 
 
 # Graphing suicide rates and total conflicts over time for any arbitrary country. Graphing 2 types of data
 # for every country would be a nightmare, so I had to go one at a time.
 # I put this graph second in order so that, once the user has reviewed the global data, they can then look
 # at the graph for a particular country of their choosing.
-print(country_names)
 proceed_graphing = user_input("\nGraph a country's data? [y/n]: ", ['y', 'n'])
 if proceed_graphing == 'y':
     plt.figure(0, tight_layout=True)
@@ -271,10 +264,16 @@ if proceed_graphing == 'y':
     y1_values = [y * (10 ** 4) for y in country_dict[target][y_key_1]]
     # Suicide rates are multiplied like so for easier reading on the graph. Otherwise it looked horizontal.
     # consider not manipulating the data.
-    y2_values = [y for y in country_dict[target][y_key_2]]
+
+    # y2_values = [y for y in country_dict[target][y_key_2]]
+    # TODO: normalize y axis. Possible to make events as percentages. How much of the total occurred over each year?
+    # Y scale from 0 to 100. Percent change?
+    # check units of suicide data.
+
+    # maybe just make 2 figures, and compare visually.
 
     plt.plot(x_values, y1_values, color="red", label='Suicide Rates')
-    plt.plot(x_values, y2_values, color="blue", label='Total Events')
+    # plt.plot(x_values, y2_values, color="blue", label='Total Events')
     plt.title('Suicide Rates and Total Events of ' + target + ' over Time')
     plt.xlabel(x_key)
     plt.ylabel("Total Events (10^6) and\nSuicide Rates (10^4 for easy viewing)")
