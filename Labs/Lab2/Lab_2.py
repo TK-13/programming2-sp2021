@@ -8,6 +8,7 @@ country_names = []
 total_events = []
 total_years = [2000, 2010, 2015, 2016]
 center_coordinates = [0, 0]
+RUNS = 0
 
 
 # Describe intentions in comments, not implementation.
@@ -271,9 +272,16 @@ if proceed_map == 'y':
 # at the graph for a particular country of their choosing.
 proceed_graphing = user_input("\nGraph a country's data? [y/n]: ", ['y', 'n'])
 if proceed_graphing == 'y':
-    print(country_names)
-    target = user_input("Select a country: ", country_names)
-    graph(0, target, 'Years', 'Suicide Rates', 'red')
-    graph(1, target, 'Years', 'Events', 'blue')
+    done = False
+    while done != 'True':
+        if RUNS > 0:
+            done = user_input("Finished? [True, False] ", ['True', 'False'])
+        if done != 'True':
+            print()
+            print(country_names)
+            target = user_input("Select a country: ", country_names)
+            graph(0, target, 'Years', 'Suicide Rates', 'red')
+            graph(1, target, 'Years', 'Events', 'blue')
+            RUNS += 1
 
-    plt.show()
+            plt.show()
