@@ -11,11 +11,8 @@ center_coordinates = [0, 0]
 RUNS = 0
 
 
-# Describe intentions in comments, not implementation.
-
-
-# This function compiles a chronological list of the total events of the specified country. This is used to efficiently
-# populate the event information for each country.
+# This function is meant to compile a chronological list of the total events of the specified country.
+# This is used to efficiently populate the event information for each country.
 def populate_events(country):
     year_tracker = []
     events = []
@@ -26,17 +23,18 @@ def populate_events(country):
     return events
 
 
-# This function returns a chronological list of the suicide rates of the specified country.
+# This function works similarly a the previous one, but returns a list of suicide rates by year.
 def populate_suicides(country):
     suicide_rates = []
     for s in new_suicide_dataset:
         if s["Country"] == country and s["Sex"] == " Both sexes":
             for t in total_years:
-                suicide_rates.append(float(s[str(t)]))  # does it have to be specified as string?
+                suicide_rates.append(float(s[str(t)]))  # The values of total_years are ints, so in order for
+                # this to work as a key for new_suicide_dataset, it must be a string.
     return suicide_rates
 
 
-# This function just makes it easier to put the datasets into a dictionary.
+# This function is just mean to make it easier to put the datasets into a dictionary.
 def read_data(path):
     data_raw = open(path)
     data_reader = csv.DictReader(data_raw)
@@ -53,7 +51,8 @@ def user_input(message, param_list):
     return user_entry
 
 
-# This function finds the average rate of change of a value (whether that's suicide rate or conflicts) from
+# This function is part of my attempt to determine correlation between suicide rates and violent events.
+# It finds the average rate of change of a value (whether that's suicide rate or conflicts) from
 # 2000 to 2016. Although crude, it was my best idea for determining whether the data correlated.
 # If I have time, I could try taking instantaneous rate of change for each year, to see if the conflicts and
 # suicides have similar slopes yearly.
@@ -61,9 +60,10 @@ def rate_of_change(country, key):
     return float((country_dict[country][key][3] - country_dict[country][key][0]) / 16)
 
 
-# Developed in the dataset_sorting file, this function sorts through a target dataset and changes the value of
-# the specified key (usually, a unique country name like "Bahamas, The" is replaced with "Bahamas", to match
-# the country list
+# Developed in the dataset_sorting file, this function makes it easier to sort through all datasets using
+# one country_names list. In order to do that, I had to rename certain countries within a target dataset to a
+# specified key (Example: a unique country name like "Bahamas, The" is replaced with "Bahamas", to match
+# the country list)
 def country_rename(target_dataset, key, target_name, replacement_name):
     for row in target_dataset:
         if row[key] == target_name:
@@ -72,15 +72,10 @@ def country_rename(target_dataset, key, target_name, replacement_name):
 
 # This function is supposed to make two graphs for the target country; suicide rates over time, and total conflicts
 # over time.
-def graph(figure_no, target_country, x_key, y_key, color):
+def line_graph(figure_no, target_country, x_key, y_key, color):
     plt.figure(figure_no, tight_layout=True)
     x_values = [x for x in country_dict[target_country][x_key]]
     y_values = [y for y in country_dict[target_country][y_key]]
-
-    # TODO: normalize y axis. Possible to make events as percentages. How much of the total occurred over each year?
-    #  Y scale from 0 to 100. Percent change?
-    # check units of suicide data.
-
     plt.plot(x_values, y_values, color=color)
     plt.title(y_key + ' of ' + target_country + ' over Time')
     plt.ylabel(y_key)
@@ -123,7 +118,7 @@ target_list = ['Bahamas',
                "Republic of Korea",
                "Republic of Moldova",
                "Republic of North Macedonia",
-               "Russian Federation"]  # The names of certain countries within the suicide dataset
+               "Russian Federation"]  # The names of certain, misnamed countries within the suicide dataset
 
 replacement_list = ['Bahamas, The',
                     'Bolivia',
@@ -150,42 +145,19 @@ replacement_list = ['Bahamas, The',
                     "Macedonia",
                     "Russia"]  # The name of that same country within the gdelt dataset.
 
-'''
-Example:
-my_dict = {
-    "USA": {
-        "Years": [2018, 2019, ...],
-        "Suicide Rates": [1.4, 6.7, ...],
-        "Event Numbers": [50, 67, ...]
-    },
-    "Brazil": {
-        "Years": [2018, 2019, ...],
-        "Suicide Rates": [1.4, 6.7, ...],
-        "Event Numbers": [50, 67, ...]
-        }
-    }
-}
-
-my_dict {
-    2018: {
-        "USA": {
-        "Suicide Rate": 1.4,
-        "Num Events": 5
-    },
-    "Brazil": {
-        }
-}
-'''
-
+# This is supposed to go through the suicide dataset and rename all the countries specified in target_list
+# with their 'correct' name from the replacement list.
 for r in range(len(target_list)):
     country_rename(new_suicide_dataset, 'Country', target_list[r], replacement_list[r])
-# extra line for the Democratic Republic of Congo because it had two names in gdelt too. --__--
+# extra line for the Democratic Republic of Congo because it had two names within gdelt too.
 country_rename(conflict_dataset, 'CountryName', 'Congo, Republic of the', 'Congo, Democratic Republic of the')
 print("Anomalous countries renamed.")
 print()
 
 
 # Making Dictionaries for each country, all nested within an overall dictionary.
+# Ms. Ifft suggested making a dictionary of all countries, and to make sub-dictionaries within each country
+# containing lists for violent events, years, etc. This code is meant to accomplish that.
 country_dict = {}
 for i in new_suicide_dataset:
     name = i["Country"]
@@ -202,12 +174,13 @@ for i in new_suicide_dataset:
 print("Dictionaries made.")
 print()
 
-# Finding correlation between conflict and suicides for every country, and adds to dictionary.
+# This is supposed to find correlation between conflict and suicides for every country. I thought that, if the
+# average rate of change of the two is similar, there must be better correlation. Vice-versa, if the avg. rates
+# of change are different, there probably wasn't a connection.
 for country in country_names:
     delta_suicides = rate_of_change(country, "Suicide Rates")
     delta_conflicts = rate_of_change(country, "Events")
     difference = abs(delta_conflicts - delta_suicides)
-    # print(country, delta_suicides, delta_conflicts, difference)
     country_dict[country]['Difference'] = difference
 print("Difference in rate of change data added.")
 print()
@@ -225,12 +198,6 @@ print("Coordinate data added.")
 print()
 
 
-# Checks if any countries in the dictionary lack Event data.
-for k, r in country_dict.items():
-    if not country_dict[k]['Events']:
-        print(k, r)
-
-
 # Mapping correlation between conflict and suicides geographically.
 proceed_map = user_input("\nMap correlation? [y/n]: ", ['y', 'n'])
 if proceed_map == 'y':
@@ -245,7 +212,7 @@ if proceed_map == 'y':
         # This section is supposed to color code the circle marker for each country, by how great the difference is
         # in rate of change of suicide rates vs conflicts. The smaller the difference, the darker the color.
         # This just makes it easier to identify which regions have particularly strong correlation.
-        # Countries with massive distances are replaced by a red dot, to avoid overcrowding the map.
+        # Countries with massive differences are replaced by a red dot, to avoid overcrowding the map.
         if country_dict[place]['Difference'] <= 600.0:
             dummy_color = "yellow"
         if country_dict[place]['Difference'] <= 500.0:
@@ -266,22 +233,23 @@ if proceed_map == 'y':
     circle_map.save('lab2_map.html')
 
 
-# Graphing suicide rates and total conflicts over time for any arbitrary country. Graphing 2 types of data
-# for every country would be a nightmare, so I had to go one at a time.
-# I put this graph second in order so that, once the user has reviewed the global data, they can then look
-# at the graph for a particular country of their choosing.
+# Graphing suicide rates and total conflicts over time for any chosen country.
+# Even though it's technically my first graph, I put it second in order so that, once the user has reviewed the
+# global data, they can then look at the graph for a particular country of their choosing.
 proceed_graphing = user_input("\nGraph a country's data? [y/n]: ", ['y', 'n'])
 if proceed_graphing == 'y':
     done = False
     while done != 'True':
         if RUNS > 0:
             done = user_input("Finished? [True, False] ", ['True', 'False'])
+            # This "game loop" is in place so that users can look at as many graphs as they want, rather than having
+            # to re-run the whole program each time.
         if done != 'True':
             print()
             print(country_names)
             target = user_input("Select a country: ", country_names)
-            graph(0, target, 'Years', 'Suicide Rates', 'red')
-            graph(1, target, 'Years', 'Events', 'blue')
+            line_graph(0, target, 'Years', 'Suicide Rates', 'red')
+            line_graph(1, target, 'Years', 'Events', 'blue')
             RUNS += 1
 
             plt.show()

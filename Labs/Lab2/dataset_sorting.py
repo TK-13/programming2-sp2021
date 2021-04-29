@@ -1,5 +1,8 @@
 import csv
 
+
+# Datasets are read and converted in exactly the same way as in Lab_2, to simulate that 'environment' without having
+# to run the whole Lab program.
 def read_data(path):
     data_raw = open(path)
     data_reader = csv.DictReader(data_raw)
@@ -13,14 +16,16 @@ coordinate_dataset = read_data("/Users/tkmuro/PycharmProjects/tkProgramming/Labs
 conflict_dataset = read_data("/Users/tkmuro/PycharmProjects/tkProgramming/Labs/Lab2/gdelt_processor_friendly.csv")
 
 
+# Reading all the country names into lists, for easier handling. Supposed to be more efficient than running through
+# the whole dataset each time.
 def read_country_names(dataset, key):
     name_list = []
     for row in dataset:
         name = row[key]
-        # print(name)
+        print(name)
         if name not in name_list:
             name_list.append(name)
-    # print()
+    print()
     name_list.sort()
     return name_list
 
@@ -30,7 +35,14 @@ countries_gdelt = read_country_names(conflict_dataset, 'CountryName')
 countries_coords = read_country_names(coordinate_dataset, 'name')
 print()
 
-# Filtering
+# Filtering:
+# every country name in GDELT is cross referenced against the suicide dataset, because country_names is derived from
+# the names in the suicide dataset. This is because suicide dataset has fewer entries, so otherwise there would be
+# lots of entries in country_dict without suicide data.
+
+# If a name is in both the suicide and coordinate lists, it's listed as confirmed.
+# If a name is not in suicides, it's appended to the appropriate list for later use. Same goes for names not in
+# coordinates.
 gdelt_not_in_suicides = []
 gdelt_not_in_coords = []
 dunce_list = []
@@ -58,6 +70,7 @@ def country_rename(target_dataset, key, target_name, replacement_name):
             row[key] = replacement_name
 
 
+# A testing ground, to see if country_rename worked.
 # Attempt 1
 # for row in conflict_dataset:
 #     if row['CountryName'] == "Bahamas, The":
@@ -81,6 +94,8 @@ def country_rename(target_dataset, key, target_name, replacement_name):
 #     if row['Country'] == 'Bahamas':
 #         print(row)
 
+# Manually-generated lists of names, and their replacements. I printed out the gdelt_not_in... lists, to put these
+# together.
 '''
 Fixable gdelt not in suicides:
 Bahamas, The - Bahamas
@@ -109,32 +124,4 @@ Korea, North, Democratic People's Republic of Korea + Republic of Korea
 Fixable gdelt not in coords:
 Myanmar - Myanmar [Burma]
 Sao Tome and Principe - S?o Tom? and Pr?ncipe
-'''
-
-
-
-
-'''
-countries_s = {}
-for s in suicide_dataset:
-    if s["year"] == "2014":
-        if s["\ufeffcountry"] not in countries_s:
-            countries_s[str(s["\ufeffcountry"])] = s['suicides_no']
-            # countries_s.append(s["\ufeffcountry"])
-        else:
-            countries_s[str(s["\ufeffcountry"])] += s['suicides_no']
-
-for c in countries_s:
-    print(c)
-
-# output_file = open('gdelt_trimmed', 'w')
-# output_writer = csv.writer(output_file)
-# output_writer.writerow(['Year', 'Country', 'Total Events', 'Total Suicides'])
-# for row in conflict_dataset:
-#     if row["Year"] == 2014:
-#         output_writer.writerow()
-#
-#
-# output_file.close()
-
 '''
