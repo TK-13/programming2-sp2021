@@ -8,13 +8,14 @@ country_names = []
 total_events = []
 total_years = [2000, 2010, 2015, 2016]
 center_coordinates = [0, 0]
-RUNS = 0
+runs = 0
 
 
 # This function is meant to compile a chronological list of the total events of the specified country.
 # This is used to efficiently populate the event information for each country.
 def populate_events(country):
-    year_tracker = []
+    year_tracker = []  # this list is meant to keep track of which years have had their associated total event data
+    # recorded, to prevent redundancy.
     events = []
     for c in conflict_dataset:
         if c["CountryName"] == country and int(c['Year']) in total_years and c["Year"] not in year_tracker:
@@ -240,7 +241,7 @@ proceed_graphing = user_input("\nGraph a country's data? [y/n]: ", ['y', 'n'])
 if proceed_graphing == 'y':
     done = False
     while done != 'True':
-        if RUNS > 0:
+        if runs > 0:
             done = user_input("Finished? [True, False] ", ['True', 'False'])
             # This "game loop" is in place so that users can look at as many graphs as they want, rather than having
             # to re-run the whole program each time.
@@ -250,6 +251,6 @@ if proceed_graphing == 'y':
             target = user_input("Select a country: ", country_names)
             line_graph(0, target, 'Years', 'Suicide Rates', 'red')
             line_graph(1, target, 'Years', 'Events', 'blue')
-            RUNS += 1
+            runs += 1
 
             plt.show()
