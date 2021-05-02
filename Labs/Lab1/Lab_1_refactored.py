@@ -14,8 +14,8 @@ done = False
 date_list = []
 
 
-# Functions now ordered by appearance.
 # While the program is active, this function will prompt the user to decide what to do.
+# REFACTOR: Functions now ordered by appearance.
 # REFACTOR: I tried to pass the 'done' variable through the interface and manipulate it that way, but then the end
 def main_interface():
     global done
@@ -65,6 +65,30 @@ def user_input(message, options_list, response="", options_message="Valid Inputs
     return entry
 
 
+# For easy access in the main interface, this function just finds all the different dates in my_schedule.csv, and
+# prints those options for the user to decide which date to work with.
+def list_of_dates():
+    global date_list
+    for d in range(len(schedule_list)):
+        if schedule_list[d]["Date"] not in date_list:
+            date_list.append(schedule_list[d]["Date"])
+    print("Available dates:")
+    for date in date_list:
+        print(date)
+    return date_list
+
+
+# Updating the CSV: this function rewrites the contents of schedule_list (which has been modified by cancel, reschedule,
+# or conflict_check), back to my_schedule.csv.
+def update():
+    schedule_csv = open('./my_schedule.csv', 'w')
+    writer = csv.writer(schedule_csv)
+    writer.writerow(["Date", "Event", "Start Time", "End Time"])
+    for x in range(len(schedule_list)):
+        writer.writerow([schedule_list[x]["Date"], schedule_list[x]["Event"], schedule_list[x]["Start Time"],
+                         schedule_list[x]["End Time"]])
+
+
 # This runs through all events on a date, detects if any events have the same start time, and asks the user if
 # they would like to reschedule or cancel.
 # Unfortunately, I wasn't able to check whether rescheduled times conflicted with other events, or parse through the
@@ -107,7 +131,7 @@ def conflict_check(date, conflict_list, removed_tally):
     update()
 
 
-# In progress, currently doesn't work.
+# REFACTOR: Still doesn't work, sorry.
 def reschedule(location, date=None, name=False, s_time=None):  # can it work on its own?
     global removed_tally
     if location:
@@ -135,30 +159,6 @@ def reschedule_manual(place):
     schedule_list[place]["Start Time"] = new_start
     new_end = input("New end time: ")
     schedule_list[place - removed_tally]["End Time"] = new_end
-
-
-# For easy access in the main interface, this function just finds all the different dates in my_schedule.csv, and
-# prints those options for the user to decide which date to work with.
-def list_of_dates():
-    global date_list
-    for d in range(len(schedule_list)):
-        if schedule_list[d]["Date"] not in date_list:
-            date_list.append(schedule_list[d]["Date"])
-    print("Available dates:")
-    for date in date_list:
-        print(date)
-    return date_list
-
-
-# Updating the CSV: this function rewrites the contents of schedule_list (which has been modified by cancel, reschedule,
-# or conflict_check), back to my_schedule.csv.
-def update():
-    schedule_csv = open('./my_schedule.csv', 'w')
-    writer = csv.writer(schedule_csv)
-    writer.writerow(["Date", "Event", "Start Time", "End Time"])
-    for x in range(len(schedule_list)):
-        writer.writerow([schedule_list[x]["Date"], schedule_list[x]["Event"], schedule_list[x]["Start Time"],
-                         schedule_list[x]["End Time"]])
 
 
 # This function is the basic form of my cancellation system. If given a name, or a date and a name, it will remove the
