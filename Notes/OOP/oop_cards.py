@@ -1,3 +1,5 @@
+import random
+
 SUITS = ['♥', '♦', '♠', '♣']
 RANKS = ['2', '3', '4', '5', '6', '7', '8', '9', '10', 'Jack', 'Queen', 'King', 'Ace']
 
@@ -22,10 +24,22 @@ class Deck:
         for card in self.deck:
             card.flip()
 
+    def shuffle(self):
+        random.shuffle(self.deck)
+
+    def draw_card(self):
+        selection = self.deck.pop(0)
+        selection.flip()
+        return selection
+
+
 
 def main():
     deck = Deck()
+    deck.shuffle()
     deck.show()
+    drawn_card = deck.draw_card()
+
 
 
 if __name__ == "__main__":
