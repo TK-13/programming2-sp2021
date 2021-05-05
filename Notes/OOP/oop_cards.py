@@ -1,10 +1,12 @@
+import random
+
 SUITS = ['♥', '♦', '♠', '♣']
 RANKS = ['2', '3', '4', '5', '6', '7', '8', '9', '10', 'Jack', 'Queen', 'King', 'Ace']
 
 
-class Card:
-    def __init__(self, rank, suit):
-        self.rank = rank
+class Card:  # The blueprint for a card object
+    def __init__(self, rank, suit):  # everything after self is a customization.
+        self.rank = rank  # The object's customization feature = what the user specifies.
         self.suit = suit
 
     def flip(self):
@@ -22,9 +24,34 @@ class Deck:
         for card in self.deck:
             card.flip()
 
+    def shuffle(self):
+        random.shuffle(self.deck)
+        # self.deck = random.sample(self.deck, 52)
+
+    def draw_card(self):
+        # x = random.randint(1, 52)
+        # listlist = []
+        # for i in x:
+        #     if i in listlist:
+        #         i = random.randint(1, 52)
+
+        selection = self.deck.pop(0)
+        # self.deck.pop(0)
+        # selection.flip()  # keep selection hidden (not shown in a game)
+        return selection
+
 
 def main():
     deck = Deck()
+    deck.show()
+    print()
+
+    deck.shuffle()
+    deck.show()
+    print()
+
+    drawn_card = deck.draw_card()
+    print()
     deck.show()
 
 
