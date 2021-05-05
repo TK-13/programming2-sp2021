@@ -1,5 +1,3 @@
-import random
-
 SUITS = ['♥', '♦', '♠', '♣']
 RANKS = ['2', '3', '4', '5', '6', '7', '8', '9', '10', 'Jack', 'Queen', 'King', 'Ace']
 
@@ -43,16 +41,10 @@ class Deck:
 
 def main():
     deck = Deck()
-    deck.show()
-    print()
-
     deck.shuffle()
     deck.show()
-    print()
-
     drawn_card = deck.draw_card()
-    print()
-    deck.show()
+
 
 
 if __name__ == "__main__":
