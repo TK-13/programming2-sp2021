@@ -9,15 +9,15 @@ schedule_list = list(csv.DictReader(schedule_reader))
 
 # Globals
 conflict_list = []
-removed_tally = 0
+REMOVED_TALLY = 0
 done = False
-date_list = []
+DATE_LIST = []
 
 
 # For easy access in the main interface, this function just finds all the different dates in my_schedule.csv, and
 # prints those options for the user to decide which date to work with.
 def list_of_dates():
-    global date_list
+    global DATE_LIST
     for d in range(len(schedule_list)):
         if schedule_list[d]["Date"] not in date_list:
             date_list.append(schedule_list[d]["Date"])
@@ -41,7 +41,7 @@ def update():
 # While the program is active, this function will prompt the user to decide what to do.
 def main_interface():
     global done
-    global date_list
+    global DATE_LIST
     act_list = ["1. Check for schedule conflicts.",
                 "2. Reschedule an event.",
                 "3. Cancel an event",
@@ -94,7 +94,7 @@ def user_input(message, param_list):
 # new date and time to put the rescheduled event in chronological order.
 def conflict_check(date):
     global conflict_list
-    global removed_tally
+    global REMOVED_TALLY
     event_names = []
     print()
     for i in range(len(schedule_list)):
@@ -158,7 +158,7 @@ def book(date="", name="", start="20", end=""):
 
 # In progress, currently doesn't work.
 def reschedule(location, date=None, name=False, s_time=None):  # can it work on its own?
-    global removed_tally
+    global REMOVED_TALLY
     if location:
         reschedule_manual(location)
     else:
@@ -183,14 +183,14 @@ def reschedule_manual(place):
     new_start = input("New start time: ")
     schedule_list[place]["Start Time"] = new_start
     new_end = input("New end time: ")
-    schedule_list[place - removed_tally]["End Time"] = new_end
+    schedule_list[place - REMOVED_TALLY]["End Time"] = new_end
 
 
 # This function is the basic form of my cancellation system. If given a name, or a date and a name, it will remove the
 # event from schedule_list and notify the user. It can take either manual inputs (see manual_reschedule), or date, time,
 # and name values from conflict_check.
 def cancel(date, name, time=""):
-    global removed_tally
+    global REMOVED_TALLY
     for i in range(len(schedule_list)):
         start_time = schedule_list[i - removed_tally]['Start Time']
         event_title = schedule_list[i - removed_tally]['Event']
@@ -209,7 +209,7 @@ def cancel(date, name, time=""):
 # date), by it's name versus its' start time.
 # At last, it works.
 def manual_cancel(date):
-    global removed_tally
+    global REMOVED_TALLY
     name = ""
     time = ""
     valid_events = [schedule_list[r]["Event"] for r in range(len(schedule_list))]

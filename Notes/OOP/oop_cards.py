@@ -1,3 +1,5 @@
+import random
+
 SUITS = ['♥', '♦', '♠', '♣']
 RANKS = ['2', '3', '4', '5', '6', '7', '8', '9', '10', 'Jack', 'Queen', 'King', 'Ace']
 
@@ -7,8 +9,10 @@ class Card:  # The blueprint for a card object
         self.rank = rank  # The object's customization feature = what the user specifies.
         self.suit = suit
 
-    def flip(self):
-        print(self.rank + " of " + self.suit)
+    def flip(self, to_print=False):
+        if to_print:
+            print(self.rank + " of " + self.suit)
+        return self.rank + " of " + self.suit
 
 
 class Deck:
@@ -20,7 +24,7 @@ class Deck:
 
     def show(self):
         for card in self.deck:
-            card.flip()
+            card.flip(True)
 
     def shuffle(self):
         random.shuffle(self.deck)
@@ -39,15 +43,46 @@ class Deck:
         return selection
 
 
+class Player:
+    def __init__(self, name):
+        self.name = name
+        self.hand = []
+
+    def draw(self, source):
+        drawn_card = source.draw_card()
+        self.hand.append(drawn_card)
+
+    # From Alex and Aaron
+    def draw_better(self, deck, amount=1):
+        for i in range(amount):
+            self.hand.append(deck.draw_card())
+
+    def show_hand(self):
+        print(self.name + " has:\n")
+        for card in self.hand:
+            card.flip()
+
+    # From Alex and Aaron
+    def show_hand_better(self):
+        card_names = [card.flip() for card in self.hand]
+        print("{0}: {1}".format(self.name, ", ".join(card_names)))
+
+
 def main():
     deck = Deck()
     deck.shuffle()
     deck.show()
-    drawn_card = deck.draw_card()
 
+    print()
+    bob = Player("Bob")
+    bob.draw_better(deck,  3)
+    bob.show_hand_better()
+
+    print()
+    lucy = Player("Lucy")
+    lucy.draw_better(deck, 49)
+    lucy.show_hand_better()
 
 
 if __name__ == "__main__":
     main()
-
-
