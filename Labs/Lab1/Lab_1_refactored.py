@@ -7,18 +7,16 @@ schedule_reader = open('./my_schedule.csv', 'r')
 dict_reader = csv.DictReader(schedule_reader)
 schedule_list = list(csv.DictReader(schedule_reader))
 
-# Globals
-CONFLICT_LIST = []
-REMOVED_TALLY = 0
-DATE_LIST = []  # Try passing it into the functions, and define date list in main. Globals are usually used, and not
-# modified, so this isn't correct.
 
+# REFACTOR: Functions now ordered by appearance.
 
 # While the program is active, this function will prompt the user to decide what to do.
-# REFACTOR: Functions now ordered by appearance.
-# REFACTOR: I tried to pass the 'done' variable through the interface and manipulate it that way, but then the end
 def main_interface():
+    # Refactor 2: Successfully passed the former "globals" into each function without having to use the global label.
     done = False
+    conflict_list = []
+    removed_tally = 0
+    date_list = []
     command_list = ["1. Check for schedule conflicts.", "2. Reschedule an event.", "3. Cancel an event",
                     "4. Book an event.", "5. List today's events.", "13. End."]
 
@@ -31,20 +29,20 @@ def main_interface():
                             ["1", "2", "3", "4", "5", "13"],
                             response='Invalid command. ')
         if action == "1":
-            list_of_dates()
-            check_date = user_input("What date would you like to check? ", DATE_LIST, response='Date not found. ')
-            conflict_check(check_date, CONFLICT_LIST, REMOVED_TALLY)
+            list_of_dates(date_list)
+            check_date = user_input("What date would you like to check? ", date_list, response='Date not found. ')
+            conflict_check(check_date, conflict_list, removed_tally)
         elif action == "2":
             print("Unfortunately, I was unable to complete a manual reschedule system.")
         elif action == "3":
-            list_of_dates()
-            cancel_date = user_input("What date would you like to modify? ", DATE_LIST, response='Date not found. ')
-            manual_cancel(cancel_date)
+            list_of_dates(date_list)
+            cancel_date = user_input("What date would you like to modify? ", date_list, response='Date not found. ')
+            manual_cancel(cancel_date, removed_tally)
         elif action == "4":
             book()
         elif action == "5":
-            list_of_dates()
-            list_date = user_input("What date would you like to view? ", DATE_LIST, response='Date not found. ')
+            list_of_dates(date_list)
+            list_date = user_input("What date would you like to view? ", date_list, response='Date not found. ')
             days_events(list_date)
             print()
         elif action == "13":
@@ -70,15 +68,14 @@ def user_input(message, options_list, response="", options_message="Valid Inputs
 
 # For easy access in the main interface, this function just finds all the different dates in my_schedule.csv, and
 # prints those options for the user to decide which date to work with.
-def list_of_dates():
-    global DATE_LIST
+def list_of_dates(dates):
     for d in range(len(schedule_list)):
-        if schedule_list[d]["Date"] not in DATE_LIST:
-            DATE_LIST.append(schedule_list[d]["Date"])
+        if schedule_list[d]["Date"] not in dates:
+            dates.append(schedule_list[d]["Date"])
     print("Available dates:")
-    for date in DATE_LIST:
+    for date in dates:
         print(date)
-    return DATE_LIST
+    return dates
 
 
 # Updating the CSV: this function rewrites the contents of schedule_list (which has been modified by cancel, reschedule,
@@ -96,12 +93,9 @@ def update():
 # they would like to reschedule or cancel.
 # Unfortunately, I wasn't able to check whether rescheduled times conflicted with other events, or parse through the
 # new date and time to put the rescheduled event in chronological order.
-def conflict_check(date, conflict_list, removed_tally):  # TODO: example of passing into the function.
-    # global conflict_list
-    # global removed_tally
-    # REFACTOR: since the observation doc said only to use variables that were constants or passed into the
-    # function, I tried passing the conflict list and removed tally into the function, rather than using global.
-    # is that correct, or was my original method okay?
+def conflict_check(date, conflict_list, removed_tally):
+    # REFACTOR 2: as per your instructions, I passed date_list, conflict_list, and removed_tally through each
+    # function in this manner.
     event_names = []
     print()
     for i in range(len(schedule_list)):
@@ -112,21 +106,22 @@ def conflict_check(date, conflict_list, removed_tally):  # TODO: example of pass
                 print("\n{0} is not available.".format(start_time))
                 print("Events during {0}: ".format(start_time))
                 for w in range(len(schedule_list)):
-                    if schedule_list[w - removed_tally]['Date'] == str(date) and conflict_list.count(
-                            schedule_list[w - removed_tally]['Start Time']) >= 2:
-                        print(schedule_list[w - removed_tally]['Event'])
-                        event_names.append(schedule_list[w - removed_tally]['Event'])
+                    tally_shifted = w - removed_tally
+                    if schedule_list[tally_shifted]['Date'] == str(date) and conflict_list.count(
+                            schedule_list[tally_shifted]['Start Time']) >= 2:
+                        print(schedule_list[tally_shifted]['Event'])
+                        event_names.append(schedule_list[tally_shifted]['Event'])
                 target_event = user_input("Which event would you like to change? ", event_names,
                                           response="Event not found. ", print_options=False)
                 choice = user_input("Would you like to cancel or reschedule {0}? (r/c) ".format(target_event),
                                     ['r', 'c'], response="Invalid command. ")
                 if choice.lower() == "r":  # check if entered new start time conflicts with something else.
-                    reschedule(i)
+                    reschedule(i, conflict_list, removed_tally)
                     print("{0} has been rescheduled.".format(target_event, date))
                     conflict_list.clear()
                     event_names.clear()
                 elif choice.lower() == "c":
-                    cancel(date, target_event)
+                    cancel(removed_tally, date, target_event)
                     removed_tally += 1
                     conflict_list.clear()
                     event_names.clear()
@@ -134,51 +129,36 @@ def conflict_check(date, conflict_list, removed_tally):  # TODO: example of pass
     update()
 
 
-# REFACTOR: Still doesn't work, sorry.
-def reschedule(location, date=None, name=False, s_time=None):  # can it work on its own?
-    global REMOVED_TALLY
-    if location:
-        reschedule_manual(location)
-    else:
-        for j in range(len(schedule_list)):
-            if schedule_list[j]["Date"] == date:
-                if schedule_list[j]["Event"] == name:
-                    reschedule_manual(j)
-                elif schedule_list[j]["Start Time"] == s_time:
-                    print(CONFLICT_LIST)
-                    target = input("Which event do you want to alter at {0}? ".format(s_time))
-                    if schedule_list[j]["Event"] == target:
-                        reschedule_manual(j)
+# REFACTOR 2: Removed the reschedule function I wasn't able to finish, just to clear up space.
 
 
 # This function just takes new inputs for an event's new start time, end time, and date, and sets their values in
 # schedule_list accordingly.
 # These are probably throwing "Unexpected type" errors. Since the
 # keys for the dictionaries in schedule_list are strings, I'm not sure why this is happening.
-def reschedule_manual(place):
+def reschedule_manual(place, removed_tally):
     new_date = input("New date: ")
     schedule_list[place]["Date"] = new_date
     new_start = input("New start time: ")
     schedule_list[place]["Start Time"] = new_start
     new_end = input("New end time: ")
-    schedule_list[place - REMOVED_TALLY]["End Time"] = new_end
+    schedule_list[place - removed_tally]["End Time"] = new_end
 
 
 # This function is the basic form of my cancellation system. If given a name, or a date and a name, it will remove the
 # event from schedule_list and notify the user. It can take either manual inputs (see manual_reschedule), or date, time,
 # and name values from conflict_check.
-def cancel(date, name, time=""):
-    global REMOVED_TALLY
+def cancel(removed_tally, date, name, time=""):
     for i in range(len(schedule_list)):
-        start_time = schedule_list[i - REMOVED_TALLY]['Start Time']
-        event_title = schedule_list[i - REMOVED_TALLY]['Event']
-        if schedule_list[i - REMOVED_TALLY]['Date'] == str(date):
+        start_time = schedule_list[i - removed_tally]['Start Time']
+        event_title = schedule_list[i - removed_tally]['Event']
+        if schedule_list[i - removed_tally]['Date'] == str(date):
             if event_title == str(name):
-                del schedule_list[i - REMOVED_TALLY]
-                REMOVED_TALLY += 1
+                del schedule_list[i - removed_tally]
+                removed_tally += 1
             elif start_time == str(time) and str(time) and event_title == name:
-                del schedule_list[i - REMOVED_TALLY]
-                REMOVED_TALLY += 1
+                del schedule_list[i - removed_tally]
+                removed_tally += 1
     print("{0} has been cancelled on {1}.".format(name, date))
 
 
@@ -186,8 +166,7 @@ def cancel(date, name, time=""):
 # conflict_check function. It also asks the user whether they want to cancel an event (on the specified
 # date), by it's name versus its' start time.
 # At last, it works.
-def manual_cancel(date):
-    global REMOVED_TALLY
+def manual_cancel(date, removed_tally):
     name = ""
     time = ""
     valid_events = [schedule_list[r]["Event"] for r in range(len(schedule_list))]
@@ -201,10 +180,10 @@ def manual_cancel(date):
         print()
         print("Events during {0}: ".format(time))
         for w in range(len(schedule_list)):
-            if schedule_list[w - REMOVED_TALLY]['Date'] == str(date) and schedule_list[w - REMOVED_TALLY]["Start Time"] == time:
-                print(schedule_list[w - REMOVED_TALLY]['Event'])
+            if schedule_list[w - removed_tally]['Date'] == str(date) and schedule_list[w - removed_tally]["Start Time"] == time:
+                print(schedule_list[w - removed_tally]['Event'])
         name = user_input("Which event would you like to change? ", valid_events, response="Event not found. ")
-    cancel(date, name, time)
+    cancel(removed_tally, date, name, time)
     print()
     update()
 
@@ -231,8 +210,8 @@ def book(date="", name="", start="20", end=""):
         name = input("New event title: ")
         insert_point = 0
         # REFACTOR: I (sort of) improved the filtering system which prevents booking events after 20:00.
-        # this is sort of an improvement because it uses the user_input function, but more work had to be done
-        # above to make a list filtering out all options before 20:00.
+        # this is only sort of an improvement because although it uses the user_input function, more work had to be
+        # done above to make a list filtering out all options before 20:00.
         start = user_input("New event start time: ", open_times, response="Please do not schedule events after 20:00.")
         end = input("New event end time: ")
         for d in range(len(schedule_list)):
