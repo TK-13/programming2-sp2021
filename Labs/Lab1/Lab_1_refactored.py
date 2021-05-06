@@ -129,7 +129,20 @@ def conflict_check(date, conflict_list, removed_tally):
     update()
 
 
-# REFACTOR 2: Removed the reschedule function I wasn't able to finish, just to clear up space.
+# REFACTOR: Still doesn't work, sorry.
+def reschedule(location, conflict_list, removed_tally, date=None, name=False, s_time=None):  # can it work on its own?
+    if location:
+        reschedule_manual(location, removed_tally)
+    else:
+        for j in range(len(schedule_list)):
+            if schedule_list[j]["Date"] == date:
+                if schedule_list[j]["Event"] == name:
+                    reschedule_manual(j, removed_tally)
+                elif schedule_list[j]["Start Time"] == s_time:
+                    print(conflict_list)
+                    target = input("Which event do you want to alter at {0}? ".format(s_time))
+                    if schedule_list[j]["Event"] == target:
+                        reschedule_manual(j, removed_tally)
 
 
 # This function just takes new inputs for an event's new start time, end time, and date, and sets their values in
@@ -210,8 +223,8 @@ def book(date="", name="", start="20", end=""):
         name = input("New event title: ")
         insert_point = 0
         # REFACTOR: I (sort of) improved the filtering system which prevents booking events after 20:00.
-        # this is only sort of an improvement because although it uses the user_input function, more work had to be
-        # done above to make a list filtering out all options before 20:00.
+        # this is sort of an improvement because it uses the user_input function, but more work had to be done
+        # above to make a list filtering out all options before 20:00.
         start = user_input("New event start time: ", open_times, response="Please do not schedule events after 20:00.")
         end = input("New event end time: ")
         for d in range(len(schedule_list)):
