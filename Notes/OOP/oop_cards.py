@@ -24,22 +24,14 @@ class Deck:
 
     def show(self):
         for card in self.deck:
-            card.flip(True)
+            card.flip(to_print=True)
 
     def shuffle(self):
         random.shuffle(self.deck)
-        # self.deck = random.sample(self.deck, 52)
 
     def draw_card(self):
-        # x = random.randint(1, 52)
-        # listlist = []
-        # for i in x:
-        #     if i in listlist:
-        #         i = random.randint(1, 52)
-
         selection = self.deck.pop(0)
-        # self.deck.pop(0)
-        # selection.flip()  # keep selection hidden (not shown in a game)
+        selection.flip()
         return selection
 
 
@@ -72,17 +64,18 @@ def main():
     deck = Deck()
     deck.shuffle()
     deck.show()
+    drawn_card = deck.draw_card()
 
-    print()
     bob = Player("Bob")
-    bob.draw_better(deck,  3)
-    bob.show_hand_better()
+    bob.draw(deck, 3)
+    bob.show_hand()
 
-    print()
     lucy = Player("Lucy")
-    lucy.draw_better(deck, 49)
-    lucy.show_hand_better()
+    lucy.draw(deck, 49)
+    lucy.show_hand()
 
 
 if __name__ == "__main__":
     main()
+
+
