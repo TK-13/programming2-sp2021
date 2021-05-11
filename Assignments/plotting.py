@@ -11,7 +11,7 @@ import matplotlib.pyplot as plt
 
 
 # 1  Download the dataset and read in the file.
-cta_data_open = open("/Users/tkmuro/PycharmProjects/tkProgramming/Assignments/CTA_-_Ridership_-_Annual_Boarding_Totals.csv")
+cta_data_open = open("/Assignments/CTA_Ridership.csv")
 cta_data = csv.DictReader(cta_data_open)
 cta_data = list(cta_data)
 cta_data_open.close()
