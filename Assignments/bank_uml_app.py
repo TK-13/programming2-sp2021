@@ -1,8 +1,7 @@
 import random
-import names
-from tkinter import *
 
 
+# Supposed to make it easier to validate user inputs.
 def user_input(message, options_list, response="", options_message="Valid Inputs: ", print_options=False,
                entry_type='str'):
     if print_options:
@@ -22,54 +21,52 @@ def user_input(message, options_list, response="", options_message="Valid Inputs
     return entry
 
 
-def auth(message, options_list, correct_option, response="", entry_type='int'):
-    auth_done = False
-    if entry_type == 'str':
-        entry = str(input(message))
-    elif entry_type == 'int':
-        entry = int(input(message))
-    print(entry)
-    print(type(entry))
-    while entry != correct_option:
+# Rather than confirm from a list of correct answers, this function is meant to validate whether the user enters a
+# specific answer (like an account number).
+def auth(message, correct_option, response=""):
+    entry = int(input(message))
+    while entry != correct_option and entry != "":
         print(response)
-        print('Correct: ', correct_option)
-        entry = input(message)
-    if entry == correct_option:
-        return True
-    else:
-        return False
+        print('(Debug) Correct: ', correct_option)  # This is just here to make it easier to use on the developer side.
+        # it would be removed for the true product.
+        entry = int(input(message))
 
 
 class Client:
-    def __init__(self, name, social_security_num, cash, phone_num, email, mailing_address, account_list, account=None):
+    def __init__(self, name, social_security_num, cash, phone_num=0, email='', mailing_address='', account=None):
         self.name = name
         self.social_security_num = social_security_num
         self.cash = cash
         self.phone_num = phone_num
         self.email = email
         self.mailing_address = mailing_address
-        if account:
-            self.account = account
-        # else:
-        #     self.account = user_input('What is your account number? ', account_list,
-        #                               response='That is not a valid number.', entry_type='int')
-        # account_list.append(account_num)
+        self.account = account
 
-    def withdraw(self, account_list):
-        access_granted = auth("Please enter your account number: ", account_list, self.account.account_number,
-                              response='That is not your account number.', entry_type='int')
-        if access_granted:
-            amount = float(input("How much would you like to withdraw? "))
-            self.account.withdraw(amount)
+    def withdraw(self):
+        auth("Please enter your account number: ", self.account.account_number,
+             response='That is not your account number.')
+        amount = float(input("How much would you like to withdraw? "))
+        withdrawal = self.account.withdraw(amount)
+        if withdrawal:
+            self.cash += amount
+            print('Your cash: ', self.cash)
 
-    def deposit(self, account_list):
-        correct_account_num = auth("Please enter your account number: ", account_list, self.account.account_number,
-                                   response='Invalid number', entry_type='int')
-        if correct_account_num:
-            amount = float(input("How much would you like to withdraw? "))
-            self.account.deposit(amount)
-        else:
-            print("That is not your account number.")
+    def deposit(self, skip_receipt):
+        auth("Please enter your account number: ", self.account.account_number,
+             response='Invalid number')
+        amount = float(input("How much would you like to deposit? "))
+        self.account.deposit(amount, self.cash, skip_receipt)
+        self.cash -= amount
+        print('Your cash: ', self.cash)
+
+    def get_info(self):
+        self.account.get_info()
+
+    def close_account(self, account_list, dead_list):
+        dead_list.append(self.account.account_number)
+        account_list.remove(self.account.account_number)
+        del self.account
+        print('Your account has been closed.')
 
 
 class Account:
@@ -83,16 +80,26 @@ class Account:
     def withdraw(self, amount):
         if amount > self.balance:
             print('That amount exceeds your balance.\n')
+            return False
         else:
             self.balance -= amount
-            print('Withdrawal complete. New balance: ', str(self.balance), '\n')
+            print('Withdrawal complete. New balance: ', str(self.balance))
+            return True
 
-    def deposit(self, amount):
-        self.balance += amount
-        print('Deposit complete. New balance: ', str(self.balance), '\n')
+    def deposit(self, amount, cash, skip_receipt):
+        if amount > cash:
+            print('That amount exceeds your cash on hand.\n')
+        else:
+            self.balance += amount
+            print('Deposit complete. New balance: ', str(self.balance), '\n')
+            if not skip_receipt:
+                receipt_requested = user_input('Would you like a receipt? (y/n) ', ['y', 'yes', 'n', 'no'],
+                                               response='Invalid Entry')
+                if receipt_requested == 'y' or receipt_requested == 'yes':
+                    Account.give_receipt(self, quantity=amount)
 
     def get_info(self):
-        query_options = ['The account number', 'The account owner']
+        query_options = ['The account number', 'The account owner', 'The balance']
         query = user_input('What do you want to know about this account?\n',
                            query_options,
                            response='That is not an option.', print_options=True)
@@ -100,25 +107,29 @@ class Account:
             print(str(self.account_number))
         elif query == query_options[1]:
             print(str(self.owner))
-        print()
+        elif query == query_options[2]:
+            Account.give_receipt(self, quantity=0)
 
-    def give_receipt(self):
-        print('!!! receipt placeholder !!!\n')
-        print()
-
-
-# def access_account(accounts, number=0, owner=""):
-#     for i in range(len(accounts)):
-#         if accounts[i['account_number']] == number or accounts[i['owner']] == owner:
-#             print('Account found.\n')
+    def give_receipt(self, quantity):
+        print('Receipt: \nDate: (date would go here) \nName:', self.owner, '\nNumber:', self.account_number,
+              '\nDeposit Amount:', quantity, '\nTotal Balance:', self.balance)
 
 
-def make_account(account_list, social_security_num, owner, password, account_num=0, starting_amt=0.0):
-    if not account_num:
-        account_num = random.randrange(10000, 50000)
-    new_account = Account(account_num, starting_amt, owner, password, social_security_num)
-    account_list.append(account_num)
+def make_account(account_list, social_security_num, owner, password, account_number=0, starting_amt=0.0):
+    auth('New account: Please enter your social security number: ', social_security_num,
+         response='That is not your social security number. ')
+    if not account_number:
+        account_number = random.randrange(10000, 50000)
+    new_account = Account(account_number, starting_amt, owner, password, social_security_num)
+    account_list.append(account_number)
     return new_account
+
+
+def ask_for_num(account_list):
+    selected_account = int(input('What is your account number? '))
+    if selected_account not in account_list:
+        print('That account number is not in our database. Let me give you a call back later.')
+        callback_num = input('What is your phone number? ')
 
 
 # def close_account(self, social_security_num, owner, password):
@@ -126,60 +137,65 @@ def make_account(account_list, social_security_num, owner, password, account_num
 
 def main():
     account_list = []
-    print(account_list)
-    User = Client('User', 987654321, 20.0, 1231231234, 'noname@gmail.com', '330 Webster Avenue', account_list)
-    test = make_account(account_list, User.social_security_num, User.name, 'abcde', account_num=12345,
-                        starting_amt=1000.0)
-    User.account = test
-
+    dead_accounts = []
     print(account_list)
 
-    User.withdraw(account_list)
-    # User.deposit(account_list)
+    print('\nScenario 1: Withdrawal')
+    scenario_1 = Client('User', 987654321, 20.0, 1231231234, 'noname@gmail.com', '330 Webster Avenue')
+    scen_1_account = Account(12345, 1000.0, 'User', 'abcde', scenario_1.social_security_num)
+    account_list.append(scen_1_account.account_number)
+    scenario_1.account = scen_1_account
+    scenario_1.withdraw()
 
-    # test = Account(12345, 1000.00, 'User', 'abcde', 987654321)
-    # test.withdraw(10)
-    # test.deposit(20)
-    # test.get_info()
-    # test.give_receipt()
+    print('\nScenario 2: New account + deposit')
+    scenario_2 = Client('User 2', 246810121, 2000.0)
+    scen_2_account = make_account(account_list, scenario_2.social_security_num, scenario_2.name, 'password 2',
+                                  starting_amt=100)
+    scenario_2.account = scen_2_account
+    print(account_list)
+    scenario_2.deposit(skip_receipt=True)
 
-    # accounts = []
-    # done = False
-    # for i in range(47):
-    #     dummy_num = random.randrange(10001, 99999)
-    #     dummy_balance = random.randrange(10.00, 99999.00)
-    #     dummy_owner = names.get_full_name()
-    #     dummy_password = "password"
-    #     dummy_ssn = random.randrange(100000000, 999999999)
-    #     # dummy_account = Account(dummy_num, dummy_balance, dummy_owner, dummy_password, dummy_ssn)
-    #     # accounts.append(dummy_account)
-    #     accounts[dummy_num] = {'Balance': dummy_balance,
-    #                            'Owner': dummy_owner,
-    #                            'Password': dummy_password,
-    #                            'Social Security Num': dummy_ssn
-    #                            }
+    print('\nScenario 3: Deposit + Receipt')
+    scenario_3 = Client('User 3', 112112321, 1000.0)
+    scen_3_account = Account(33333, 0.0, scenario_3.name, 'passpasswordword', scenario_3.social_security_num)
+    scenario_3.account = scen_3_account
+    account_list.append(scen_3_account.account_number)
+    scenario_3.deposit(skip_receipt=False)
 
-    # user_account = Account(10000, 500.00, 'Dan Frank', '3mbry0n1c', 123456789)
-    # accounts.append(user_account)
-    #
-    # for a in accounts:
-    #     print(a)
-    # access = user_input("Enter your account number: ", accounts, response='That account number is invalid. ', entry_type='int')
+    print('\nScenario 4: Check balance + Receipt')
+    scenario_4 = Client('User 4', 444444444, 1000.0)
+    scen_4_account = Account(44444, 1301.56, scenario_4.name, 'passpasswordword', scenario_4.social_security_num)
+    scenario_4.account = scen_4_account
+    account_list.append(scen_4_account.account_number)
+    scenario_4.get_info()
 
-    # while not done:
-    #     command_list = ['1', '2,', '3', '4', '5,']
-    #     UI_list = ['1. Make a withdrawal. ',
-    #                '2. Make a deposit. ',
-    #                '3. Get account information. ',
-    #                '4. Make a new account. ',
-    #                '5. Close an account.']
-    #     command = user_input("What would you like to do? ", command_list, 'That is not a valid input. ')
-    #     for option in UI_list:
-    #         print(option)
+    print('\nScenario 5: Close account')
+    scenario_5 = Client('User 5', 555555555, 1000.0)
+    scen_5_account = Account(55555, 2000.0, scenario_5.name, 'password5', scenario_5.social_security_num)
+    scenario_5.account = scen_5_account
+    account_list.append(scen_5_account.account_number)
+    print('Before:', scenario_5.account)
+    scenario_5.close_account(account_list, dead_accounts)
+    print('After:')
+    try:
+        print(scenario_5.account)
+    except AttributeError:
+        print("!!! Attribute error hit. scenario_5's account no longer exists !!!")
+
+    print('\nScenario 6: Extreme withdrawal')
+    scenario_6 = Client('User 6', 666666666, 1000.0)
+    scen_6_account = Account(66666, 100.0, scenario_6.name, 'password6', scenario_6.social_security_num)
+    scenario_6.account = scen_6_account
+    account_list.append(scen_6_account.account_number)
+    scenario_6.withdraw()
+
+    print('\nScenario 7: Ask for an account number')
+    scenario_7 = Client('User 7', 777777777, 1000.0, phone_num=1234567890)
+    scen_7_account = Account(77777, 100.0, scenario_7.name, 'password7', scenario_7.social_security_num)
+    scenario_7.account = scen_7_account
+    account_list.append(scen_7_account.account_number)
+    ask_for_num(account_list)
 
 
 if __name__ == '__main__':
     main()
-
-    # todo: full main program is lower priority than class structures
-    # start with simple functionality, then add more.
