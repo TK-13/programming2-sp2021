@@ -5,6 +5,8 @@ class Person:
         self.address = None
         self.phone_number = None
 
+    # KEEP THIS IN MERGE: Setter function. If an attribute is not defined in init,
+    # you can do that here.
     def add_address(self, address):
         self.address = address
 
