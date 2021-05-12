@@ -43,10 +43,19 @@ class Student(Person):  # parent or super class is Person
             print("C: ({0})".format(self.group))
 
 
+class Teacher(Person):
+    def __init__(self, name, email_address):
+        super().__init__(name, email_address)
+
+    def print_contact_info(self):
+        print("Teacher:", self.name)
+        print(self.email_address)
+        if self.phone_number:
+            print("H: {0}".format(self.phone_number))
 
 
 def main():
-    ms_ifft = Person("Ms. Ifft", "bifft@fwparker.org")
+    ms_ifft = Teacher("Ms. Ifft", "bifft@fwparker.org")
     ms_ifft.add_phone_number('333-333-3333')
     ms_ifft.add_address('Chicago, IL 60647')
 
@@ -79,4 +88,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-
