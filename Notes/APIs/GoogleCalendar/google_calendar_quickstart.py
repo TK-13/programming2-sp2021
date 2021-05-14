@@ -1,3 +1,7 @@
+# https://developers.google.com/calendar/quickstart/python
+# https://developers.google.com/calendar/create-events
+# https://google-api-client-libraries.appspot.com/documentation/calendar/v3/python/latest/
+
 from __future__ import print_function
 import datetime
 import os.path
