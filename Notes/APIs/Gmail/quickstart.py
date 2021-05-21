@@ -61,19 +61,27 @@ def main():
             print(label['name'])
 
     # Call the Gmail API to get messages
-
-    result = service.users().messages().list(userId='me').execute()
+    # https://support.google.com/mail/answer/7190?hl=en
+    result = service.users().messages().list(userId='me', q='(college university)').execute()
     messages = result.get('messages')
+    next_page_token = result.get('nextPageToken')
+    counter = 0
+    while next_page_token:
+        counter += len(messages)
+        for msg in messages:
+            # Get the message from its id
+            txt = service.users().messages().get(userId='me', id=msg['id']).execute()
 
-    for msg in messages:
-        # Get the message from its id
-        txt = service.users().messages().get(userId='me', id=msg['id']).execute()
+            # Get value of 'payload' from dictionary 'txt'
+            payload = txt['payload']
+            headers = payload['headers']
+        result = service.users().messages().list(userId='me', q='(college university)', pageToken=next_page_token).execute()
+        messages = result.get('messages')
+        next_page_token = result.get('nextPageToken')
+        print(counter)
+        print(str(next_page_token))
 
-        # Get value of 'payload' from dictionary 'txt'
-        payload = txt['payload']
-        headers = payload['headers']
-
-        # body is in payload['body'] but needs to be decoded; mimeType is in payload['mimeType']
+            # body is in payload['body'] but needs to be decoded; mimeType is in payload['mimeType']
 
 
 if __name__ == '__main__':
