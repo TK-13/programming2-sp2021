@@ -5,7 +5,6 @@
 from pprint import pprint
 import csv
 
-
 # this will create a list of dictionaries
 print("\n\nPrinting a dictionary per row of roster.csv: ")
 class_data = open('../Resources/roster.csv')
