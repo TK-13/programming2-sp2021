@@ -63,6 +63,23 @@ for i in (progressbar):
 
 greenlight = [ledC, ledD, ledE]
 
+ldr = LightSensor(20)
+ldr.threshold = 0.6
+boundary = [0.6, 0.7]
+
+
+'''
+PDF Conversion lists: these are where the names of each photo taken by the camera will be stored whenever the program is run,
+so that they're kept in the proper order for conversion into a single PDF. The tally variable adds a random number between 0-500
+to the end of the pdf's title, to prevent files with the same name from being uploaded. 
+'''
+photolist = []
+namelist = []
+dummylist = []
+readylist = []
+tally = random.randrange(0, 500)
+imagelist = []
+
 
 def loading():
     greenlight = [ledC, ledD, ledE]
@@ -82,21 +99,26 @@ def loading():
         b.off()
 
 
-ldr = LightSensor(20)
-ldr.threshold = 0.6
-boundary = [0.6, 0.7]
-
 '''
-PDF Conversion lists: these are where the names of each photo taken by the camera will be stored whenever the program is run,
-so that they're kept in the proper order for conversion into a single PDF. The tally variable adds a random number between 0-500
-to the end of the pdf's title, to prevent files with the same name from being uploaded. 
+Adaptive Lighting: one of my pet peeves is having bad lighting when taking a picture of a homework submission. 
+The Snap gauges the ambient light using the light sensor, and turns on none, some, or all of the while overhead-mounted 
+LEDs accordingly. 
 '''
-photolist = []
-namelist = []
-dummylist = []
-readylist = []
-tally = random.randrange(0, 500)
-imagelist = []
+def adaptive_lighting(lightlist):
+    ldr.wait_for_light(3)
+    if boundary[0] >= ldr.value >= 0:
+        for q in lightlist:
+            q.on()
+    elif boundary[1] >= ldr.value >= boundary[0]:
+        for q in lightlist:
+            q.off()
+        for q in halflist:
+            q.on()
+    #         print("Light setting: intermediate")
+    elif ldr.value >= boundary[1]:
+        for q in lightlist:
+            q.off()
+    #         print("Light setting: off")
 
 
 def main():
@@ -105,26 +127,9 @@ def main():
 
     cam.start_preview(fullscreen=False, window=(300, 200, 640, 480))
 
-    while run == True:
+    while run:
+        adaptive_lighting(lightlist)
 
-        '''
-        Adaptive Lighting: one of my pet peeves is having bad lighting when taking a picture of a homework submission. The Snap gauges the
-        ambient light using the light sensor, and turns on none, some, or all of the while overhead-mounted LEDs accordingly. 
-        '''
-        ldr.wait_for_light(3)
-        if ldr.value >= 0 and ldr.value <= boundary[0]:
-            for q in lightlist:
-                q.on()
-        elif ldr.value >= boundary[0] and ldr.value <= boundary[1]:
-            for q in lightlist:
-                q.off()
-            for q in halflist:
-                q.on()
-        #         print("Light setting: intermediate")
-        elif ldr.value >= boundary[1]:
-            for q in lightlist:
-                q.off()
-        #         print("Light setting: off")
         '''
         Capture Loop: every time the left button is pressed, the camera takes a picture, whose name is saved to one of the PDF Conversion
         lists for later. Then, the user has three seconds (indicated by the green LEDs) to either stop the loop by holding the right
