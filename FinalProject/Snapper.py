@@ -15,7 +15,6 @@ pauses (ex. when camera waits to see if user wants to stop), PIL for converting 
 from gpiozero import Button, LED, LightSensor
 from time import sleep
 from PIL import Image
-import random
 from picamera import PiCamera
 
 
@@ -75,7 +74,7 @@ namelist = []
 dummylist = []
 readylist = []
 imagelist = []
-pdf_tally_path = '/Users/tkmuro/PycharmProjects/tkProgramming/FinalProject/testtest'
+pdf_tally_path = '/home/pi/testtest.txt'
 
 
 def loading(greenlight):
@@ -141,14 +140,14 @@ def convert_pdfs(names, storing_list, ready, tally):
         ready.append(j)
 
     # pdf_name = input("Enter PDF name: ")
-    storing_list[0].save(r'/home/pi/Desktop/' + str(tally) + '.pdf', save_all=True, append_images=ready)
+    storing_list[0].save(r'/home/pi/Desktop/TransferFiles/' + str(tally) + '.pdf', save_all=True, append_images=ready)
     tally += 1  # ^^^ PDF NAMES
 
 
 def main():
     run = True
     i = 0
-    tally = read_data(pdf_tally_path)
+    tally = int(read_data(pdf_tally_path))
     cam.start_preview(fullscreen=False, window=(300, 200, 640, 480))
 
     while run:
@@ -258,8 +257,8 @@ def main():
     #     print()
 
     # check if file with same name already exists
-    file_to_upload_path = '/home/pi/Desktop/' + str(tally) + '.pdf'  # <<< PDF NAMES
-    name_of_uploaded_file = ('hw%s.pdf' % (int(tally)))
+    file_to_upload_path = '/home/pi/Desktop/TransferFiles/' + str(tally) + '.pdf'  # <<< PDF NAMES
+    name_of_uploaded_file = ('hw%s.pdf' % (tally))
     response = service.files().list(
         q="trashed = false and name = '" + name_of_uploaded_file + "' and parents in '" + str(folder_id) + "'",
         spaces='drive',
@@ -316,8 +315,10 @@ def main():
         for i in PROGRESS_BAR:
             i.off()
 
-        tally_rewrite = open(pdf_tally_path)
-        tally_rewrite.write()
+        tally_rewrite = open(pdf_tally_path, 'w')
+        print(tally)
+        tally_rewrite.write(str(tally))
+        tally_rewrite.close()
 
 
 #     print()
