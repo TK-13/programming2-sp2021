@@ -1,7 +1,5 @@
-'''
-API Imports: these are required to interface with the Google Drive API
-https://developers.google.com/drive/api/v3/quickstart/python
-'''
+""" API Imports: these are required to interface with the Google Drive API
+https://developers.google.com/drive/api/v3/quickstart/python """
 from __future__ import print_function
 import pickle
 import os.path
@@ -17,13 +15,13 @@ pauses (ex. when camera waits to see if user wants to stop), PIL for converting 
 from gpiozero import Button, LED, LightSensor
 from time import sleep
 from PIL import Image
-import random
-try:
-    from picamera import PiCamera
+from picamera import PiCamera
 
-except:
-    print("Picamera doesn't work. Dummy Picam on.")
-    dummy_picam = True
+
+'''
+Version 2 Imports: pygame for new interface
+'''
+import pygame as pg
 
 '''
 Devices: These define the different hardware devices used with the Snap, using the GPIO library. The PiCamera required that
@@ -32,10 +30,8 @@ the rotation setting, which is part of the picamera library, be set to 90 degree
 The LEDs had to be grouped into lists, to make it easier to control large groups of them with fewer lines of code. This also allowed
 for some fun lighting patterns, such as the upload progress bar and PDF conversion indicator.
 '''
-if not dummy_picam:
-    cam = PiCamera()
-    cam.rotation = 180
-else:
+cam = PiCamera()
+cam.rotation = 180
 
 btn = Button(26)
 btn2 = Button(19)
@@ -57,11 +53,11 @@ ledC = LED(7)
 ledD = LED(8)
 ledE = LED(25)
 
-progressbar = [ledA, ledB, ledC, ledD, ledE]
-for i in (progressbar):
+PROGRESS_BAR = [ledA, ledB, ledC, ledD, ledE]
+for i in PROGRESS_BAR:
     i.off()
 
-greenlight = [ledC, ledD, ledE]
+GREEN_LIGHTS = [ledC, ledD, ledE]
 
 ldr = LightSensor(20)
 ldr.threshold = 0.6
@@ -77,12 +73,11 @@ photolist = []
 namelist = []
 dummylist = []
 readylist = []
-tally = random.randrange(0, 500)
 imagelist = []
+pdf_tally_path = '/home/pi/testtest.txt'
 
 
-def loading():
-    greenlight = [ledC, ledD, ledE]
+def loading(greenlight):
     c = -1
     f = 1
     for i in range(11):
@@ -99,32 +94,60 @@ def loading():
         b.off()
 
 
+# This function is just mean to make it easier to put the datasets into a string.
+def read_data(path):
+    file_for_read = open(path)
+    content = file_for_read.read()
+    file_for_read.close()
+    return content
+
+
 '''
 Adaptive Lighting: one of my pet peeves is having bad lighting when taking a picture of a homework submission. 
 The Snap gauges the ambient light using the light sensor, and turns on none, some, or all of the while overhead-mounted 
 LEDs accordingly. 
 '''
-def adaptive_lighting(lightlist):
+def adaptive_lighting(lights):
     ldr.wait_for_light(3)
     if boundary[0] >= ldr.value >= 0:
-        for q in lightlist:
+        for q in lights:
             q.on()
     elif boundary[1] >= ldr.value >= boundary[0]:
-        for q in lightlist:
+        for q in lights:
             q.off()
         for q in halflist:
             q.on()
-    #         print("Light setting: intermediate")
     elif ldr.value >= boundary[1]:
-        for q in lightlist:
+        for q in lights:
             q.off()
-    #         print("Light setting: off")
+
+
+'''
+Image to pdf conversion: this is where the PIL library comes into play. Each photo is defined as an Image, using the names saved from
+earlier. All images are appended to the ready list, except for the first. Then, the first image is saved as the PDF, while the other
+images are added on. This way, the PDF stays in order.
+'''
+def convert_pdfs(names, storing_list, ready, tally):
+    # print()
+    # print("--Starting PDF Conversion--")
+    for q in names:
+        image = Image.open(str(q))
+        im1 = image.convert('RGB')
+        out = im1.rotate(-90)
+        storing_list.append(out)
+
+    for j in storing_list[1:]:
+        ready.append(j)
+
+    # pdf_name = input("Enter PDF name: ")
+    storing_list[0].save(r'/home/pi/Desktop/TransferFiles/' + str(tally) + '.pdf', save_all=True, append_images=ready)
+    tally += 1  # ^^^ PDF NAMES
 
 
 def main():
     run = True
     i = 0
-
+    tally = int(read_data(pdf_tally_path))
     cam.start_preview(fullscreen=False, window=(300, 200, 640, 480))
 
     while run:
@@ -135,24 +158,24 @@ def main():
         lists for later. Then, the user has three seconds (indicated by the green LEDs) to either stop the loop by holding the right
         button, or to let it continue, in which case the program reevaluates the lighting and re-prompts the user to take a picture.
         '''
-        for item in greenlight:
+        for item in GREEN_LIGHTS:
             item.on()
         btn.wait_for_press()
-        for item in greenlight:
+        for item in GREEN_LIGHTS:
             item.off()
         sleep(1)
         cam.capture('/home/pi/Desktop/hw%s.jpg' % (str(i)))
         namelist.append('/home/pi/Desktop/hw%s.jpg' % (str(i)))
         i += 1
         #     print("Do you want to stop (press button2)?")
-        for item in greenlight:
+        for item in GREEN_LIGHTS:
             sleep(1)
             item.on()
-        if btn2.is_pressed == True:
+        if btn2.is_pressed:
             run = False
         else:
             #             print("Camera ready")
-            for item in greenlight:
+            for item in GREEN_LIGHTS:
                 item.on()
                 sleep(1)
     #         continue
@@ -162,27 +185,11 @@ def main():
 
     for item in lightlist:
         item.off()
-    for item in greenlight:
+    for item in GREEN_LIGHTS:
         item.off()
 
-    '''
-    Image to pdf conversion: this is where the PIL library comes into play. Each photo is defined as an Image, using the names saved from
-    earlier. All images are appended to the ready list, except for the first. Then, the first image is saved as the PDF, while the other
-    images are added on. This way, the PDF stays in order.
-    '''
-    # print()
-    # print("--Starting PDF Conversion--")
-    for q in namelist:
-        image = Image.open(str(q))
-        im1 = image.convert('RGB')
-        out = im1.rotate(-90)
-        dummylist.append(out)
-
-    for j in dummylist[1:]:
-        readylist.append(j)
-
-    dummylist[0].save(r'/home/pi/Desktop/raw.pdf', save_all=True, append_images=readylist)
-    loading()
+    convert_pdfs(namelist, dummylist, readylist, tally)
+    loading(GREEN_LIGHTS)
 
     '''
     Drive API Credentials: this is where the user is authorized to use the Drive API. If they don't have token.pickle (if they've never
@@ -250,8 +257,8 @@ def main():
     #     print()
 
     # check if file with same name already exists
-    file_to_upload_path = '/home/pi/Desktop/raw.pdf'
-    name_of_uploaded_file = ('hw%s.pdf' % (int(tally)))
+    file_to_upload_path = '/home/pi/Desktop/TransferFiles/' + str(tally) + '.pdf'  # <<< PDF NAMES
+    name_of_uploaded_file = ('hw%s.pdf' % (tally))
     response = service.files().list(
         q="trashed = false and name = '" + name_of_uploaded_file + "' and parents in '" + str(folder_id) + "'",
         spaces='drive',
@@ -268,15 +275,15 @@ def main():
         # print('File info: %s (%s)' % (files[0].get('name'), files[0].get('id')))
         # ^^ this was old diagnostic code, which told the user what happened with text. This has been replaced with LED indicators.
     else:
-        #         print("File with name {0} does not exist in {1}.".format(name_of_uploaded_file, folder_name))
+        # print("File with name {0} does not exist in {1}.".format(name_of_uploaded_file, folder_name))
 
         # do the upload
         #         print()
         # print("Uploading file with name {0} to folder {1}".format(name_of_uploaded_file, folder_name))
         file_metadata = {'name': name_of_uploaded_file, 'parents': [folder_id]}
         media = MediaFileUpload(file_to_upload_path, mimetype='application/pdf')
-        for i in (progressbar):
-            i.on()
+        for progress in PROGRESS_BAR:
+            progress.on()
             sleep(1)
 
         '''
@@ -292,7 +299,7 @@ def main():
                                           fields='id, size').execute()
             if not file.get("id") or file.get("size") == 0:
                 ledB.on()
-                for i in range(5):
+                for x in range(5):
                     ledB.toggle()
         except:
             ledA.on()
@@ -305,8 +312,13 @@ def main():
 
         #         print()
 
-        for i in (progressbar):
+        for i in PROGRESS_BAR:
             i.off()
+
+        tally_rewrite = open(pdf_tally_path, 'w')
+        print(tally)
+        tally_rewrite.write(str(tally))
+        tally_rewrite.close()
 
 
 #     print()
