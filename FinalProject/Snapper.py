@@ -21,7 +21,7 @@ from picamera import PiCamera
 '''
 Version 2 Imports: pygame for new interface
 '''
-import pygame as pg
+import pygame
 
 '''
 Devices: These define the different hardware devices used with the Snap, using the GPIO library. The PiCamera required that
@@ -33,8 +33,11 @@ for some fun lighting patterns, such as the upload progress bar and PDF conversi
 cam = PiCamera()
 cam.rotation = 180
 
-btn = Button(26)
-btn2 = Button(19)
+# btn = Button(26)
+# btn2 = Button(19)
+
+SCREEN_WIDTH = 200
+SCREEN_HEIGHT = 200
 
 led = LED(17)
 led2 = LED(27)
@@ -145,6 +148,11 @@ def convert_pdfs(names, storing_list, ready, tally):
 
 
 def main():
+    size = [SCREEN_WIDTH, SCREEN_HEIGHT]
+    screen = pygame.display.set_mode(size)
+
+    pygame.display.set_caption("Window")
+    
     run = True
     i = 0
     tally = int(read_data(pdf_tally_path))
@@ -161,7 +169,15 @@ def main():
         '''
         for item in GREEN_LIGHTS:
             item.on()
-        btn.wait_for_press()
+            
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                run = False
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_a:
+                    print("Success")
+                    continue
+        
         for item in GREEN_LIGHTS:
             item.off()
         sleep(1)
@@ -172,13 +188,19 @@ def main():
         for item in GREEN_LIGHTS:
             sleep(1)
             item.on()
-        if btn2.is_pressed:
-            run = False
-        else:
-            #             print("Camera ready")
-            for item in GREEN_LIGHTS:
-                item.on()
-                sleep(1)
+            
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                run = False
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_s:
+                    print("Success 2")
+                    continue
+            else:
+                #             print("Camera ready")
+                for item in GREEN_LIGHTS:
+                    item.on()
+                    sleep(1)
     #         continue
 
     cam.stop_preview()
