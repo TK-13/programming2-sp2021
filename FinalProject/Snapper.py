@@ -148,6 +148,7 @@ def main():
     run = True
     i = 0
     tally = int(read_data(pdf_tally_path))
+    print(tally)
     cam.start_preview(fullscreen=False, window=(300, 200, 640, 480))
 
     while run:
@@ -208,6 +209,7 @@ def main():
     if os.path.exists('token.pickle'):
         with open('token.pickle', 'rb') as token:
             creds = pickle.load(token)
+
     # If there are no (valid) credentials available, let the user log in.
     if not creds or not creds.valid:
         if creds and creds.expired and creds.refresh_token:
@@ -216,25 +218,23 @@ def main():
             flow = InstalledAppFlow.from_client_secrets_file(
                 'credentials.json', SCOPES)
             creds = flow.run_local_server(port=0)
+
         # Save the credentials for the next run
         with open('token.pickle', 'wb') as token:
             pickle.dump(creds, token)
 
     service = build('drive', 'v3', credentials=creds)
 
-    #     print()
-
     # look for a specific folder and get its id
-
     page_token = None
     folder_name = "File Transfer"
     folder_id = None
+
     '''
     q means query. If there are a lot of results, Google sends first x results, and a Token of where it left off.
     This makes the program continue to query until there are no more results
     '''
     while True:
-
         response = service.files().list(
             q="mimeType='application/vnd.google-apps.folder' and name = '" + folder_name + "'",
             spaces='drive',
@@ -249,16 +249,13 @@ def main():
         ID saved to send file to correct folder, regardless of name. Prints name and behind-scenes ID.
         Folders can have same name, but all have unique IDs
         '''
-
         page_token = response.get('nextPageToken', None)
         if page_token is None:
             break
-    #     print()
-    #     print()
 
     # check if file with same name already exists
     file_to_upload_path = '/home/pi/Desktop/TransferFiles/' + str(tally) + '.pdf'  # <<< PDF NAMES
-    name_of_uploaded_file = ('hw%s.pdf' % (tally))
+    name_of_uploaded_file = ('hw%s.pdf' % tally)
     response = service.files().list(
         q="trashed = false and name = '" + name_of_uploaded_file + "' and parents in '" + str(folder_id) + "'",
         spaces='drive',
@@ -310,10 +307,8 @@ def main():
 
         sleep(2)
 
-        #         print()
-
-        for i in PROGRESS_BAR:
-            i.off()
+        for light in PROGRESS_BAR:
+            light.off()
 
         tally_rewrite = open(pdf_tally_path, 'w')
         print(tally)
