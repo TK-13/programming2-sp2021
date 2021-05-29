@@ -16,7 +16,7 @@ from gpiozero import Button, LED, LightSensor
 from time import sleep
 from PIL import Image
 import random
-    from picamera import PiCamera
+from picamera import PiCamera
 
 
 '''
@@ -33,7 +33,6 @@ for some fun lighting patterns, such as the upload progress bar and PDF conversi
 '''
 cam = PiCamera()
 cam.rotation = 180
-else:
 
 btn = Button(26)
 btn2 = Button(19)
@@ -75,8 +74,8 @@ photolist = []
 namelist = []
 dummylist = []
 readylist = []
-tally = random.randrange(0, 500)
 imagelist = []
+pdf_tally_path = '/Users/tkmuro/PycharmProjects/tkProgramming/FinalProject/testtest'
 
 
 def loading(greenlight):
@@ -109,18 +108,18 @@ Adaptive Lighting: one of my pet peeves is having bad lighting when taking a pic
 The Snap gauges the ambient light using the light sensor, and turns on none, some, or all of the while overhead-mounted 
 LEDs accordingly. 
 '''
-def adaptive_lighting(lightlist):
+def adaptive_lighting(lights):
     ldr.wait_for_light(3)
     if boundary[0] >= ldr.value >= 0:
-        for q in lightlist:
+        for q in lights:
             q.on()
     elif boundary[1] >= ldr.value >= boundary[0]:
-        for q in lightlist:
+        for q in lights:
             q.off()
         for q in halflist:
             q.on()
     elif ldr.value >= boundary[1]:
-        for q in lightlist:
+        for q in lights:
             q.off()
 
 
@@ -129,29 +128,27 @@ Image to pdf conversion: this is where the PIL library comes into play. Each pho
 earlier. All images are appended to the ready list, except for the first. Then, the first image is saved as the PDF, while the other
 images are added on. This way, the PDF stays in order.
 '''
-def convert_pdfs(namelist, dummylist, readylist, tally):
+def convert_pdfs(names, storing_list, ready, tally):
     # print()
     # print("--Starting PDF Conversion--")
-    for q in namelist:
+    for q in names:
         image = Image.open(str(q))
         im1 = image.convert('RGB')
         out = im1.rotate(-90)
-        dummylist.append(out)
+        storing_list.append(out)
 
-    for j in dummylist[1:]:
-        readylist.append(j)
+    for j in storing_list[1:]:
+        ready.append(j)
 
-    pdf_name = input("Enter PDF name: ")
-    dummylist[0].save(r'/home/pi/Desktop/'+str(pdf_name)+'.pdf', save_all=True, append_images=readylist)
-    tally += 1
+    # pdf_name = input("Enter PDF name: ")
+    storing_list[0].save(r'/home/pi/Desktop/' + str(tally) + '.pdf', save_all=True, append_images=ready)
+    tally += 1  # ^^^ PDF NAMES
 
 
 def main():
     run = True
     i = 0
-
-    tally = read_data('/Users/tkmuro/PycharmProjects/tkProgramming/FinalProject/testtest')
-
+    tally = read_data(pdf_tally_path)
     cam.start_preview(fullscreen=False, window=(300, 200, 640, 480))
 
     while run:
@@ -261,7 +258,7 @@ def main():
     #     print()
 
     # check if file with same name already exists
-    file_to_upload_path = '/home/pi/Desktop/raw.pdf'
+    file_to_upload_path = '/home/pi/Desktop/' + str(tally) + '.pdf'  # <<< PDF NAMES
     name_of_uploaded_file = ('hw%s.pdf' % (int(tally)))
     response = service.files().list(
         q="trashed = false and name = '" + name_of_uploaded_file + "' and parents in '" + str(folder_id) + "'",
@@ -279,15 +276,15 @@ def main():
         # print('File info: %s (%s)' % (files[0].get('name'), files[0].get('id')))
         # ^^ this was old diagnostic code, which told the user what happened with text. This has been replaced with LED indicators.
     else:
-        #         print("File with name {0} does not exist in {1}.".format(name_of_uploaded_file, folder_name))
+        # print("File with name {0} does not exist in {1}.".format(name_of_uploaded_file, folder_name))
 
         # do the upload
         #         print()
         # print("Uploading file with name {0} to folder {1}".format(name_of_uploaded_file, folder_name))
         file_metadata = {'name': name_of_uploaded_file, 'parents': [folder_id]}
         media = MediaFileUpload(file_to_upload_path, mimetype='application/pdf')
-        for i in PROGRESS_BAR:
-            i.on()
+        for progress in PROGRESS_BAR:
+            progress.on()
             sleep(1)
 
         '''
@@ -303,7 +300,7 @@ def main():
                                           fields='id, size').execute()
             if not file.get("id") or file.get("size") == 0:
                 ledB.on()
-                for i in range(5):
+                for x in range(5):
                     ledB.toggle()
         except:
             ledA.on()
@@ -318,6 +315,9 @@ def main():
 
         for i in PROGRESS_BAR:
             i.off()
+
+        tally_rewrite = open(pdf_tally_path)
+        tally_rewrite.write()
 
 
 #     print()
