@@ -17,7 +17,6 @@ from time import sleep
 from PIL import Image
 from picamera import PiCamera
 
-
 '''
 Version 2 Imports: pygame for new interface
 '''
@@ -66,7 +65,6 @@ ldr = LightSensor(20)
 ldr.threshold = 0.6
 boundary = [0.6, 0.7]
 
-
 '''
 PDF Conversion lists: these are where the names of each photo taken by the camera will be stored whenever the program is run,
 so that they're kept in the proper order for conversion into a single PDF. The tally variable adds a random number between 0-500
@@ -84,7 +82,7 @@ def loading(greenlight):
     c = -1
     f = 1
     for i in range(11):
-        sleep(0.1)
+        sleep(0.2)
         c += f
         greenlight[c].on()
         greenlight[c - f].off()
@@ -92,7 +90,7 @@ def loading(greenlight):
             f = -1
         elif c <= 0:
             f = 1
-        sleep(0.1)
+        sleep(0.2)
     for b in greenlight:
         b.off()
 
@@ -110,6 +108,8 @@ Adaptive Lighting: one of my pet peeves is having bad lighting when taking a pic
 The Snap gauges the ambient light using the light sensor, and turns on none, some, or all of the while overhead-mounted 
 LEDs accordingly. 
 '''
+
+
 def adaptive_lighting(lights):
     ldr.wait_for_light(3)
     if boundary[0] >= ldr.value >= 0:
@@ -130,6 +130,8 @@ Image to pdf conversion: this is where the PIL library comes into play. Each pho
 earlier. All images are appended to the ready list, except for the first. Then, the first image is saved as the PDF, while the other
 images are added on. This way, the PDF stays in order.
 '''
+
+
 def convert_pdfs(names, storing_list, ready, tally):
     # print()
     # print("--Starting PDF Conversion--")
@@ -147,12 +149,25 @@ def convert_pdfs(names, storing_list, ready, tally):
     tally += 1  # ^^^ PDF NAMES
 
 
+def keyboard_input(target_key):
+    sleep(3)
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            run = False
+        if event.type == pygame.KEYDOWN:
+            if event.key == pygame.target_key:
+                print("%s Triggered" % target_key)
+                return True
+        else:
+            return False
+
+
 def main():
     size = [SCREEN_WIDTH, SCREEN_HEIGHT]
     screen = pygame.display.set_mode(size)
 
     pygame.display.set_caption("Window")
-    
+
     run = True
     i = 0
     tally = int(read_data(pdf_tally_path))
@@ -169,44 +184,32 @@ def main():
         '''
         for item in GREEN_LIGHTS:
             item.on()
-            
+
         print("\nWaiting for button a.")
-        sleep(3)
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                run = False
-            if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_a:
-                    print("Success")
-                    for item in GREEN_LIGHTS:
-                        item.off()
-                    sleep(1)
-                    cam.capture('/home/pi/Desktop/hw%s.jpg' % (str(i)))
-                    namelist.append('/home/pi/Desktop/hw%s.jpg' % (str(i)))
-                    i += 1
-        
+        take_pic = keyboard_input(pygame.K_a)
+        if take_pic:
+            print("Success")
+            for item in GREEN_LIGHTS:
+                item.off()
+            sleep(1)
+            cam.capture('/home/pi/Desktop/hw%s.jpg' % (str(i)))
+            namelist.append('/home/pi/Desktop/hw%s.jpg' % (str(i)))
+            i += 1
+
         print("\nProceeding 1")
-        
-        #     print("Do you want to stop (press button2)?")
         for item in GREEN_LIGHTS:
             sleep(1)
             item.on()
-            
-        print("Wairing for button s")
-        
-        sleep(3)
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                run = False
-            if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_s:
-                    print("Success 2")
-                    run = False
-                    for item in GREEN_LIGHTS:
-                        item.on()
-                        sleep(1)
-                print("\nProceeding 2")
-    #         continue
+
+        print("Waiting for button s")
+        button_s = keyboard_input(pygame.K_s)
+        if button_s:
+            print("Success 2")
+            run = False
+            for item in GREEN_LIGHTS:
+                item.on()
+                sleep(1)
+        print("\nProceeding 2. Looping program.")
 
     cam.stop_preview()
     cam.close()
