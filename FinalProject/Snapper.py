@@ -150,16 +150,20 @@ def convert_pdfs(names, storing_list, ready, tally):
 
 
 def keyboard_input(target_key):
+    print("Keyboard input function reached")
     sleep(3)
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            run = False
-        if event.type == pygame.KEYDOWN:
-            if event.key == pygame.target_key:
-                print("%s Triggered" % target_key)
-                return True
-        else:
-            return False
+    print("Delay period expired")
+    for i in range(10):
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                run = False
+            if event.type == pygame.KEYDOWN:
+                if event.key == target_key:
+                    print("%s Triggered" % target_key)
+                    return True
+            else:
+                print("Event not triggered")
+                return False
 
 
 def main():
@@ -186,15 +190,31 @@ def main():
             item.on()
 
         print("\nWaiting for button a.")
-        take_pic = keyboard_input(pygame.K_a)
-        if take_pic:
-            print("Success")
-            for item in GREEN_LIGHTS:
-                item.off()
-            sleep(1)
-            cam.capture('/home/pi/Desktop/hw%s.jpg' % (str(i)))
-            namelist.append('/home/pi/Desktop/hw%s.jpg' % (str(i)))
-            i += 1
+        sleep(3)
+        print("Delay period expired")
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                run = False
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_a:
+                    print("Button a Triggered")
+                    for item in GREEN_LIGHTS:
+                        item.off()
+                    sleep(1)
+                    cam.capture('/home/pi/Desktop/hw%s.jpg' % (str(i)))
+                    namelist.append('/home/pi/Desktop/hw%s.jpg' % (str(i)))
+                    i += 1
+            else:
+                print("Event not triggered")
+#         take_pic = keyboard_input(pygame.K_a)
+#         if take_pic:
+#             print("Button a triggered")
+#             for item in GREEN_LIGHTS:
+#                 item.off()
+#             sleep(1)
+#             cam.capture('/home/pi/Desktop/hw%s.jpg' % (str(i)))
+#             namelist.append('/home/pi/Desktop/hw%s.jpg' % (str(i)))
+#             i += 1
 
         print("\nProceeding 1")
         for item in GREEN_LIGHTS:
@@ -202,14 +222,30 @@ def main():
             item.on()
 
         print("Waiting for button s")
-        button_s = keyboard_input(pygame.K_s)
-        if button_s:
-            print("Success 2")
-            run = False
-            for item in GREEN_LIGHTS:
-                item.on()
-                sleep(1)
-        print("\nProceeding 2. Looping program.")
+        sleep(3)
+        print("Delay period expired")
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                run = False
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_s:
+                    print("Button S Triggered")
+                    run = False
+                    for item in GREEN_LIGHTS:
+                        item.on()
+                    sleep(1)
+                else:
+                    print("\nProceeding 2. Looping program.")
+        
+        
+#         button_s = keyboard_input(pygame.K_s)
+#         if button_s:
+#             print("button 2 true, but button 2 False?")
+#             run = False
+#             for item in GREEN_LIGHTS:
+#                 item.on()
+#                 sleep(1)
+#         print("\nProceeding 2. Looping program.")
 
     cam.stop_preview()
     cam.close()
@@ -311,7 +347,7 @@ def main():
         media = MediaFileUpload(file_to_upload_path, mimetype='application/pdf')
         for progress in PROGRESS_BAR:
             progress.on()
-            sleep(1)
+            sleep(0.2)
 
         '''
         Upload: this is where the program uses the "create" method from the Drive API. If the file is missing it's ID, or has no size,
