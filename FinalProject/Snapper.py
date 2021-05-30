@@ -84,7 +84,7 @@ def loading(greenlight):
     c = -1
     f = 1
     for i in range(11):
-        sleep(0.5)
+        sleep(0.1)
         c += f
         greenlight[c].on()
         greenlight[c - f].off()
@@ -92,7 +92,7 @@ def loading(greenlight):
             f = -1
         elif c <= 0:
             f = 1
-        sleep(0.5)
+        sleep(0.1)
     for b in greenlight:
         b.off()
 
@@ -170,37 +170,42 @@ def main():
         for item in GREEN_LIGHTS:
             item.on()
             
+        print("\nWaiting for button a.")
+        sleep(3)
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 run = False
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_a:
                     print("Success")
-                    continue
+                    for item in GREEN_LIGHTS:
+                        item.off()
+                    sleep(1)
+                    cam.capture('/home/pi/Desktop/hw%s.jpg' % (str(i)))
+                    namelist.append('/home/pi/Desktop/hw%s.jpg' % (str(i)))
+                    i += 1
         
-        for item in GREEN_LIGHTS:
-            item.off()
-        sleep(1)
-        cam.capture('/home/pi/Desktop/hw%s.jpg' % (str(i)))
-        namelist.append('/home/pi/Desktop/hw%s.jpg' % (str(i)))
-        i += 1
+        print("\nProceeding 1")
+        
         #     print("Do you want to stop (press button2)?")
         for item in GREEN_LIGHTS:
             sleep(1)
             item.on()
             
+        print("Wairing for button s")
+        
+        sleep(3)
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 run = False
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_s:
                     print("Success 2")
-                    continue
-            else:
-                #             print("Camera ready")
-                for item in GREEN_LIGHTS:
-                    item.on()
-                    sleep(1)
+                    run = False
+                    for item in GREEN_LIGHTS:
+                        item.on()
+                        sleep(1)
+                print("\nProceeding 2")
     #         continue
 
     cam.stop_preview()
