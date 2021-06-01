@@ -13,7 +13,6 @@ from google.auth.transport.requests import Request
 from time import sleep
 from PIL import Image
 from picamera import PiCamera
-from gpiozero import Button, LED, LightSensor
 
 # Version 2 Imports: pygame for new interface
 import pygame
@@ -33,33 +32,6 @@ cam.rotation = 180
 SCREEN_WIDTH = 200
 SCREEN_HEIGHT = 200
 
-led = LED(17)
-led2 = LED(27)
-led3 = LED(22)
-led4 = LED(10)
-led5 = LED(23)
-led6 = LED(18)
-led7 = LED(15)
-led8 = LED(24)
-lightlist = [led, led2, led3, led4, led5, led6, led7, led8]
-halflist = [led, led3, led5, led7]
-
-ledA = LED(16)
-ledB = LED(12)
-ledC = LED(7)
-ledD = LED(8)
-ledE = LED(25)
-
-PROGRESS_BAR = [ledA, ledB, ledC, ledD, ledE]
-for i in PROGRESS_BAR:
-    i.off()
-
-GREEN_LIGHTS = [ledC, ledD, ledE]
-
-ldr = LightSensor(20)
-ldr.threshold = 0.6
-boundary = [0.6, 0.7]
-
 '''
 PDF Conversion lists: these are where the names of each photo taken by the camera will be stored whenever the program is run,
 so that they're kept in the proper order for conversion into a single PDF. The tally variable adds a random number between 0-500
@@ -73,47 +45,12 @@ imagelist = []
 pdf_tally_path = '/home/pi/testtest.txt'
 
 
-def loading(greenlight):
-    c = -1
-    f = 1
-    for i in range(11):
-        sleep(0.2)
-        c += f
-        greenlight[c].on()
-        greenlight[c - f].off()
-        if c >= 2:
-            f = -1
-        elif c <= 0:
-            f = 1
-        sleep(0.2)
-    for b in greenlight:
-        b.off()
-
-
 # This function is just mean to make it easier to put the datasets into a string.
 def read_data(path):
     file_for_read = open(path)
     content = file_for_read.read()
     file_for_read.close()
     return content
-
-
-# Adaptive Lighting: one of my pet peeves is having bad lighting when taking a picture of a homework submission.
-# The Snap gauges the ambient light using the light sensor, and turns on none, some, or all of the while overhead-mounted
-# LEDs accordingly.
-def adaptive_lighting(lights):
-    ldr.wait_for_light(3)
-    if boundary[0] >= ldr.value >= 0:
-        for q in lights:
-            q.on()
-    elif boundary[1] >= ldr.value >= boundary[0]:
-        for q in lights:
-            q.off()
-        for q in halflist:
-            q.on()
-    elif ldr.value >= boundary[1]:
-        for q in lights:
-            q.off()
 
 
 # Image to pdf conversion: this is where the PIL library comes into play. Each photo is defined as an Image, using the names saved from
@@ -164,15 +101,10 @@ def main():
     cam.start_preview(fullscreen=False, window=(300, 200, 640, 480))
 
     while run:
-        adaptive_lighting(lightlist)
-
         # Capture Loop: every time the left button is pressed, the camera takes a picture, whose name is saved to one
         # of the PDF Conversion lists for later. Then, the user has three seconds (indicated by the green LEDs) to
         # either stop the loop by holding the right button, or to let it continue, in which case the program
         # reevaluates the lighting and re-prompts the user to take a picture.
-
-        # for item in GREEN_LIGHTS:
-        #     item.on()
 
         # print("\nWaiting for button a.")
         # sleep(3)
@@ -200,9 +132,6 @@ def main():
             i += 1
 
         print("\nProceeding 1")
-        # for item in GREEN_LIGHTS:
-        #     sleep(1)
-        #     item.on()
 
         # print("Waiting for button s")
         # sleep(3)
@@ -224,22 +153,13 @@ def main():
     if button_s:
         print("button 2 true, but button 2 False?")
         run = False
-        # for item in GREEN_LIGHTS:
-        #     item.on()
-        #     sleep(1)
     print("\nProceeding 2. Looping program.")
 
     cam.stop_preview()
     cam.close()
     print("/nCamera Off")
 
-    # for item in lightlist:
-    #     item.off()
-    # for item in GREEN_LIGHTS:
-    #     item.off()
-
     convert_pdfs(namelist, dummylist, readylist, tally)
-    # loading(GREEN_LIGHTS)
 
     # Drive API Credentials: this is where the user is authorized to use the Drive API. If they don't have token.pickle
     # (if they've never used the Snap before), they will be prompted to log into their google account. A new
@@ -308,13 +228,9 @@ def main():
     files = response.get('files', [])
     if files:
         print("There is already a file with that name in File Transfer")
-        # ledB.on()
     else:
         file_metadata = {'name': name_of_uploaded_file, 'parents': [folder_id]}
         media = MediaFileUpload(file_to_upload_path, mimetype='application/pdf')
-        # for progress in PROGRESS_BAR:
-        #     progress.on()
-        #     sleep(0.2)
 
         # Upload: this is where the program uses the "create" method from the Drive API. If the file is missing it's
         # ID, or has no size, (which might indicate an upload issue in which content was damaged), the program throws
@@ -328,16 +244,10 @@ def main():
                                           fields='id, size').execute()
             if not file.get("id") or file.get("size") == 0:
                 print("Incomplete Upload")
-                # ledB.on()
-                # for x in range(5):
-                #     ledB.toggle()
         except:
-            # ledA.on()
             print("An error occurred")
 
         sleep(2)
-        # for light in PROGRESS_BAR:
-        #     light.off()
 
         tally_rewrite = open(pdf_tally_path, 'w')
         print(tally)
