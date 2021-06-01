@@ -152,6 +152,78 @@ def keyboard_input(target_key):
             return False
 
 
+def authenticate_scopes():# If modifying these scopes, delete the file token.pickle.
+    SCOPES = ['https://www.googleapis.com/auth/drive']
+    credentials = None
+    if os.path.exists('token.pickle'):
+        with open('token.pickle', 'rb') as token:
+            credentials = pickle.load(token)
+
+    # If there are no (valid) credentials available, let the user log in.
+    if not credentials or not credentials.valid:
+        if credentials and credentials.expired and credentials.refresh_token:
+            credentials.refresh(Request())
+        else:
+            flow = InstalledAppFlow.from_client_secrets_file(
+                'credentials.json', SCOPES)
+            credentials = flow.run_local_server(port=0)
+
+        # Save the credentials for the next run
+        with open('token.pickle', 'wb') as token:
+            pickle.dump(credentials, token)
+
+    service = build('drive', 'v3', credentials=credentials)
+
+    # look for a specific folder and get its id
+    page_token = None
+    folder_name = "File Transfer"
+    folder_id = None
+
+    # q means query. If there are a lot of results, Google sends first x results, and a Token of where it left off.
+    # This makes the program continue to query until there are no more results
+    while True:
+        response = service.files().list(
+            q="mimeType='application/vnd.google-apps.folder' and name = '" + folder_name + "'",
+            spaces='drive',
+            fields='nextPageToken, files(id, name)',
+            pageToken=page_token).execute()
+        for file in response.get('files', []):
+            # Process change
+            folder_id = file.get('id')
+            # print('Found folder: %s (%s)' % (file.get('name'), file.get('id')))
+
+        # ID saved to send file to correct folder, regardless of name. Prints name and behind-scenes ID.
+        # Folders can have same name, but all have unique IDs
+        page_token = response.get('nextPageToken', None)
+        if page_token is None:
+            break
+    return service, page_token, folder_id
+
+
+def redundancy_check(tally_place, service_place, page_token_place, folder_id_place):
+    # check if file with same name already exists
+    file_to_upload_path = '/home/pi/Desktop/TransferFiles/' + pdf_name + '.pdf'  # <<< PDF NAMES
+    name_of_uploaded_file = ('hw%s.pdf' % tally_place)
+    response = service_place.files().list(
+        q="trashed = false and name = '" + name_of_uploaded_file + "' and parents in '" + str(folder_id_place) + "'",
+        spaces='drive',
+        fields='nextPageToken, files(id, name)',
+        pageToken=page_token_place).execute()
+
+    # this query checks if there's already a file with that name. 'trashed = false', and omits results found in Trash.
+    # If no response(no pre-existing file), returns None
+    files = response.get('files', [])
+    if files:
+        print("There is already a file with that name in File Transfer")
+        # ledB.on()
+        return True, True, True
+
+    else:
+        file_metadata = {'name': name_of_uploaded_file, 'parents': [folder_id_place]}
+        media = MediaFileUpload(file_to_upload_path, mimetype='application/pdf')
+        return False, file_metadata, media,
+
+
 def main():
     size = [SCREEN_WIDTH, SCREEN_HEIGHT]
     screen = pygame.display.set_mode(size)
@@ -252,74 +324,12 @@ def main():
     # only one that worked.
     # From this point forward, Ms. Ifft helped me a lot with the code and figuring out the API.
 
-    # If modifying these scopes, delete the file token.pickle.
-    SCOPES = ['https://www.googleapis.com/auth/drive']
-    credentials = None
-    if os.path.exists('token.pickle'):
-        with open('token.pickle', 'rb') as token:
-            credentials = pickle.load(token)
+    service, page_token, folder_id = authenticate_scopes()
 
-    # If there are no (valid) credentials available, let the user log in.
-    if not credentials or not credentials.valid:
-        if credentials and credentials.expired and credentials.refresh_token:
-            credentials.refresh(Request())
-        else:
-            flow = InstalledAppFlow.from_client_secrets_file(
-                'credentials.json', SCOPES)
-            credentials = flow.run_local_server(port=0)
-
-        # Save the credentials for the next run
-        with open('token.pickle', 'wb') as token:
-            pickle.dump(credentials, token)
-
-    service = build('drive', 'v3', credentials=credentials)
-
-    # look for a specific folder and get its id
-    page_token = None
-    folder_name = "File Transfer"
-    folder_id = None
-
-    # q means query. If there are a lot of results, Google sends first x results, and a Token of where it left off.
-    # This makes the program continue to query until there are no more results
-    while True:
-        response = service.files().list(
-            q="mimeType='application/vnd.google-apps.folder' and name = '" + folder_name + "'",
-            spaces='drive',
-            fields='nextPageToken, files(id, name)',
-            pageToken=page_token).execute()
-        for file in response.get('files', []):
-            # Process change
-            folder_id = file.get('id')
-            # print('Found folder: %s (%s)' % (file.get('name'), file.get('id')))
-
-        # ID saved to send file to correct folder, regardless of name. Prints name and behind-scenes ID.
-        # Folders can have same name, but all have unique IDs
-        page_token = response.get('nextPageToken', None)
-        if page_token is None:
-            break
-
-    # check if file with same name already exists
-    file_to_upload_path = '/home/pi/Desktop/TransferFiles/' + pdf_name + '.pdf'  # <<< PDF NAMES
-    name_of_uploaded_file = ('hw%s.pdf' % tally)
-    response = service.files().list(
-        q="trashed = false and name = '" + name_of_uploaded_file + "' and parents in '" + str(folder_id) + "'",
-        spaces='drive',
-        fields='nextPageToken, files(id, name)',
-        pageToken=page_token).execute()
-
-    # this query checks if there's already a file with that name. 'trashed = false', and omits results found in Trash.
-    # If no response(no pre-existing file), returns None
-    files = response.get('files', [])
-    if files:
-        print("There is already a file with that name in File Transfer")
-        # ledB.on()
+    already_file, file_metadata, media = redundancy_check(tally, service, page_token, folder_id)
+    if already_file:
+        print("Aforementioned error")
     else:
-        file_metadata = {'name': name_of_uploaded_file, 'parents': [folder_id]}
-        media = MediaFileUpload(file_to_upload_path, mimetype='application/pdf')
-        # for progress in PROGRESS_BAR:
-        #     progress.on()
-        #     sleep(0.2)
-
         # Upload: this is where the program uses the "create" method from the Drive API. If the file is missing it's
         # ID, or has no size, (which might indicate an upload issue in which content was damaged), the program throws
         # an error LED.
