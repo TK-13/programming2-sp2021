@@ -195,8 +195,8 @@ def main():
         take_pic = keyboard_input(pygame.K_a, run)
         if take_pic:
             print("Button a triggered")
-            # cam.capture('/home/pi/Desktop/hw%s.jpg' % (str(i)))
-            # namelist.append('/home/pi/Desktop/hw%s.jpg' % (str(i)))
+            cam.capture('/home/pi/Desktop/hw%s.jpg' % (str(i)))
+            namelist.append('/home/pi/Desktop/hw%s.jpg' % (str(i)))
             i += 1
 
         print("\nProceeding 1")
