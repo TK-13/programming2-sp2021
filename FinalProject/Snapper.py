@@ -205,14 +205,6 @@ def main():
         #     else:
         #         print("Event not triggered")
 
-
-#         take_pic = keyboard_input(pygame.K_a)
-#         if take_pic:
-#             print("Button a triggered")
-#             cam.capture('/home/pi/Desktop/hw%s.jpg' % (str(i)))
-#             namelist.append('/home/pi/Desktop/hw%s.jpg' % (str(i)))
-#             i += 1
-
 #         print("\nProceeding 1")
 
         # for item in GREEN_LIGHTS:
@@ -235,13 +227,6 @@ def main():
         #         else:
         #             print("\nProceeding 2. Looping program.")
 
-#     button_s = keyboard_input(pygame.K_s)
-#     if button_s:
-#         print("button 2 true, but button 2 False?")
-#         run = False
-#         # for item in GREEN_LIGHTS:
-#         #     item.on()
-#         #     sleep(1)
 #     print("\nProceeding 2. Looping program.")
 
     cam.stop_preview()
