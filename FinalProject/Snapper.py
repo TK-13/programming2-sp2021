@@ -327,13 +327,13 @@ def main():
     # for item in GREEN_LIGHTS:
     #     item.off()
 
-    custom_names = user_input('Would you like to enter a custom name? (y/n)', ['y', 'n'],
+    custom_names = user_input('Would you like to enter a custom name? (y/n) ', ['y', 'n'],
                               response='That is not a valid answer.')
-    if custom_names:
+    if custom_names == 'y':
         print(pdf_name)
         tally, pdf_name = convert_pdfs(namelist, dummylist, readylist, tally)
         print(pdf_name)
-    else:
+    elif custom_names == 'n':
         pdf_name = str(tally)
     # loading(GREEN_LIGHTS)
 
