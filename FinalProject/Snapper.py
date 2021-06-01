@@ -241,7 +241,7 @@ def main():
     #     item.off()
 
     print(pdf_name)
-    convert_pdfs(namelist, dummylist, readylist, tally)
+    tally = convert_pdfs(namelist, dummylist, readylist, tally)
     print(pdf_name)
     # loading(GREEN_LIGHTS)
 
