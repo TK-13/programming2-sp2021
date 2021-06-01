@@ -140,15 +140,14 @@ def keyboard_input(target_key):
     # print("Keyboard input function reached")
     # sleep(3)
     # print("Delay period expired")
-    for i in range(10):
-        for event in pygame.event.get():
-            if event.type == pygame.KEYDOWN:
-                if event.key == target_key:
-                    print("%s Triggered" % target_key)
-                    return True
-            else:
-                print("Event not triggered")
-                return False
+    for event in pygame.event.get():
+        if event.type == pygame.KEYDOWN:
+            if event.key == target_key:
+                print("%s Triggered" % target_key)
+                return True
+        else:
+            print("Event not triggered")
+            return False
 
 
 def main():
@@ -164,7 +163,21 @@ def main():
     cam.start_preview(fullscreen=False, window=(300, 200, 640, 480))
 
     while run:
-        adaptive_lighting(lightlist)
+        take_pic = keyboard_input(pygame.K_a)
+        if take_pic:
+            print("Button a triggered")
+            cam.capture('/home/pi/Desktop/hw%s.jpg' % (str(i)))
+            namelist.append('/home/pi/Desktop/hw%s.jpg' % (str(i)))
+            i += 1
+        
+        user_quits = keyboard_input(pygame.K_q)
+        if user_quits:
+            run = False
+            print(run)
+            break
+        
+        
+#         adaptive_lighting(lightlist)
 
         # Capture Loop: every time the left button is pressed, the camera takes a picture, whose name is saved to one
         # of the PDF Conversion lists for later. Then, the user has three seconds (indicated by the green LEDs) to
@@ -192,14 +205,16 @@ def main():
         #     else:
         #         print("Event not triggered")
 
-        take_pic = keyboard_input(pygame.K_a, run)
-        if take_pic:
-            print("Button a triggered")
-            cam.capture('/home/pi/Desktop/hw%s.jpg' % (str(i)))
-            namelist.append('/home/pi/Desktop/hw%s.jpg' % (str(i)))
-            i += 1
 
-        print("\nProceeding 1")
+#         take_pic = keyboard_input(pygame.K_a)
+#         if take_pic:
+#             print("Button a triggered")
+#             cam.capture('/home/pi/Desktop/hw%s.jpg' % (str(i)))
+#             namelist.append('/home/pi/Desktop/hw%s.jpg' % (str(i)))
+#             i += 1
+
+#         print("\nProceeding 1")
+
         # for item in GREEN_LIGHTS:
         #     sleep(1)
         #     item.on()
@@ -220,14 +235,14 @@ def main():
         #         else:
         #             print("\nProceeding 2. Looping program.")
 
-    button_s = keyboard_input(pygame.K_s, run)
-    if button_s:
-        print("button 2 true, but button 2 False?")
-        run = False
-        # for item in GREEN_LIGHTS:
-        #     item.on()
-        #     sleep(1)
-    print("\nProceeding 2. Looping program.")
+#     button_s = keyboard_input(pygame.K_s)
+#     if button_s:
+#         print("button 2 true, but button 2 False?")
+#         run = False
+#         # for item in GREEN_LIGHTS:
+#         #     item.on()
+#         #     sleep(1)
+#     print("\nProceeding 2. Looping program.")
 
     cam.stop_preview()
     cam.close()
