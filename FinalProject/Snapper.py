@@ -71,6 +71,7 @@ dummylist = []
 readylist = []
 imagelist = []
 pdf_tally_path = '/home/pi/testtest.txt'
+pdf_name = 'default_name'
 
 
 def loading(greenlight):
@@ -131,9 +132,10 @@ def convert_pdfs(names, storing_list, ready, tally):
     for j in storing_list[1:]:
         ready.append(j)
 
-    # pdf_name = input("Enter PDF name: ")
-    storing_list[0].save(r'/home/pi/Desktop/TransferFiles/' + str(tally) + '.pdf', save_all=True, append_images=ready)
+    pdf_name = input("Enter PDF name: ")
+    storing_list[0].save(r'/home/pi/Desktop/TransferFiles/' + pdf_name + '.pdf', save_all=True, append_images=ready)
     tally += 1  # ^^^ PDF NAMES
+    return pdf_name
 
 
 def keyboard_input(target_key):
@@ -231,14 +233,16 @@ def main():
 
     cam.stop_preview()
     cam.close()
-    print("/nCamera Off")
+    print("\nCamera Off")
 
     # for item in lightlist:
     #     item.off()
     # for item in GREEN_LIGHTS:
     #     item.off()
 
+    print(pdf_name)
     convert_pdfs(namelist, dummylist, readylist, tally)
+    print(pdf_name)
     # loading(GREEN_LIGHTS)
 
     # Drive API Credentials: this is where the user is authorized to use the Drive API. If they don't have token.pickle
@@ -295,7 +299,7 @@ def main():
             break
 
     # check if file with same name already exists
-    file_to_upload_path = '/home/pi/Desktop/TransferFiles/' + str(tally) + '.pdf'  # <<< PDF NAMES
+    file_to_upload_path = '/home/pi/Desktop/TransferFiles/' + pdf_name + '.pdf'  # <<< PDF NAMES
     name_of_uploaded_file = ('hw%s.pdf' % tally)
     response = service.files().list(
         q="trashed = false and name = '" + name_of_uploaded_file + "' and parents in '" + str(folder_id) + "'",
