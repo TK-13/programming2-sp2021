@@ -8,27 +8,22 @@ from googleapiclient.discovery import build
 from google_auth_oauthlib.flow import InstalledAppFlow
 from google.auth.transport.requests import Request
 
-'''
-Imports: GPIOZERO for input/output devices, picamera for controlling PiCamera, time for creating
-pauses (ex. when camera waits to see if user wants to stop), PIL for converting images into PDFs
-'''
-from gpiozero import Button, LED, LightSensor
+# Imports: GPIOZERO for input/output devices, picamera for controlling PiCamera, time for creating
+# pauses (ex. when camera waits to see if user wants to stop), PIL for converting images into PDFs
 from time import sleep
 from PIL import Image
 from picamera import PiCamera
+from gpiozero import Button, LED, LightSensor
 
-'''
-Version 2 Imports: pygame for new interface
-'''
+# Version 2 Imports: pygame for new interface
 import pygame
 
-'''
-Devices: These define the different hardware devices used with the Snap, using the GPIO library. The PiCamera required that
-the rotation setting, which is part of the picamera library, be set to 90 degrees from default due to it's stand mount.
+# Devices: These define the different hardware devices used with the Snap, using the GPIO library. The PiCamera
+# required that the rotation setting, which is part of the picamera library, be set to 90 degrees from default due to
+# it's stand mount.
 
-The LEDs had to be grouped into lists, to make it easier to control large groups of them with fewer lines of code. This also allowed
-for some fun lighting patterns, such as the upload progress bar and PDF conversion indicator.
-'''
+# The LEDs had to be grouped into lists, to make it easier to control large groups of them with fewer lines of code.
+# This also allowed for some fun lighting patterns, such as the upload progress bar and PDF conversion indicator.
 cam = PiCamera()
 cam.rotation = 180
 
@@ -103,13 +98,9 @@ def read_data(path):
     return content
 
 
-'''
-Adaptive Lighting: one of my pet peeves is having bad lighting when taking a picture of a homework submission. 
-The Snap gauges the ambient light using the light sensor, and turns on none, some, or all of the while overhead-mounted 
-LEDs accordingly. 
-'''
-
-
+# Adaptive Lighting: one of my pet peeves is having bad lighting when taking a picture of a homework submission.
+# The Snap gauges the ambient light using the light sensor, and turns on none, some, or all of the while overhead-mounted
+# LEDs accordingly.
 def adaptive_lighting(lights):
     ldr.wait_for_light(3)
     if boundary[0] >= ldr.value >= 0:
@@ -125,13 +116,9 @@ def adaptive_lighting(lights):
             q.off()
 
 
-'''
-Image to pdf conversion: this is where the PIL library comes into play. Each photo is defined as an Image, using the names saved from
-earlier. All images are appended to the ready list, except for the first. Then, the first image is saved as the PDF, while the other
-images are added on. This way, the PDF stays in order.
-'''
-
-
+# Image to pdf conversion: this is where the PIL library comes into play. Each photo is defined as an Image, using the names saved from
+# earlier. All images are appended to the ready list, except for the first. Then, the first image is saved as the PDF, while the other
+# images are added on. This way, the PDF stays in order.
 def convert_pdfs(names, storing_list, ready, tally):
     # print()
     # print("--Starting PDF Conversion--")
@@ -150,20 +137,17 @@ def convert_pdfs(names, storing_list, ready, tally):
 
 
 def keyboard_input(target_key):
-    print("Keyboard input function reached")
-    sleep(3)
-    print("Delay period expired")
-    for i in range(10):
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                run = False
-            if event.type == pygame.KEYDOWN:
-                if event.key == target_key:
-                    print("%s Triggered" % target_key)
-                    return True
-            else:
-                print("Event not triggered")
-                return False
+    # print("Keyboard input function reached")
+    # sleep(3)
+    # print("Delay period expired")
+    for event in pygame.event.get():
+        if event.type == pygame.KEYDOWN:
+            if event.key == target_key:
+                print("%s Triggered" % target_key)
+                return True
+        else:
+            print("Event not triggered")
+            return False
 
 
 def main():
@@ -179,127 +163,135 @@ def main():
     cam.start_preview(fullscreen=False, window=(300, 200, 640, 480))
 
     while run:
-        adaptive_lighting(lightlist)
+        take_pic = keyboard_input(pygame.K_a)
+        if take_pic:
+            print("Button a triggered")
+            cam.capture('/home/pi/Desktop/hw%s.jpg' % (str(i)))
+            namelist.append('/home/pi/Desktop/hw%s.jpg' % (str(i)))
+            i += 1
+        
+        user_quits = keyboard_input(pygame.K_q)
+        if user_quits:
+            run = False
+            print(run)
+            break
+        
+        
+#         adaptive_lighting(lightlist)
 
-        '''
-        Capture Loop: every time the left button is pressed, the camera takes a picture, whose name is saved to one of the PDF Conversion
-        lists for later. Then, the user has three seconds (indicated by the green LEDs) to either stop the loop by holding the right
-        button, or to let it continue, in which case the program reevaluates the lighting and re-prompts the user to take a picture.
-        '''
-        for item in GREEN_LIGHTS:
-            item.on()
+        # Capture Loop: every time the left button is pressed, the camera takes a picture, whose name is saved to one
+        # of the PDF Conversion lists for later. Then, the user has three seconds (indicated by the green LEDs) to
+        # either stop the loop by holding the right button, or to let it continue, in which case the program
+        # reevaluates the lighting and re-prompts the user to take a picture.
 
-        print("\nWaiting for button a.")
-        sleep(3)
-        print("Delay period expired")
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                run = False
-            if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_a:
-                    print("Button a Triggered")
-                    for item in GREEN_LIGHTS:
-                        item.off()
-                    sleep(1)
-                    cam.capture('/home/pi/Desktop/hw%s.jpg' % (str(i)))
-                    namelist.append('/home/pi/Desktop/hw%s.jpg' % (str(i)))
-                    i += 1
-            else:
-                print("Event not triggered")
+        # for item in GREEN_LIGHTS:
+        #     item.on()
+
+        # print("\nWaiting for button a.")
+        # sleep(3)
+        # print("Delay period expired")
+        # for event in pygame.event.get():
+        #     if event.type == pygame.QUIT:
+        #         run = False
+        #     if event.type == pygame.KEYDOWN:
+        #         if event.key == pygame.K_a:
+        #             print("Button a Triggered")
+        #             for item in GREEN_LIGHTS:
+        #                 item.off()
+        #             sleep(1)
+        #             cam.capture('/home/pi/Desktop/hw%s.jpg' % (str(i)))
+        #             namelist.append('/home/pi/Desktop/hw%s.jpg' % (str(i)))
+        #             i += 1
+        #     else:
+        #         print("Event not triggered")
+
+
 #         take_pic = keyboard_input(pygame.K_a)
 #         if take_pic:
 #             print("Button a triggered")
-#             for item in GREEN_LIGHTS:
-#                 item.off()
-#             sleep(1)
 #             cam.capture('/home/pi/Desktop/hw%s.jpg' % (str(i)))
 #             namelist.append('/home/pi/Desktop/hw%s.jpg' % (str(i)))
 #             i += 1
 
-        print("\nProceeding 1")
-        for item in GREEN_LIGHTS:
-            sleep(1)
-            item.on()
+#         print("\nProceeding 1")
 
-        print("Waiting for button s")
-        sleep(3)
-        print("Delay period expired")
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                run = False
-            if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_s:
-                    print("Button S Triggered")
-                    run = False
-                    for item in GREEN_LIGHTS:
-                        item.on()
-                    sleep(1)
-                else:
-                    print("\nProceeding 2. Looping program.")
-        
-        
-#         button_s = keyboard_input(pygame.K_s)
-#         if button_s:
-#             print("button 2 true, but button 2 False?")
-#             run = False
-#             for item in GREEN_LIGHTS:
-#                 item.on()
-#                 sleep(1)
-#         print("\nProceeding 2. Looping program.")
+        # for item in GREEN_LIGHTS:
+        #     sleep(1)
+        #     item.on()
+
+        # print("Waiting for button s")
+        # sleep(3)
+        # print("Delay period expired")
+        # for event in pygame.event.get():
+        #     if event.type == pygame.QUIT:
+        #         run = False
+        #     if event.type == pygame.KEYDOWN:
+        #         if event.key == pygame.K_s:
+        #             print("Button S Triggered")
+        #             run = False
+        #             for item in GREEN_LIGHTS:
+        #                 item.on()
+        #             sleep(1)
+        #         else:
+        #             print("\nProceeding 2. Looping program.")
+
+#     button_s = keyboard_input(pygame.K_s)
+#     if button_s:
+#         print("button 2 true, but button 2 False?")
+#         run = False
+#         # for item in GREEN_LIGHTS:
+#         #     item.on()
+#         #     sleep(1)
+#     print("\nProceeding 2. Looping program.")
 
     cam.stop_preview()
     cam.close()
+    print("/nCamera Off")
 
-    for item in lightlist:
-        item.off()
-    for item in GREEN_LIGHTS:
-        item.off()
+    # for item in lightlist:
+    #     item.off()
+    # for item in GREEN_LIGHTS:
+    #     item.off()
 
     convert_pdfs(namelist, dummylist, readylist, tally)
-    loading(GREEN_LIGHTS)
+    # loading(GREEN_LIGHTS)
 
-    '''
-    Drive API Credentials: this is where the user is authorized to use the Drive API. If they don't have token.pickle (if they've never
-    used the Snap before), they will be prompted to log into their google account. A new token.pickle file is created, which stores
-    the user's access and refresh tokens. SCOPES determines what the user does and does not have permission to do. Although the scope can
-    be narrowed down, this broad-access one was the only one that worked.
+    # Drive API Credentials: this is where the user is authorized to use the Drive API. If they don't have token.pickle
+    # (if they've never used the Snap before), they will be prompted to log into their google account. A new
+    # token.pickle file is created, which stores the user's access and refresh tokens. SCOPES determines what the user
+    # does and does not have permission to do. Although the scope can be narrowed down, this broad-access one was the
+    # only one that worked.
+    # From this point forward, Ms. Ifft helped me a lot with the code and figuring out the API.
 
-    From this point forward, Ms. Ifft helped me a lot with the code and figuring out the API.
-    '''
     # If modifying these scopes, delete the file token.pickle.
     SCOPES = ['https://www.googleapis.com/auth/drive']
-    """Shows basic usage of the Drive v3 API.
-    Prints the names and ids of the first 10 files the user has access to.
-    """
-    creds = None
+    credentials = None
     if os.path.exists('token.pickle'):
         with open('token.pickle', 'rb') as token:
-            creds = pickle.load(token)
+            credentials = pickle.load(token)
 
     # If there are no (valid) credentials available, let the user log in.
-    if not creds or not creds.valid:
-        if creds and creds.expired and creds.refresh_token:
-            creds.refresh(Request())
+    if not credentials or not credentials.valid:
+        if credentials and credentials.expired and credentials.refresh_token:
+            credentials.refresh(Request())
         else:
             flow = InstalledAppFlow.from_client_secrets_file(
                 'credentials.json', SCOPES)
-            creds = flow.run_local_server(port=0)
+            credentials = flow.run_local_server(port=0)
 
         # Save the credentials for the next run
         with open('token.pickle', 'wb') as token:
-            pickle.dump(creds, token)
+            pickle.dump(credentials, token)
 
-    service = build('drive', 'v3', credentials=creds)
+    service = build('drive', 'v3', credentials=credentials)
 
     # look for a specific folder and get its id
     page_token = None
     folder_name = "File Transfer"
     folder_id = None
 
-    '''
-    q means query. If there are a lot of results, Google sends first x results, and a Token of where it left off.
-    This makes the program continue to query until there are no more results
-    '''
+    # q means query. If there are a lot of results, Google sends first x results, and a Token of where it left off.
+    # This makes the program continue to query until there are no more results
     while True:
         response = service.files().list(
             q="mimeType='application/vnd.google-apps.folder' and name = '" + folder_name + "'",
@@ -311,10 +303,8 @@ def main():
             folder_id = file.get('id')
             # print('Found folder: %s (%s)' % (file.get('name'), file.get('id')))
 
-        '''
-        ID saved to send file to correct folder, regardless of name. Prints name and behind-scenes ID.
-        Folders can have same name, but all have unique IDs
-        '''
+        # ID saved to send file to correct folder, regardless of name. Prints name and behind-scenes ID.
+        # Folders can have same name, but all have unique IDs
         page_token = response.get('nextPageToken', None)
         if page_token is None:
             break
@@ -327,63 +317,48 @@ def main():
         spaces='drive',
         fields='nextPageToken, files(id, name)',
         pageToken=page_token).execute()
-    '''
-    this query checks if there's already a file with that name. 'trashed = false', and omits results found in Trash. If no response
-    (no pre-existing file), returns None
-    '''
+
+    # this query checks if there's already a file with that name. 'trashed = false', and omits results found in Trash.
+    # If no response(no pre-existing file), returns None
     files = response.get('files', [])
     if files:
-        ledB.on()
-        # print("File with name {0} in {1} already exists!".format(name_of_uploaded_file, folder_name))
-        # print('File info: %s (%s)' % (files[0].get('name'), files[0].get('id')))
-        # ^^ this was old diagnostic code, which told the user what happened with text. This has been replaced with LED indicators.
+        print("There is already a file with that name in File Transfer")
+        # ledB.on()
     else:
-        # print("File with name {0} does not exist in {1}.".format(name_of_uploaded_file, folder_name))
-
-        # do the upload
-        #         print()
-        # print("Uploading file with name {0} to folder {1}".format(name_of_uploaded_file, folder_name))
         file_metadata = {'name': name_of_uploaded_file, 'parents': [folder_id]}
         media = MediaFileUpload(file_to_upload_path, mimetype='application/pdf')
-        for progress in PROGRESS_BAR:
-            progress.on()
-            sleep(0.2)
+        # for progress in PROGRESS_BAR:
+        #     progress.on()
+        #     sleep(0.2)
 
-        '''
-        Upload: this is where the program uses the "create" method from the Drive API. If the file is missing it's ID, or has no size,
-        (which might indicate an upload issue in which content was damaged), the program throws an error LED.
-
-        Communicating with the Drive API to figure out just what error happened, or whether there was an upload issue, was challenging,
-        so we decided to put this whole upload in a try/except, so that any issue will result in the Red LED going off.
-        '''
+        # Upload: this is where the program uses the "create" method from the Drive API. If the file is missing it's
+        # ID, or has no size, (which might indicate an upload issue in which content was damaged), the program throws
+        # an error LED.
+        # Communicating with the Drive API to figure out just what error happened, or whether there was an upload
+        # issue, was challenging, so we decided to use this general try/except, so that any issue will
+        # result in the error going off.
         try:
             file = service.files().create(body=file_metadata,
                                           media_body=media,
                                           fields='id, size').execute()
             if not file.get("id") or file.get("size") == 0:
-                ledB.on()
-                for x in range(5):
-                    ledB.toggle()
+                print("Incomplete Upload")
+                # ledB.on()
+                # for x in range(5):
+                #     ledB.toggle()
         except:
-            ledA.on()
+            # ledA.on()
             print("An error occurred")
 
-        #         file.get('id')
-        #         print(file)
-
         sleep(2)
-
-        for light in PROGRESS_BAR:
-            light.off()
+        # for light in PROGRESS_BAR:
+        #     light.off()
 
         tally_rewrite = open(pdf_tally_path, 'w')
         print(tally)
         tally_rewrite.write(str(tally))
         tally_rewrite.close()
 
-
-#     print()
-#     print()
 
 if __name__ == '__main__':
     main()
