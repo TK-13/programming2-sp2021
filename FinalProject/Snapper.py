@@ -71,7 +71,7 @@ dummylist = []
 readylist = []
 imagelist = []
 pdf_tally_path = '/home/pi/testtest.txt'
-pdf_name = 'default_name'
+# pdf_name = 'default_name'
 
 
 def loading(greenlight):
@@ -135,7 +135,7 @@ def convert_pdfs(names, storing_list, ready, tally):
     pdf_name = input("Enter PDF name: ")
     storing_list[0].save(r'/home/pi/Desktop/TransferFiles/' + pdf_name + '.pdf', save_all=True, append_images=ready)
     tally += 1  # ^^^ PDF NAMES
-    return pdf_name
+    return tally, pdf_name
 
 
 def keyboard_input(target_key):
@@ -200,9 +200,9 @@ def authenticate_scopes():# If modifying these scopes, delete the file token.pic
     return service, page_token, folder_id
 
 
-def redundancy_check(tally_place, service_place, page_token_place, folder_id_place):
+def redundancy_check(tally_place, service_place, page_token_place, folder_id_place, pdf_name_place):
     # check if file with same name already exists
-    file_to_upload_path = '/home/pi/Desktop/TransferFiles/' + pdf_name + '.pdf'  # <<< PDF NAMES
+    file_to_upload_path = '/home/pi/Desktop/TransferFiles/' + pdf_name_place + '.pdf'  # <<< PDF NAMES
     name_of_uploaded_file = ('hw%s.pdf' % tally_place)
     response = service_place.files().list(
         q="trashed = false and name = '" + name_of_uploaded_file + "' and parents in '" + str(folder_id_place) + "'",
@@ -225,6 +225,8 @@ def redundancy_check(tally_place, service_place, page_token_place, folder_id_pla
 
 
 def main():
+    pdf_name = 'default_name'
+    
     size = [SCREEN_WIDTH, SCREEN_HEIGHT]
     screen = pygame.display.set_mode(size)
 
@@ -313,7 +315,7 @@ def main():
     #     item.off()
 
     print(pdf_name)
-    tally = convert_pdfs(namelist, dummylist, readylist, tally)
+    tally, pdf_name = convert_pdfs(namelist, dummylist, readylist, tally)
     print(pdf_name)
     # loading(GREEN_LIGHTS)
 
@@ -326,7 +328,7 @@ def main():
 
     service, page_token, folder_id = authenticate_scopes()
 
-    already_file, file_metadata, media = redundancy_check(tally, service, page_token, folder_id)
+    already_file, file_metadata, media = redundancy_check(tally, service, page_token, folder_id, pdf_name)
     if already_file:
         print("Aforementioned error")
     else:
