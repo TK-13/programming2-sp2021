@@ -71,6 +71,8 @@ dummylist = []
 readylist = []
 imagelist = []
 pdf_tally_path = '/home/pi/testtest.txt'
+
+
 # pdf_name = 'default_name'
 
 
@@ -97,6 +99,18 @@ def read_data(path):
     content = file_for_read.read()
     file_for_read.close()
     return content
+
+
+def user_input(message, options_list, response="", options_message="Valid Inputs: ", print_options=False):
+    if print_options:
+        print(options_message)
+        for option in options_list:
+            print(option)
+    entry = input(message)
+    while entry not in options_list:
+        print(response)
+        entry = input(message)
+    return entry
 
 
 # Adaptive Lighting: one of my pet peeves is having bad lighting when taking a picture of a homework submission.
@@ -152,7 +166,7 @@ def keyboard_input(target_key):
             return False
 
 
-def authenticate_scopes():# If modifying these scopes, delete the file token.pickle.
+def authenticate_scopes():  # If modifying these scopes, delete the file token.pickle.
     SCOPES = ['https://www.googleapis.com/auth/drive']
     credentials = None
     if os.path.exists('token.pickle'):
@@ -226,7 +240,7 @@ def redundancy_check(tally_place, service_place, page_token_place, folder_id_pla
 
 def main():
     pdf_name = 'default_name'
-    
+
     size = [SCREEN_WIDTH, SCREEN_HEIGHT]
     screen = pygame.display.set_mode(size)
 
@@ -245,65 +259,64 @@ def main():
             cam.capture('/home/pi/Desktop/hw%s.jpg' % (str(i)))
             namelist.append('/home/pi/Desktop/hw%s.jpg' % (str(i)))
             i += 1
-        
+
         user_quits = keyboard_input(pygame.K_q)
         if user_quits:
             run = False
             print(run)
             break
-        
-        
-#         adaptive_lighting(lightlist)
 
-        # Capture Loop: every time the left button is pressed, the camera takes a picture, whose name is saved to one
-        # of the PDF Conversion lists for later. Then, the user has three seconds (indicated by the green LEDs) to
-        # either stop the loop by holding the right button, or to let it continue, in which case the program
-        # reevaluates the lighting and re-prompts the user to take a picture.
+    #         adaptive_lighting(lightlist)
 
-        # for item in GREEN_LIGHTS:
-        #     item.on()
+    # Capture Loop: every time the left button is pressed, the camera takes a picture, whose name is saved to one
+    # of the PDF Conversion lists for later. Then, the user has three seconds (indicated by the green LEDs) to
+    # either stop the loop by holding the right button, or to let it continue, in which case the program
+    # reevaluates the lighting and re-prompts the user to take a picture.
 
-        # print("\nWaiting for button a.")
-        # sleep(3)
-        # print("Delay period expired")
-        # for event in pygame.event.get():
-        #     if event.type == pygame.QUIT:
-        #         run = False
-        #     if event.type == pygame.KEYDOWN:
-        #         if event.key == pygame.K_a:
-        #             print("Button a Triggered")
-        #             for item in GREEN_LIGHTS:
-        #                 item.off()
-        #             sleep(1)
-        #             cam.capture('/home/pi/Desktop/hw%s.jpg' % (str(i)))
-        #             namelist.append('/home/pi/Desktop/hw%s.jpg' % (str(i)))
-        #             i += 1
-        #     else:
-        #         print("Event not triggered")
+    # for item in GREEN_LIGHTS:
+    #     item.on()
 
-#         print("\nProceeding 1")
+    # print("\nWaiting for button a.")
+    # sleep(3)
+    # print("Delay period expired")
+    # for event in pygame.event.get():
+    #     if event.type == pygame.QUIT:
+    #         run = False
+    #     if event.type == pygame.KEYDOWN:
+    #         if event.key == pygame.K_a:
+    #             print("Button a Triggered")
+    #             for item in GREEN_LIGHTS:
+    #                 item.off()
+    #             sleep(1)
+    #             cam.capture('/home/pi/Desktop/hw%s.jpg' % (str(i)))
+    #             namelist.append('/home/pi/Desktop/hw%s.jpg' % (str(i)))
+    #             i += 1
+    #     else:
+    #         print("Event not triggered")
 
-        # for item in GREEN_LIGHTS:
-        #     sleep(1)
-        #     item.on()
+    #         print("\nProceeding 1")
 
-        # print("Waiting for button s")
-        # sleep(3)
-        # print("Delay period expired")
-        # for event in pygame.event.get():
-        #     if event.type == pygame.QUIT:
-        #         run = False
-        #     if event.type == pygame.KEYDOWN:
-        #         if event.key == pygame.K_s:
-        #             print("Button S Triggered")
-        #             run = False
-        #             for item in GREEN_LIGHTS:
-        #                 item.on()
-        #             sleep(1)
-        #         else:
-        #             print("\nProceeding 2. Looping program.")
+    # for item in GREEN_LIGHTS:
+    #     sleep(1)
+    #     item.on()
 
-#     print("\nProceeding 2. Looping program.")
+    # print("Waiting for button s")
+    # sleep(3)
+    # print("Delay period expired")
+    # for event in pygame.event.get():
+    #     if event.type == pygame.QUIT:
+    #         run = False
+    #     if event.type == pygame.KEYDOWN:
+    #         if event.key == pygame.K_s:
+    #             print("Button S Triggered")
+    #             run = False
+    #             for item in GREEN_LIGHTS:
+    #                 item.on()
+    #             sleep(1)
+    #         else:
+    #             print("\nProceeding 2. Looping program.")
+
+    #     print("\nProceeding 2. Looping program.")
 
     cam.stop_preview()
     cam.close()
@@ -314,9 +327,14 @@ def main():
     # for item in GREEN_LIGHTS:
     #     item.off()
 
-    print(pdf_name)
-    tally, pdf_name = convert_pdfs(namelist, dummylist, readylist, tally)
-    print(pdf_name)
+    custom_names = user_input('Would you like to enter a custom name? (y/n)', ['y', 'n'],
+                              response='That is not a valid answer.')
+    if custom_names:
+        print(pdf_name)
+        tally, pdf_name = convert_pdfs(namelist, dummylist, readylist, tally)
+        print(pdf_name)
+    else:
+        pdf_name = str(tally)
     # loading(GREEN_LIGHTS)
 
     # Drive API Credentials: this is where the user is authorized to use the Drive API. If they don't have token.pickle
