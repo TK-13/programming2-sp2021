@@ -62,13 +62,15 @@ boundary = [0.6, 0.7]
 
 # PDF Conversion lists: these are where the names of each photo taken by the camera will be stored whenever the program is run,
 # so that they're kept in the proper order for conversion into a single PDF. The tally variable adds a random number between 0-500
-# to the end of the pdf's title, to prevent files with the same name from being uploaded. 
+# to the end of the pdf's title, to prevent files with the same name from being uploaded.
 photo_list = []
 name_list = []
 dummy_list = []
 ready_list = []
 image_list = []
 pdf_tally_path = '/home/pi/testtest.txt'
+
+current_photos_list = []
 
 
 def loading(greenlight):
@@ -129,28 +131,30 @@ def adaptive_lighting(lights):
 # Image to pdf conversion: this is where the PIL library comes into play. Each photo is defined as an Image, using the names saved from
 # earlier. All images are appended to the ready list, except for the first. Then, the first image is saved as the PDF, while the other
 # images are added on. This way, the PDF stays in order.
-def convert_pdfs(names, storing_list, ready, tally, custom_name=False):
+def convert_pdfs(names, storing_list, ready, tally, groups, custom_name=False):
+    pdf_name = str(tally)
     # print()
     # print("--Starting PDF Conversion--")
-    for q in names:
-        image = Image.open(str(q))
-        im1 = image.convert('RGB')
-        out = im1.rotate(-90)
-        storing_list.append(out)
+    for g in groups:
+        for pic in g:
+            image = Image.open(str(pic))
+            im1 = image.convert('RGB')
+            out = im1.rotate(-90)
+            storing_list.append(out)
+# HOW.
+        for j in storing_list[1:]:
+            ready.append(j)
 
-    for j in storing_list[1:]:
-        ready.append(j)
+        if custom_name:
+            pdf_name = input("Enter PDF name: ")
 
-    if custom_name:
-        pdf_name = input("Enter PDF name: ")
-    else:
-        pdf_name = str(tally)
-
-    storing_list[0].save(r'/home/pi/Desktop/TransferFiles/' + pdf_name + '.pdf', save_all=True, append_images=ready)
-    tally += 1  # ^^^ PDF NAMES
+        storing_list[0].save(r'/home/pi/Desktop/TransferFiles/' + pdf_name + '.pdf', save_all=True, append_images=ready)
+        tally += 1  # ^^^ PDF NAMES
     return tally, pdf_name
 
 
+# Tried making a function to streamline getting keyboard inputs. However, the inputs were not as reliable as the usual if/elif tree,
+# so I returned to that.
 def keyboard_input(target_key):
     # print("Keyboard input function reached")
     # sleep(3)
@@ -239,6 +243,8 @@ def redundancy_check(tally_place, service_place, page_token_place, folder_id_pla
 
 def main():
     pdf_name = 'default_name'
+    photo_groups = {}
+    groups_num = 0
 
     size = [SCREEN_WIDTH, SCREEN_HEIGHT]
     screen = pygame.display.set_mode(size)
@@ -252,18 +258,37 @@ def main():
     cam.start_preview(fullscreen=False, window=(300, 200, 640, 480))
 
     while run:
-        take_pic = keyboard_input(pygame.K_a)
-        if take_pic:
-            print("Button a triggered")
-            cam.capture('/home/pi/Desktop/hw%s.jpg' % (str(i)))
-            name_list.append('/home/pi/Desktop/hw%s.jpg' % (str(i)))
-            i += 1
+        for event in pygame.event.get():
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_a:
+                    print("Button a triggered")
+                    cam.capture('/home/pi/Desktop/hw%s.jpg' % (str(i)))
+                    name_list.append('/home/pi/Desktop/hw%s.jpg' % (str(i)))
+                    current_photos_list.append('/home/pi/Desktop/hw%s.jpg' % (str(i)))
+                    i += 1
+                elif event.key == pygame.K_z:
+                    photo_groups[groups_num] = current_photos_list
+                    current_photos_list.clear()
+                    print(photo_groups)
+                    groups_num += 1
+                elif event.key == pygame.K_q:
+                    run = False
+                    print(run)
+                    pygame.quit()
+                    break
 
-        user_quits = keyboard_input(pygame.K_q)
-        if user_quits:
-            run = False
-            print(run)
-            break
+        # take_pic = keyboard_input(pygame.K_a)
+        # if take_pic:
+        #     print("Button a triggered")
+        #     cam.capture('/home/pi/Desktop/hw%s.jpg' % (str(i)))
+        #     name_list.append('/home/pi/Desktop/hw%s.jpg' % (str(i)))
+        #     i += 1
+        #
+        # user_quits = keyboard_input(pygame.K_q)
+        # if user_quits:
+        #     run = False
+        #     print(run)
+        #     break
 
     #         adaptive_lighting(lightlist)
 
@@ -330,12 +355,12 @@ def main():
                               response='That is not a valid answer.')
     if custom_names == 'y':
         print(pdf_name)
-        tally, pdf_name = convert_pdfs(name_list, dummy_list, ready_list, tally, custom_name=True)
+        tally, pdf_name = convert_pdfs(name_list, dummy_list, ready_list, tally, photo_groups, custom_name=True)
         print(pdf_name)
     elif custom_names == 'n':
         # pdf_name = str(tally)
         print(pdf_name)
-        tally, pdf_name = convert_pdfs(name_list, dummy_list, ready_list, tally)
+        tally, pdf_name = convert_pdfs(name_list, dummy_list, ready_list, tally, photo_groups)
         print(pdf_name)
     # loading(GREEN_LIGHTS)
 
