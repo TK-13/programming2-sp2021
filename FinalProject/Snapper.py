@@ -217,7 +217,7 @@ def authenticate_scopes():  # If modifying these scopes, delete the file token.p
 def redundancy_check(tally_place, service_place, page_token_place, folder_id_place, pdf_name_place):
     # check if file with same name already exists
     file_to_upload_path = '/home/pi/Desktop/TransferFiles/' + pdf_name_place + '.pdf'  # <<< PDF NAMES
-    name_of_uploaded_file = ('hw%s.pdf' % tally_place)
+    name_of_uploaded_file = (str(pdf_name_place) + '.pdf')
     response = service_place.files().list(
         q="trashed = false and name = '" + name_of_uploaded_file + "' and parents in '" + str(folder_id_place) + "'",
         spaces='drive',
@@ -347,6 +347,7 @@ def main():
     service, page_token, folder_id = authenticate_scopes()
 
     already_file, file_metadata, media = redundancy_check(tally, service, page_token, folder_id, pdf_name)
+    
     if already_file:
         print("Aforementioned error")
     else:
