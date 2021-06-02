@@ -70,6 +70,8 @@ ready_list = []
 image_list = []
 pdf_tally_path = '/home/pi/testtest.txt'
 
+current_photos_list = []
+
 
 def loading(greenlight):
     c = -1
@@ -151,6 +153,8 @@ def convert_pdfs(names, storing_list, ready, tally, custom_name=False):
     return tally, pdf_name
 
 
+# Tried making a function to streamline getting keyboard inputs. However, the inputs were not as reliable as the usual if/elif tree,
+# so I returned to that.
 def keyboard_input(target_key):
     # print("Keyboard input function reached")
     # sleep(3)
@@ -239,6 +243,8 @@ def redundancy_check(tally_place, service_place, page_token_place, folder_id_pla
 
 def main():
     pdf_name = 'default_name'
+    photo_groups = {}
+    groups_num = 0
 
     size = [SCREEN_WIDTH, SCREEN_HEIGHT]
     screen = pygame.display.set_mode(size)
@@ -258,10 +264,18 @@ def main():
                     print("Button a triggered")
                     cam.capture('/home/pi/Desktop/hw%s.jpg' % (str(i)))
                     name_list.append('/home/pi/Desktop/hw%s.jpg' % (str(i)))
+                    current_photos_list.append('/home/pi/Desktop/hw%s.jpg' % (str(i)))
                     i += 1
+                elif event.key == pygame.K_z:
+                    photo_groups[groups_num] = current_photos_list
+                    current_photos_list
+#                     CONTINUE HERE
+                    groups_num += 1
+                    
                 elif event.key == pygame.K_q:
                     run = False
                     print(run)
+                    pygame.quit()
                     break
 
         # take_pic = keyboard_input(pygame.K_a)
