@@ -60,11 +60,9 @@ ldr = LightSensor(20)
 ldr.threshold = 0.6
 boundary = [0.6, 0.7]
 
-'''
-PDF Conversion lists: these are where the names of each photo taken by the camera will be stored whenever the program is run,
-so that they're kept in the proper order for conversion into a single PDF. The tally variable adds a random number between 0-500
-to the end of the pdf's title, to prevent files with the same name from being uploaded. 
-'''
+# PDF Conversion lists: these are where the names of each photo taken by the camera will be stored whenever the program is run,
+# so that they're kept in the proper order for conversion into a single PDF. The tally variable adds a random number between 0-500
+# to the end of the pdf's title, to prevent files with the same name from being uploaded. 
 photolist = []
 namelist = []
 dummylist = []
@@ -134,7 +132,7 @@ def adaptive_lighting(lights):
 # Image to pdf conversion: this is where the PIL library comes into play. Each photo is defined as an Image, using the names saved from
 # earlier. All images are appended to the ready list, except for the first. Then, the first image is saved as the PDF, while the other
 # images are added on. This way, the PDF stays in order.
-def convert_pdfs(names, storing_list, ready, tally):
+def convert_pdfs(names, storing_list, ready, tally, custom_name=False):
     # print()
     # print("--Starting PDF Conversion--")
     for q in names:
@@ -145,8 +143,12 @@ def convert_pdfs(names, storing_list, ready, tally):
 
     for j in storing_list[1:]:
         ready.append(j)
-
-    pdf_name = input("Enter PDF name: ")
+    
+    if custom_name:
+        pdf_name = input("Enter PDF name: ")
+    else:
+        pdf_name = str(tally)
+        
     storing_list[0].save(r'/home/pi/Desktop/TransferFiles/' + pdf_name + '.pdf', save_all=True, append_images=ready)
     tally += 1  # ^^^ PDF NAMES
     return tally, pdf_name
@@ -331,10 +333,13 @@ def main():
                               response='That is not a valid answer.')
     if custom_names == 'y':
         print(pdf_name)
-        tally, pdf_name = convert_pdfs(namelist, dummylist, readylist, tally)
+        tally, pdf_name = convert_pdfs(namelist, dummylist, readylist, tally, custom_name=True)
         print(pdf_name)
     elif custom_names == 'n':
-        pdf_name = str(tally)
+#         pdf_name = str(tally)
+        print(pdf_name)
+        tally, pdf_name = convert_pdfs(namelist, dummylist, readylist, tally)
+        print(pdf_name)
     # loading(GREEN_LIGHTS)
 
     # Drive API Credentials: this is where the user is authorized to use the Drive API. If they don't have token.pickle
