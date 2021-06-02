@@ -62,7 +62,7 @@ boundary = [0.6, 0.7]
 
 # PDF Conversion lists: these are where the names of each photo taken by the camera will be stored whenever the program is run,
 # so that they're kept in the proper order for conversion into a single PDF. The tally variable adds a random number between 0-500
-# to the end of the pdf's title, to prevent files with the same name from being uploaded. 
+# to the end of the pdf's title, to prevent files with the same name from being uploaded.
 photo_list = []
 name_list = []
 dummy_list = []
@@ -252,18 +252,30 @@ def main():
     cam.start_preview(fullscreen=False, window=(300, 200, 640, 480))
 
     while run:
-        take_pic = keyboard_input(pygame.K_a)
-        if take_pic:
-            print("Button a triggered")
-            cam.capture('/home/pi/Desktop/hw%s.jpg' % (str(i)))
-            name_list.append('/home/pi/Desktop/hw%s.jpg' % (str(i)))
-            i += 1
+        for event in pygame.event.get():
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_a:
+                    print("Button a triggered")
+                    cam.capture('/home/pi/Desktop/hw%s.jpg' % (str(i)))
+                    name_list.append('/home/pi/Desktop/hw%s.jpg' % (str(i)))
+                    i += 1
+                elif event.key == pygame.K_q:
+                    run = False
+                    print(run)
+                    break
 
-        user_quits = keyboard_input(pygame.K_q)
-        if user_quits:
-            run = False
-            print(run)
-            break
+        # take_pic = keyboard_input(pygame.K_a)
+        # if take_pic:
+        #     print("Button a triggered")
+        #     cam.capture('/home/pi/Desktop/hw%s.jpg' % (str(i)))
+        #     name_list.append('/home/pi/Desktop/hw%s.jpg' % (str(i)))
+        #     i += 1
+        #
+        # user_quits = keyboard_input(pygame.K_q)
+        # if user_quits:
+        #     run = False
+        #     print(run)
+        #     break
 
     #         adaptive_lighting(lightlist)
 
