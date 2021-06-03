@@ -135,21 +135,22 @@ def convert_pdfs(names, storing_list, ready, tally, groups, custom_name=False):
     pdf_name = str(tally)
     # print()
     # print("--Starting PDF Conversion--")
-    for g in groups:
-        for pic in g:
-            image = Image.open(str(pic))
-            im1 = image.convert('RGB')
-            out = im1.rotate(-90)
-            storing_list.append(out)
-# HOW.
-        for j in storing_list[1:]:
-            ready.append(j)
+    for q in names:
+        image = Image.open(str(q))
+        im1 = image.convert('RGB')
+        out = im1.rotate(-90)
+        storing_list.append(out)
 
-        if custom_name:
-            pdf_name = input("Enter PDF name: ")
+    for j in storing_list[1:]:
+        ready.append(j)
 
-        storing_list[0].save(r'/home/pi/Desktop/TransferFiles/' + pdf_name + '.pdf', save_all=True, append_images=ready)
-        tally += 1  # ^^^ PDF NAMES
+    if custom_name:
+        pdf_name = input("Enter PDF name: ")
+    else:
+        pdf_name = str(tally)
+
+    storing_list[0].save(r'/home/pi/Desktop/TransferFiles/' + pdf_name + '.pdf', save_all=True, append_images=ready)
+    tally += 1  # ^^^ PDF NAMES
     return tally, pdf_name
 
 
@@ -351,6 +352,13 @@ def main():
     # for item in GREEN_LIGHTS:
     #     item.off()
 
+    if groups_num > 0:
+        for group in photo_groups:
+            tally, pdf_name = convert_pdfs(name_list, dummy_list, ready_list, tally, photo_groups)
+    elif groups_num == 0:
+        tally, pdf_name = convert_pdfs(name_list, dummy_list, ready_list, tally, photo_groups)
+
+    '''
     custom_names = user_input('Would you like to enter a custom name? (y/n) ', ['y', 'n'],
                               response='That is not a valid answer.')
     if custom_names == 'y':
@@ -362,6 +370,8 @@ def main():
         print(pdf_name)
         tally, pdf_name = convert_pdfs(name_list, dummy_list, ready_list, tally, photo_groups)
         print(pdf_name)
+    '''
+
     # loading(GREEN_LIGHTS)
 
     # Drive API Credentials: this is where the user is authorized to use the Drive API. If they don't have token.pickle
@@ -371,6 +381,7 @@ def main():
     # only one that worked.
     # From this point forward, Ms. Ifft helped me a lot with the code and figuring out the API.
 
+    '''
     service, page_token, folder_id = authenticate_scopes()
 
     already_file, file_metadata, media = redundancy_check(tally, service, page_token, folder_id, pdf_name)
@@ -405,7 +416,7 @@ def main():
         print(tally)
         tally_rewrite.write(str(tally))
         tally_rewrite.close()
-
+    '''
 
 if __name__ == '__main__':
     main()
