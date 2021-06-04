@@ -22,7 +22,12 @@ def convert_pdfs(names, storing_list, ready, tally, custom_name=False):
     pdf_name = str(tally)
     # print()
     # print("--Starting PDF Conversion--")
+    print('\nStart of function:')
+    print(names)
+    print(storing_list)
+    print(ready)
     for q in names:
+        print(q)
         image = Image.open(str(q))
         im1 = image.convert('RGB')
         out = im1
@@ -38,6 +43,11 @@ def convert_pdfs(names, storing_list, ready, tally, custom_name=False):
 
     storing_list[0].save(r'/Users/tkmuro/PycharmProjects/tkProgramming/FinalProject/pdfs/' + pdf_name + '.pdf', save_all=True, append_images=ready)
     tally += 1
+    print('\nEnd of function:')
+    print(names)
+    print(storing_list)
+    print(ready)
+
     return tally, pdf_name
 
 
@@ -64,15 +74,11 @@ def main():
                     current_photos_list.append(photo_id)
                     print(current_photos_list)
                     i += 1
+
                 elif event.key == pygame.K_z:
                     transition_list = current_photos_list.copy()
                     photo_groups[groups_num] = transition_list
-                    print("T1")
-                    print(photo_groups)
-
                     current_photos_list.clear()
-
-                    print("T2")
                     print(photo_groups)
                     print()
 
@@ -84,9 +90,14 @@ def main():
                     break
 
     if groups_num > 0:
-        for group in photo_groups:
-            print(group, photo_groups[group])
-            tally, pdf_name = convert_pdfs(photo_groups[group], dummy_list, ready_list, tally)
+        print('\nConversion')
+        for g in photo_groups:
+            print()
+            print(g, photo_groups[g])
+            tally, pdf_name = convert_pdfs(photo_groups[g], dummy_list, ready_list, tally)
+            photo_groups[g] = []
+        # tally, pdf_name = convert_pdfs(photo_groups[1], dummy_list, ready_list, tally)
+        # When isolated, converting the second group works. Consecutive conversions are the issue.
     elif groups_num == 0:
         tally, pdf_name = convert_pdfs(name_list, dummy_list, ready_list, tally)
 

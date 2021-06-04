@@ -271,15 +271,9 @@ def main():
                 elif event.key == pygame.K_z:
                     transition_list = current_photos_list.copy()
                     photo_groups[groups_num] = transition_list
-                    print("T1")
-                    print(photo_groups)
-
-                    current_photos_list.clear()
-
-                    print("T2")
                     print(photo_groups)
                     print()
-
+                    current_photos_list.clear()
                     groups_num += 1
                 elif event.key == pygame.K_q:
                     run = False
