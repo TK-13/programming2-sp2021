@@ -150,7 +150,7 @@ def convert_pdfs(names, storing_list, ready, tally, groups, custom_name=False):
         pdf_name = str(tally)
 
     storing_list[0].save(r'/home/pi/Desktop/TransferFiles/' + pdf_name + '.pdf', save_all=True, append_images=ready)
-    tally += 1  # ^^^ PDF NAMES
+    tally += 1
     return tally, pdf_name
 
 
@@ -273,13 +273,13 @@ def main():
                     photo_groups[groups_num] = transition_list
                     print("T1")
                     print(photo_groups)
-                    
+
                     current_photos_list.clear()
-                    
+
                     print("T2")
                     print(photo_groups)
                     print()
-                    
+
                     groups_num += 1
                 elif event.key == pygame.K_q:
                     run = False
@@ -423,6 +423,7 @@ def main():
         tally_rewrite.write(str(tally))
         tally_rewrite.close()
     '''
+
 
 if __name__ == '__main__':
     main()
