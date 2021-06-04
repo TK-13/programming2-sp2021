@@ -15,7 +15,7 @@ from PIL import Image
 from picamera import PiCamera
 from gpiozero import Button, LED, LightSensor
 
-# Version 2 Imports: pygame for new interface
+# Pygame is used to take in keyboard button inputs.
 import pygame
 
 # Devices: These define the different hardware devices used with the Snap, using the GPIO library. The PiCamera
@@ -26,12 +26,6 @@ import pygame
 # This also allowed for some fun lighting patterns, such as the upload progress bar and PDF conversion indicator.
 cam = PiCamera()
 cam.rotation = 180
-
-# btn = Button(26)
-# btn2 = Button(19)
-
-SCREEN_WIDTH = 200
-SCREEN_HEIGHT = 200
 
 led = LED(17)
 led2 = LED(27)
@@ -261,7 +255,7 @@ def main():
     photo_groups = {}
     groups_num = 0
 
-    size = [SCREEN_WIDTH, SCREEN_HEIGHT]
+    size = [200, 200]
     screen = pygame.display.set_mode(size)
 
     pygame.display.set_caption("Window")

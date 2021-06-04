@@ -6,7 +6,7 @@ name_list = []
 dummy_list = []
 ready_list = []
 image_list = []
-pdf_tally_path = '/Users/tkmuro/PycharmProjects/tkProgramming/FinalProject/testtest.txt'
+pdf_tally_path = '/Users/tkmuro/PycharmProjects/tkProgramming/FinalProject/tally.txt'
 
 current_photos_list = []
 
