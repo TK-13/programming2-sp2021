@@ -63,7 +63,8 @@ dummy_list = []
 ready_list = []
 image_list = []
 pdf_tally_path = '/home/pi/testtest.txt'
-
+# TODO: try defining this in main. Only define constants outside of main.
+# vvv
 current_photos_list = []
 
 
@@ -133,7 +134,7 @@ def convert_pdfs(names, storing_list, ready, tally, custom_name=False):
     # print('Names: ', names)
     # print('Storing list: ', storing_list)
     # print('Ready list:', ready)
-    for q in names:
+    for q in names:  # TODO: consider streamlining.
         print(q)
         image = Image.open(str(q))
         im1 = image.convert('RGB')
@@ -148,7 +149,8 @@ def convert_pdfs(names, storing_list, ready, tally, custom_name=False):
     else:
         pdf_name = str(tally)
 
-    storing_list[0].save(r'/Users/tkmuro/PycharmProjects/tkProgramming/FinalProject/pdfs/' + pdf_name + '.pdf', save_all=True, append_images=ready)
+    storing_list[0].save(r'/Users/tkmuro/PycharmProjects/tkProgramming/FinalProject/pdfs/' + pdf_name + '.pdf',
+                         save_all=True, append_images=ready)
     tally += 1
     # print('\nEnd of function:')
     # print('Names: ', names)
@@ -160,22 +162,6 @@ def convert_pdfs(names, storing_list, ready, tally, custom_name=False):
     ready.clear()
 
     return tally, pdf_name
-
-
-# Tried making a function to streamline getting keyboard inputs. However, the inputs were not as reliable as the usual if/elif tree,
-# so I returned to that.
-def keyboard_input(target_key):
-    # print("Keyboard input function reached")
-    # sleep(3)
-    # print("Delay period expired")
-    for event in pygame.event.get():
-        if event.type == pygame.KEYDOWN:
-            if event.key == target_key:
-                print("%s Triggered" % target_key)
-                return True
-        else:
-            print("Event not triggered")
-            return False
 
 
 def authenticate_scopes():  # If modifying these scopes, delete the file token.pickle.
@@ -257,7 +243,6 @@ def main():
 
     size = [200, 200]
     screen = pygame.display.set_mode(size)
-
     pygame.display.set_caption("Window")
 
     run = True
@@ -367,13 +352,25 @@ def main():
     # for item in GREEN_LIGHTS:
     #     item.off()
 
-    if groups_num > 0:
-        for g in photo_groups:
-            print(g, photo_groups[g])
-            tally, pdf_name = convert_pdfs(photo_groups[g], dummy_list, ready_list, tally)
-            photo_groups[g] = []
-    elif groups_num == 0:
-        tally, pdf_name = convert_pdfs(name_list, dummy_list, ready_list, tally)
+    custom_names = user_input('Would you like to enter a custom name? (y/n) ', ['y', 'n'],
+                              response='That is not a valid answer.')
+
+    if custom_names.lower() == 'y':
+        if groups_num > 0:
+            for g in photo_groups:
+                print(g, photo_groups[g])
+                tally, pdf_name = convert_pdfs(photo_groups[g], dummy_list, ready_list, tally, custom_name=True)
+                photo_groups[g] = []
+        elif groups_num == 0:
+            tally, pdf_name = convert_pdfs(name_list, dummy_list, ready_list, tally, custom_name=True)  # TODO: can probably be streamlined.
+    elif custom_names.lower() == 'n':
+        if groups_num > 0:
+            for g in photo_groups:
+                print(g, photo_groups[g])
+                tally, pdf_name = convert_pdfs(photo_groups[g], dummy_list, ready_list, tally)
+                photo_groups[g] = []
+        elif groups_num == 0:
+            tally, pdf_name = convert_pdfs(name_list, dummy_list, ready_list, tally)
 
     '''
     custom_names = user_input('Would you like to enter a custom name? (y/n) ', ['y', 'n'],
@@ -425,6 +422,7 @@ def main():
         sleep(2)
         # for light in PROGRESS_BAR:
         #     light.off()
+        
         tally_rewrite = open(pdf_tally_path, 'w')
         print(tally)
         tally_rewrite.write(str(tally))

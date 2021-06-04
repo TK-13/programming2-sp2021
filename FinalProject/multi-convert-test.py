@@ -18,7 +18,7 @@ def read_data(path):
     return content
 
 
-def convert_pdfs(names, storing_list, ready, tally, custom_name=False):
+def convert_pdf(names, storing_list, ready, tally, custom_name=False):
     pdf_name = str(tally)
     # print()
     # print("--Starting PDF Conversion--")
@@ -41,7 +41,8 @@ def convert_pdfs(names, storing_list, ready, tally, custom_name=False):
     else:
         pdf_name = str(tally)
 
-    storing_list[0].save(r'/Users/tkmuro/PycharmProjects/tkProgramming/FinalProject/pdfs/' + pdf_name + '.pdf', save_all=True, append_images=ready)
+    storing_list[0].save(r'/Users/tkmuro/PycharmProjects/tkProgramming/FinalProject/pdfs/' + pdf_name + '.pdf',
+                         save_all=True, append_images=ready)
     tally += 1
     print('\nEnd of function:')
     print('Names: ', names)
@@ -53,6 +54,38 @@ def convert_pdfs(names, storing_list, ready, tally, custom_name=False):
     ready.clear()
 
     return tally, pdf_name
+
+
+def multi_convert_check(groups_num_place, photo_groups_place, tally_place, do_custom_names=False):
+    if do_custom_names:
+        if groups_num_place > 0:
+            for g in photo_groups_place:
+                print(g, photo_groups_place[g])
+                tally, pdf_name = convert_pdf(photo_groups_place[g], dummy_list, ready_list, tally_place,
+                                              custom_name=True)
+                photo_groups_place[g] = []
+        elif groups_num_place == 0:
+            tally, pdf_name = convert_pdf(name_list, dummy_list, ready_list, tally_place, custom_name=True)
+    else:
+        if groups_num_place > 0:
+            for g in photo_groups_place:
+                print(g, photo_groups_place[g])
+                tally, pdf_name = convert_pdf(photo_groups_place[g], dummy_list, ready_list, tally_place)
+                photo_groups_place[g] = []
+        elif groups_num_place == 0:
+            tally, pdf_name = convert_pdf(name_list, dummy_list, ready_list, tally_place)
+
+
+def user_input(message, options_list, response="", options_message="Valid Inputs: ", print_options=False):
+    if print_options:
+        print(options_message)
+        for option in options_list:
+            print(option)
+    entry = input(message)
+    while entry not in options_list:
+        print(response)
+        entry = input(message)
+    return entry
 
 
 def main():
@@ -96,17 +129,31 @@ def main():
                     pygame.quit()
                     break
 
-    if groups_num > 0:
-        print('\nConversion')
-        for g in photo_groups:
-            print()
-            print(g, photo_groups[g])
-            tally, pdf_name = convert_pdfs(photo_groups[g], dummy_list, ready_list, tally)
-            photo_groups[g] = []
-        # tally, pdf_name = convert_pdfs(photo_groups[1], dummy_list, ready_list, tally)
-        # When isolated, converting the second group works. Consecutive conversions are the issue.
-    elif groups_num == 0:
-        tally, pdf_name = convert_pdfs(name_list, dummy_list, ready_list, tally)
+    custom_names = user_input('Would you like to enter a custom name? (y/n) ', ['y', 'n'],
+                              response='That is not a valid answer.')
+    if custom_names.lower() == 'y':
+        multi_convert_check(groups_num, photo_groups, tally, do_custom_names=True)
+    elif custom_names.lower() == 'n':
+        multi_convert_check(groups_num, photo_groups, tally)
+        # if groups_num > 0:
+        #     for g in photo_groups:
+        #         print(g, photo_groups[g])
+        #         tally, pdf_name = convert_pdf(photo_groups[g], dummy_list, ready_list, tally)
+        #         photo_groups[g] = []
+        # elif groups_num == 0:
+        #     tally, pdf_name = convert_pdf(name_list, dummy_list, ready_list, tally)
+
+    # if groups_num > 0:
+    #     print('\nConversion')
+    #     for g in photo_groups:
+    #         print()
+    #         print(g, photo_groups[g])
+    #         tally, pdf_name = convert_pdfs(photo_groups[g], dummy_list, ready_list, tally)
+    #         photo_groups[g] = []
+    #     # tally, pdf_name = convert_pdfs(photo_groups[1], dummy_list, ready_list, tally)
+    #     # When isolated, converting the second group works. Consecutive conversions are the issue.
+    # elif groups_num == 0:
+    #     tally, pdf_name = convert_pdfs(name_list, dummy_list, ready_list, tally)
 
     '''
     custom_names = user_input('Would you like to enter a custom name? (y/n) ', ['y', 'n'],
