@@ -262,19 +262,28 @@ def main():
         for event in pygame.event.get():
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_a:
-                    print("Button a triggered")
                     cam.capture('/home/pi/Desktop/hw%s.jpg' % (str(i)))
-                    name_list.append('/home/pi/Desktop/hw%s.jpg' % (str(i)))
-                    current_photos_list.append('/home/pi/Desktop/hw%s.jpg' % (str(i)))
+                    photo_id = '/home/pi/Desktop/hw%s.jpg' % (str(i))
+                    name_list.append(photo_id)
+                    current_photos_list.append(photo_id)
+                    print(current_photos_list)
                     i += 1
                 elif event.key == pygame.K_z:
-                    photo_groups[groups_num] = current_photos_list
-                    current_photos_list.clear()
+                    transition_list = current_photos_list.copy()
+                    photo_groups[groups_num] = transition_list
+                    print("T1")
                     print(photo_groups)
+                    
+                    current_photos_list.clear()
+                    
+                    print("T2")
+                    print(photo_groups)
+                    print()
+                    
                     groups_num += 1
                 elif event.key == pygame.K_q:
                     run = False
-                    print(run)
+                    print(photo_groups)
                     pygame.quit()
                     break
 
@@ -354,6 +363,7 @@ def main():
 
     if groups_num > 0:
         for group in photo_groups:
+            print(group, photo_groups[group])
             tally, pdf_name = convert_pdfs(name_list, dummy_list, ready_list, tally, photo_groups)
     elif groups_num == 0:
         tally, pdf_name = convert_pdfs(name_list, dummy_list, ready_list, tally, photo_groups)
@@ -383,9 +393,7 @@ def main():
 
     '''
     service, page_token, folder_id = authenticate_scopes()
-
     already_file, file_metadata, media = redundancy_check(tally, service, page_token, folder_id, pdf_name)
-
     if already_file:
         print("Aforementioned error")
     else:
@@ -407,11 +415,9 @@ def main():
         except:
             # ledA.on()
             print("An error occurred")
-
         sleep(2)
         # for light in PROGRESS_BAR:
         #     light.off()
-
         tally_rewrite = open(pdf_tally_path, 'w')
         print(tally)
         tally_rewrite.write(str(tally))
