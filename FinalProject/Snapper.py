@@ -131,14 +131,19 @@ def adaptive_lighting(lights):
 # Image to pdf conversion: this is where the PIL library comes into play. Each photo is defined as an Image, using the names saved from
 # earlier. All images are appended to the ready list, except for the first. Then, the first image is saved as the PDF, while the other
 # images are added on. This way, the PDF stays in order.
-def convert_pdfs(names, storing_list, ready, tally, groups, custom_name=False):
+def convert_pdfs(names, storing_list, ready, tally, custom_name=False):
     pdf_name = str(tally)
     # print()
     # print("--Starting PDF Conversion--")
+    # print('\nStart of function:')
+    # print('Names: ', names)
+    # print('Storing list: ', storing_list)
+    # print('Ready list:', ready)
     for q in names:
+        print(q)
         image = Image.open(str(q))
         im1 = image.convert('RGB')
-        out = im1.rotate(-90)
+        out = im1
         storing_list.append(out)
 
     for j in storing_list[1:]:
@@ -149,8 +154,17 @@ def convert_pdfs(names, storing_list, ready, tally, groups, custom_name=False):
     else:
         pdf_name = str(tally)
 
-    storing_list[0].save(r'/home/pi/Desktop/TransferFiles/' + pdf_name + '.pdf', save_all=True, append_images=ready)
+    storing_list[0].save(r'/Users/tkmuro/PycharmProjects/tkProgramming/FinalProject/pdfs/' + pdf_name + '.pdf', save_all=True, append_images=ready)
     tally += 1
+    # print('\nEnd of function:')
+    # print('Names: ', names)
+    # print('Storing list: ', storing_list)
+    # print('Ready list:', ready)
+
+    names.clear()
+    storing_list.clear()
+    ready.clear()
+
     return tally, pdf_name
 
 
@@ -271,11 +285,15 @@ def main():
                 elif event.key == pygame.K_z:
                     transition_list = current_photos_list.copy()
                     photo_groups[groups_num] = transition_list
-                    print(photo_groups)
-                    print()
                     current_photos_list.clear()
                     groups_num += 1
+                    print(photo_groups)
+                    print()
+
                 elif event.key == pygame.K_q:
+                    if current_photos_list:  # Auto-save, if you forgot to make a final new group.
+                        transition_list = current_photos_list.copy()
+                        photo_groups[groups_num] = transition_list
                     run = False
                     print(photo_groups)
                     pygame.quit()
@@ -356,11 +374,12 @@ def main():
     #     item.off()
 
     if groups_num > 0:
-        for group in photo_groups:
-            print(group, photo_groups[group])
-            tally, pdf_name = convert_pdfs(name_list, dummy_list, ready_list, tally, photo_groups)
+        for g in photo_groups:
+            print(g, photo_groups[g])
+            tally, pdf_name = convert_pdfs(photo_groups[g], dummy_list, ready_list, tally)
+            photo_groups[g] = []
     elif groups_num == 0:
-        tally, pdf_name = convert_pdfs(name_list, dummy_list, ready_list, tally, photo_groups)
+        tally, pdf_name = convert_pdfs(name_list, dummy_list, ready_list, tally)
 
     '''
     custom_names = user_input('Would you like to enter a custom name? (y/n) ', ['y', 'n'],

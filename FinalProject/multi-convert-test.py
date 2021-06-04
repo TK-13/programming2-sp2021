@@ -83,10 +83,10 @@ def main():
                     transition_list = current_photos_list.copy()
                     photo_groups[groups_num] = transition_list
                     current_photos_list.clear()
+                    groups_num += 1
                     print(photo_groups)
                     print()
 
-                    groups_num += 1
                 elif event.key == pygame.K_q:
                     if current_photos_list:  # Auto-save, if you forgot to make a final new group.
                         transition_list = current_photos_list.copy()
