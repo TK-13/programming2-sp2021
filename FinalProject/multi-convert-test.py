@@ -23,9 +23,9 @@ def convert_pdfs(names, storing_list, ready, tally, custom_name=False):
     # print()
     # print("--Starting PDF Conversion--")
     print('\nStart of function:')
-    print(names)
-    print(storing_list)
-    print(ready)
+    print('Names: ', names)
+    print('Storing list: ', storing_list)
+    print('Ready list:', ready)
     for q in names:
         print(q)
         image = Image.open(str(q))
@@ -44,9 +44,13 @@ def convert_pdfs(names, storing_list, ready, tally, custom_name=False):
     storing_list[0].save(r'/Users/tkmuro/PycharmProjects/tkProgramming/FinalProject/pdfs/' + pdf_name + '.pdf', save_all=True, append_images=ready)
     tally += 1
     print('\nEnd of function:')
-    print(names)
-    print(storing_list)
-    print(ready)
+    print('Names: ', names)
+    print('Storing list: ', storing_list)
+    print('Ready list:', ready)
+
+    names.clear()
+    storing_list.clear()
+    ready.clear()
 
     return tally, pdf_name
 
@@ -84,6 +88,9 @@ def main():
 
                     groups_num += 1
                 elif event.key == pygame.K_q:
+                    if current_photos_list:  # Auto-save, if you forgot to make a final new group.
+                        transition_list = current_photos_list.copy()
+                        photo_groups[groups_num] = transition_list
                     run = False
                     print(photo_groups)
                     pygame.quit()
