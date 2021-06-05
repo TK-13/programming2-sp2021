@@ -126,7 +126,7 @@ def adaptive_lighting(lights):
 # Image to pdf conversion: this is where the PIL library comes into play. Each photo is defined as an Image, using the names saved from
 # earlier. All images are appended to the ready list, except for the first. Then, the first image is saved as the PDF, while the other
 # images are added on. This way, the PDF stays in order.
-def convert_pdfs(names, storing_list, ready, tally, custom_name=False):
+def convert_pdf(names, storing_list, ready, tally, custom_name=False):
     pdf_name = str(tally)
     # print()
     # print("--Starting PDF Conversion--")
@@ -149,7 +149,7 @@ def convert_pdfs(names, storing_list, ready, tally, custom_name=False):
     else:
         pdf_name = str(tally)
 
-    storing_list[0].save(r'/Users/tkmuro/PycharmProjects/tkProgramming/FinalProject/pdfs/' + pdf_name + '.pdf',
+    storing_list[0].save(r'/home/pi/Desktop/TransferFiles/' + pdf_name + '.pdf',
                          save_all=True, append_images=ready)
     tally += 1
     # print('\nEnd of function:')
@@ -162,6 +162,26 @@ def convert_pdfs(names, storing_list, ready, tally, custom_name=False):
     ready.clear()
 
     return tally, pdf_name
+
+
+def multi_convert_check(groups_num_place, photo_groups_place, tally_place, do_custom_names=False):
+    if do_custom_names:
+        if groups_num_place > 0:
+            for g in photo_groups_place:
+                print(g, photo_groups_place[g])
+                tally, pdf_name = convert_pdf(photo_groups_place[g], dummy_list, ready_list, tally_place,
+                                              custom_name=True)
+                photo_groups_place[g] = []
+        elif groups_num_place == 0:
+            tally, pdf_name = convert_pdf(name_list, dummy_list, ready_list, tally_place, custom_name=True)
+    else:
+        if groups_num_place > 0:
+            for g in photo_groups_place:
+                print(g, photo_groups_place[g])
+                tally, pdf_name = convert_pdf(photo_groups_place[g], dummy_list, ready_list, tally_place)
+                photo_groups_place[g] = []
+        elif groups_num_place == 0:
+            tally, pdf_name = convert_pdf(name_list, dummy_list, ready_list, tally_place)
 
 
 def authenticate_scopes():  # If modifying these scopes, delete the file token.pickle.
@@ -261,6 +281,7 @@ def main():
                     current_photos_list.append(photo_id)
                     print(current_photos_list)
                     i += 1
+
                 elif event.key == pygame.K_z:
                     transition_list = current_photos_list.copy()
                     photo_groups[groups_num] = transition_list
@@ -356,35 +377,11 @@ def main():
                               response='That is not a valid answer.')
 
     if custom_names.lower() == 'y':
-        if groups_num > 0:
-            for g in photo_groups:
-                print(g, photo_groups[g])
-                tally, pdf_name = convert_pdfs(photo_groups[g], dummy_list, ready_list, tally, custom_name=True)
-                photo_groups[g] = []
-        elif groups_num == 0:
-            tally, pdf_name = convert_pdfs(name_list, dummy_list, ready_list, tally, custom_name=True)  # TODO: can probably be streamlined.
+        multi_convert_check(groups_num, photo_groups, tally, do_custom_names=True)
     elif custom_names.lower() == 'n':
-        if groups_num > 0:
-            for g in photo_groups:
-                print(g, photo_groups[g])
-                tally, pdf_name = convert_pdfs(photo_groups[g], dummy_list, ready_list, tally)
-                photo_groups[g] = []
-        elif groups_num == 0:
-            tally, pdf_name = convert_pdfs(name_list, dummy_list, ready_list, tally)
+        multi_convert_check(groups_num, photo_groups, tally)
 
-    '''
-    custom_names = user_input('Would you like to enter a custom name? (y/n) ', ['y', 'n'],
-                              response='That is not a valid answer.')
-    if custom_names == 'y':
-        print(pdf_name)
-        tally, pdf_name = convert_pdfs(name_list, dummy_list, ready_list, tally, photo_groups, custom_name=True)
-        print(pdf_name)
-    elif custom_names == 'n':
-        # pdf_name = str(tally)
-        print(pdf_name)
-        tally, pdf_name = convert_pdfs(name_list, dummy_list, ready_list, tally, photo_groups)
-        print(pdf_name)
-    '''
+    # TODO: conversion can probably be streamlined.
 
     # loading(GREEN_LIGHTS)
 
