@@ -57,15 +57,7 @@ boundary = [0.6, 0.7]
 # PDF Conversion lists: these are where the names of each photo taken by the camera will be stored whenever the program is run,
 # so that they're kept in the proper order for conversion into a single PDF. The tally variable adds a random number between 0-500
 # to the end of the pdf's title, to prevent files with the same name from being uploaded.
-photo_list = []
-name_list = []
-dummy_list = []
-ready_list = []
-image_list = []
 pdf_tally_path = '/home/pi/testtest.txt'
-# TODO: try defining this in main. Only define constants outside of main.
-# vvv
-current_photos_list = []
 
 
 def loading(greenlight):
@@ -127,7 +119,6 @@ def adaptive_lighting(lights):
 # earlier. All images are appended to the ready list, except for the first. Then, the first image is saved as the PDF, while the other
 # images are added on. This way, the PDF stays in order.
 def convert_pdf(names, storing_list, ready, tally_placeholder, custom_name=False):
-    pdf_name = str(tally_placeholder)
     # print()
     # print("--Starting PDF Conversion--")
     # print('\nStart of function:')
@@ -163,7 +154,9 @@ def convert_pdf(names, storing_list, ready, tally_placeholder, custom_name=False
     return pdf_name
 
 
-def multi_convert_check(groups_num_place, photo_groups_place, tally_place, do_custom_names=False):
+def multi_convert_check(groups_num_place, photo_groups_place, tally_place,
+                        name_list_place, dummy_list_place, ready_list_place,
+                        do_custom_names=False):
     if groups_num_place > 0:
         print("\nConfirmed: multiple groups")
         for g in photo_groups_place:
@@ -171,18 +164,18 @@ def multi_convert_check(groups_num_place, photo_groups_place, tally_place, do_cu
             print()
             print("pre-run tally within convert: ", tally_place)
             if do_custom_names:
-                pdf_name = convert_pdf(photo_groups_place[g], dummy_list, ready_list, tally_place, custom_name=True)
+                pdf_name = convert_pdf(photo_groups_place[g], dummy_list_place, ready_list_place, tally_place, custom_name=True)
             elif not do_custom_names:
-                pdf_name = convert_pdf(photo_groups_place[g], dummy_list, ready_list, tally_place)
+                pdf_name = convert_pdf(photo_groups_place[g], dummy_list_place, ready_list_place, tally_place)
             print("post-run tally within convert: ", tally_place)
             photo_groups_place[g] = []
             tally_place += 1
     elif groups_num_place == 0:
         print("\nConfirmed: single group")
         if do_custom_names:
-            pdf_name = convert_pdf(name_list, dummy_list, ready_list, tally_place, custom_name=True)
+            pdf_name = convert_pdf(name_list_place, dummy_list_place, ready_list_place, tally_place, custom_name=True)
         elif not do_custom_names:
-            pdf_name = convert_pdf(name_list, dummy_list, ready_list, tally_place)
+            pdf_name = convert_pdf(name_list_place, dummy_list_place, ready_list_place, tally_place)
         tally_place += 1
 
     print("Final tally within multi: ", tally_place, '\n')
@@ -262,7 +255,13 @@ def redundancy_check(tally_place, service_place, page_token_place, folder_id_pla
 
 
 def main():
-    pdf_name = 'default_name'
+    photo_list = []
+    name_list = []
+    current_photos_list = []
+    dummy_list = []
+    ready_list = []
+    image_list = []
+
     photo_groups = {}
     groups_num = 0
 
@@ -296,12 +295,14 @@ def main():
                     print()
 
                 elif event.key == pygame.K_q:
-                    if current_photos_list:  # Auto-save, if you forgot to make a final new group.
-                        transition_list = current_photos_list.copy()
-                        photo_groups[groups_num] = transition_list
+                    # if current_photos_list:  # Auto-save, if you forgot to make a final new group.
+                    #     transition_list = current_photos_list.copy()
+                    #     photo_groups[groups_num] = transition_list
+                    #     current_photos_list.clear()
+                    #     groups_num += 1
                     run = False
-                    # print('Groups: ', photo_groups)
-                    # print("num of groups: ", groups_num)
+                    print('Groups: ', photo_groups)
+                    print("num of groups: ", groups_num)
                     pygame.quit()
                     break
 
@@ -385,9 +386,12 @@ def main():
     print()
     print("pre-multi function tally: ", tally)
     if custom_names.lower() == 'y':
-        tally, pdf_name = multi_convert_check(groups_num, photo_groups, tally, do_custom_names=True)
+        tally, pdf_name = multi_convert_check(groups_num, photo_groups, tally,
+                                              name_list, dummy_list, ready_list,
+                                              do_custom_names=True)
     elif custom_names.lower() == 'n':
-        tally, pdf_name = multi_convert_check(groups_num, photo_groups, tally)
+        tally, pdf_name = multi_convert_check(groups_num, photo_groups, tally,
+                                              name_list, dummy_list, ready_list)
     print("post-multi function tally: ", tally)
     print()
 
