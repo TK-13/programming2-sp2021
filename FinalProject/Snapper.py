@@ -126,8 +126,8 @@ def adaptive_lighting(lights):
 # Image to pdf conversion: this is where the PIL library comes into play. Each photo is defined as an Image, using the names saved from
 # earlier. All images are appended to the ready list, except for the first. Then, the first image is saved as the PDF, while the other
 # images are added on. This way, the PDF stays in order.
-def convert_pdf(names, storing_list, ready, tally, custom_name=False):
-    pdf_name = str(tally)
+def convert_pdf(names, storing_list, ready, tally_placeholder, custom_name=False):
+    pdf_name = str(tally_placeholder)
     # print()
     # print("--Starting PDF Conversion--")
     # print('\nStart of function:')
@@ -147,11 +147,10 @@ def convert_pdf(names, storing_list, ready, tally, custom_name=False):
     if custom_name:
         pdf_name = input("Enter PDF name: ")
     else:
-        pdf_name = str(tally)
+        pdf_name = str(tally_placeholder)
 
     storing_list[0].save(r'/home/pi/Desktop/TransferFiles/' + pdf_name + '.pdf',
                          save_all=True, append_images=ready)
-    tally += 1
     # print('\nEnd of function:')
     # print('Names: ', names)
     # print('Storing list: ', storing_list)
@@ -161,40 +160,33 @@ def convert_pdf(names, storing_list, ready, tally, custom_name=False):
     storing_list.clear()
     ready.clear()
 
-    return tally, pdf_name
+    return pdf_name
 
 
 def multi_convert_check(groups_num_place, photo_groups_place, tally_place, do_custom_names=False):
-    if do_custom_names:
-        if groups_num_place > 0:
-            print("\nConfirmed: multiple groups")
-            for g in photo_groups_place:
-                print(g, photo_groups_place[g])
-                print()
-                print("pre-run tally within convert: ", tally_place)
-                tally, pdf_name = convert_pdf(photo_groups_place[g], dummy_list, ready_list, tally_place, custom_name=True)
-                print("post-run tally within convert: ", tally_place)
-                photo_groups_place[g] = []
-        elif groups_num_place == 0:
-            print("\nConfirmed: single group")
-            tally, pdf_name = convert_pdf(name_list, dummy_list, ready_list, tally_place, custom_name=True)
-            
-    elif do_custom_names == False:
-        if groups_num_place > 0:
-            print("\nConfirmed: multiple groups")
-            for g in photo_groups_place:
-                print(g, photo_groups_place[g])
-                print()
-                print("pre-run tally within convert: ", tally_place)
-                tally, pdf_name = convert_pdf(photo_groups_place[g], dummy_list, ready_list, tally_place)
-                print("post-run tally within convert: ", tally_place)
-                print()
-                photo_groups_place[g] = []
-        elif groups_num_place == 0:
-            print("\nConfirmed: single group")
-            tally, pdf_name = convert_pdf(name_list, dummy_list, ready_list, tally_place)
-            
-    return tally, pdf_name
+    if groups_num_place > 0:
+        print("\nConfirmed: multiple groups")
+        for g in photo_groups_place:
+            print(g, photo_groups_place[g])
+            print()
+            print("pre-run tally within convert: ", tally_place)
+            if do_custom_names:
+                pdf_name = convert_pdf(photo_groups_place[g], dummy_list, ready_list, tally_place, custom_name=True)
+            elif not do_custom_names:
+                pdf_name = convert_pdf(photo_groups_place[g], dummy_list, ready_list, tally_place)
+            print("post-run tally within convert: ", tally_place)
+            photo_groups_place[g] = []
+            tally_place += 1
+    elif groups_num_place == 0:
+        print("\nConfirmed: single group")
+        if do_custom_names:
+            pdf_name = convert_pdf(name_list, dummy_list, ready_list, tally_place, custom_name=True)
+        elif not do_custom_names:
+            pdf_name = convert_pdf(name_list, dummy_list, ready_list, tally_place)
+        tally_place += 1
+
+    print("Final tally within multi: ", tally_place, '\n')
+    return tally_place, pdf_name
 
 
 def authenticate_scopes():  # If modifying these scopes, delete the file token.pickle.
@@ -308,8 +300,8 @@ def main():
                         transition_list = current_photos_list.copy()
                         photo_groups[groups_num] = transition_list
                     run = False
-                    print('Groups: ', photo_groups)
-                    print("num of groups: ", groups_num)
+                    # print('Groups: ', photo_groups)
+                    # print("num of groups: ", groups_num)
                     pygame.quit()
                     break
 
@@ -392,11 +384,10 @@ def main():
 
     print()
     print("pre-multi function tally: ", tally)
-    if custom_names == 'y':
+    if custom_names.lower() == 'y':
         tally, pdf_name = multi_convert_check(groups_num, photo_groups, tally, do_custom_names=True)
-    elif custom_names == 'n':
+    elif custom_names.lower() == 'n':
         tally, pdf_name = multi_convert_check(groups_num, photo_groups, tally)
-        
     print("post-multi function tally: ", tally)
     print()
 
