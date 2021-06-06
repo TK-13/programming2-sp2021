@@ -4,6 +4,54 @@ import pygame
 pdf_tally_path = '/Users/tkmuro/PycharmProjects/tkProgramming/FinalProject/tally.txt'
 
 
+BLACK = (0, 0, 0)
+WHITE = (255, 255, 255)
+GREEN = (93, 202, 143)
+RED = (201, 93, 98)
+BLUE = (93, 131, 201)
+ORANGE = (201, 147, 93)
+GRAY = (52, 52, 52)
+YELLOW = (255, 204, 0)
+PURPLE = (102, 0, 204)
+
+mx = 0
+my = 0
+
+button1x = 32
+button1y = 338
+
+
+# Changed
+class Ntrct(pygame.sprite.Sprite):
+    def __init__(self, x_pos, y_pos, color, surface, width=80, height=40, ):
+        super().__init__()
+        self.image = pygame.Surface([width, height])
+        self.image.fill(color)
+        self.rect = self.image.get_rect()
+
+        self.rect.x = x_pos
+        self.rect.y = y_pos
+        self.rect.width = width
+        self.rect.height = height
+
+        border_width = 4
+        pygame.draw.line(surface, WHITE, (x_pos, y_pos-2), (x_pos+width, y_pos-2), border_width)
+        pygame.draw.line(surface, WHITE, (x_pos, y_pos + height), (x_pos + width, y_pos + height), border_width)
+
+        pygame.draw.line(surface, WHITE, (x_pos - 2, y_pos), (x_pos - 2, y_pos + height), border_width)
+        pygame.draw.line(surface, WHITE, (x_pos + width, y_pos), (x_pos + width, y_pos + height), border_width)
+        # self.world_shift = 0
+        # self.world_raise = 0
+
+
+def buttonadd(x, y, mouse_x, mouse_y, buttons, color, surface, button_key, w=80, h=40):
+    if x <= mouse_x <= (x + w) and y <= mouse_y <= (y + h) or button_key:
+        button = Ntrct(x, y, color, surface, w, h)
+    else:
+        button = Ntrct(x, y, BLACK, surface, w, h)
+    buttons.add(button)
+
+
 def read_data(path):
     file_for_read = open(path)
     content = file_for_read.read()
@@ -87,7 +135,19 @@ def user_input(message, options_list, response="", options_message="Valid Inputs
     return entry
 
 
+def key_a(names, current, place):
+    photo_id = '/Users/tkmuro/PycharmProjects/tkProgramming/FinalProject/Samples/hw%s.jpeg' % (str(place))
+    names.append(photo_id)
+    current.append(photo_id)
+    print(current)
+    place += 1
+    return photo_id, names, current, place
+
+
 def main():
+    # Changed
+    pygame.init()
+
     current_photos_list = []
     photo_list = []
     name_list = []
@@ -95,14 +155,21 @@ def main():
     ready_list = []
     image_list = []
 
+    a_triggered = False
+
+    # Changed
+    button_list = pygame.sprite.Group()
+
     photo_groups = {}
     groups_num = 0
 
-    size = [200, 200]
+    size = [400, 400]
     screen = pygame.display.set_mode(size)
     pygame.display.set_caption("Window")
 
     run = True
+    clock = pygame.time.Clock()
+
     i = 0
     tally = int(read_data(pdf_tally_path))
     print(tally)
@@ -111,11 +178,8 @@ def main():
         for event in pygame.event.get():
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_a:
-                    photo_id = '/Users/tkmuro/PycharmProjects/tkProgramming/FinalProject/Samples/hw%s.jpeg' % (str(i))
-                    name_list.append(photo_id)
-                    current_photos_list.append(photo_id)
-                    print(current_photos_list)
-                    i += 1
+                    photo_id, name_list, current_photos_list, i = key_a(name_list, current_photos_list, i)
+                    a_triggered = True
 
                 elif event.key == pygame.K_z:
                     transition_list = current_photos_list.copy()
@@ -125,17 +189,46 @@ def main():
                     print(photo_groups)
                     print()
 
+                # Changed
                 elif event.key == pygame.K_q:
-                    # if current_photos_list:  # Auto-save, if you forgot to make a final new group.
-                    #     transition_list = current_photos_list.copy()
-                    #     photo_groups[groups_num] = transition_list
-                    #     current_photos_list.clear()
-                    #     groups_num += 1
+                    if current_photos_list:  # Auto-save, if you forgot to make a final new group.
+                        do_auto_save = user_input('You have ungrouped photos remaining. Would you like for them to be converted? ',
+                                                  ['y', 'n'])
+                        if do_auto_save == 'y':
+                            transition_list = current_photos_list.copy()
+                            photo_groups[groups_num] = transition_list
+                            current_photos_list.clear()
+                            groups_num += 1
                     run = False
                     print('Groups: ', photo_groups)
                     print("num of groups: ", groups_num)
                     pygame.quit()
                     break
+
+
+            # Changed (work in progress)
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_a:
+                    a_triggered = False
+
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                if button1x <= mouse[0] <= (button1x + 80) and button1y <= mouse[1] <= (button1y + 40):
+                    photo_id, name_list, current_photos_list, i = key_a(name_list, current_photos_list, i)
+
+        # Changed
+        if run:
+            mouse = pygame.mouse.get_pos()
+            mx = mouse[0]
+            my = mouse[1]
+
+            screen.fill(GRAY)
+            buttonadd(button1x, button1y, mx, my, button_list, GREEN, screen, a_triggered)
+
+            button_list.update()
+            button_list.draw(screen)
+
+            pygame.display.flip()
+            clock.tick(60)
 
     custom_names = user_input('Would you like to enter a custom name? (y/n) ', ['y', 'n'],
                               response='That is not a valid answer.')
