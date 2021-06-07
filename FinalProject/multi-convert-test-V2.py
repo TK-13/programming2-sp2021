@@ -3,7 +3,6 @@ import pygame
 
 pdf_tally_path = '/Users/tkmuro/PycharmProjects/tkProgramming/FinalProject/tally.txt'
 
-
 BLACK = (0, 0, 0)
 WHITE = (255, 255, 255)
 GREEN = (93, 202, 143)
@@ -21,7 +20,6 @@ button1x = 32
 button1y = 338
 
 
-# Changed
 class Ntrct(pygame.sprite.Sprite):
     def __init__(self, x_pos, y_pos, color, surface, width=80, height=40, ):
         super().__init__()
@@ -35,7 +33,7 @@ class Ntrct(pygame.sprite.Sprite):
         self.rect.height = height
 
         border_width = 4
-        pygame.draw.line(surface, WHITE, (x_pos, y_pos-2), (x_pos+width, y_pos-2), border_width)
+        pygame.draw.line(surface, WHITE, (x_pos, y_pos - 2), (x_pos + width, y_pos - 2), border_width)
         pygame.draw.line(surface, WHITE, (x_pos, y_pos + height), (x_pos + width, y_pos + height), border_width)
 
         pygame.draw.line(surface, WHITE, (x_pos - 2, y_pos), (x_pos - 2, y_pos + height), border_width)
@@ -105,7 +103,8 @@ def multi_convert_check(groups_num_place, photo_groups_place, tally_place,
             print()
             print("pre-run tally within convert: ", tally_place)
             if do_custom_names:
-                pdf_name = convert_pdf(photo_groups_place[g], dummy_list_place, ready_list_place, tally_place, custom_name=True)
+                pdf_name = convert_pdf(photo_groups_place[g], dummy_list_place, ready_list_place, tally_place,
+                                       custom_name=True)
             elif not do_custom_names:
                 pdf_name = convert_pdf(photo_groups_place[g], dummy_list_place, ready_list_place, tally_place)
             print("post-run tally within convert: ", tally_place)
@@ -192,8 +191,9 @@ def main():
                 # Changed
                 elif event.key == pygame.K_q:
                     if current_photos_list:  # Auto-save, if you forgot to make a final new group.
-                        do_auto_save = user_input('You have ungrouped photos remaining. Would you like for them to be converted? ',
-                                                  ['y', 'n'])
+                        do_auto_save = user_input(
+                            'You have ungrouped photos remaining. Would you like for them to be converted? ',
+                            ['y', 'n'])
                         if do_auto_save == 'y':
                             transition_list = current_photos_list.copy()
                             photo_groups[groups_num] = transition_list
@@ -205,8 +205,7 @@ def main():
                     pygame.quit()
                     break
 
-
-            # Changed (work in progress)
+            # Work in Progress
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_a:
                     a_triggered = False
@@ -215,7 +214,6 @@ def main():
                 if button1x <= mouse[0] <= (button1x + 80) and button1y <= mouse[1] <= (button1y + 40):
                     photo_id, name_list, current_photos_list, i = key_a(name_list, current_photos_list, i)
 
-        # Changed
         if run:
             mouse = pygame.mouse.get_pos()
             mx = mouse[0]
