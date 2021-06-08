@@ -259,13 +259,17 @@ def redundancy_check_upload(service_place, page_token_place, folder_id_place, pd
     print("files 2: ", files, "\n")
     if files:
         print("There is already a file with that name in File Transfer")
+        response = ()
+        files = []
         return True, True, True
 
     else:
         print("\nNo files exist with that name. Proceeding...")
         file_metadata = {'name': name_of_uploaded_file, 'parents': [folder_id_place]}
         media = MediaFileUpload(file_to_upload_path, mimetype='application/pdf')
-        return False, file_metadata, media,
+        response = ()
+        files = []
+        return False, file_metadata, media
 
 
 # Keyboard functions
@@ -333,7 +337,7 @@ def main():
     # Theoretically, the user would be able to see what the PiCamera sees through a window. However, there have been
     # issues with that beyond code.
 
-    # adaptive_lighting(light_list)
+    adaptive_lighting(light_list)
 
     # "Game Loop": as long as run is true, the computer will always respond appropriately when the user presses a key,
     # or clicks a digital button.
@@ -365,6 +369,10 @@ def main():
                 elif button2x <= mx <= (button2x + 80) and buttonY <= my <= (buttonY + 40):
                     print("Contact")
                     transition_list, current_photos_list, photo_groups_dict, groups_num = key_z(current_photos_list,
+                                                                                                photo_groups_dict,
+                                                                                                groups_num)
+                elif button3x <= mx <= (button3x + 80) and buttonY <= my <= (buttonY + 40):
+                    transition_list, current_photos_list, photo_groups_dict, groups_num = key_q(current_photos_list,
                                                                                                 photo_groups_dict,
                                                                                                 groups_num)
 
