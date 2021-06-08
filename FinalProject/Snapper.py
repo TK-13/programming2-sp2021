@@ -30,8 +30,10 @@ PURPLE = (102, 0, 204)
 mx = 0  # TODO: Do the pass thing.
 my = 0
 
-button1x = 32
-button1y = 338
+button1x = 40
+button2x = 160
+button3x = 280
+buttonY = 340
 
 # Devices: These define the different hardware devices used with the Snap, using the GPIO library. The PiCamera
 # required that the rotation setting, which is part of the picamera library, be set to 90 degrees from default due to
@@ -200,27 +202,27 @@ def convert_pdf(names, storing_list, ready, tally_placeholder, custom_name=False
 
 
 def multi_convert_check(groups_num_place, photo_groups_place, tally_place,
-                        name_list_place, dummy_list_place, ready_list_place,
+                        name_list_place, dummy_list_place, ready_list_place, final_pdf_list,
                         do_custom_names=False):
     if groups_num_place > 0:
         print("\nConfirmed: multiple groups")
         for g in photo_groups_place:
-            print(g, photo_groups_place[g])
-            print()
-            print("pre-run tally within convert: ", tally_place)
             if do_custom_names:
                 pdf_name = convert_pdf(photo_groups_place[g], dummy_list_place, ready_list_place, tally_place, custom_name=True)
+                final_pdf_list.append(pdf_name)
             elif not do_custom_names:
                 pdf_name = convert_pdf(photo_groups_place[g], dummy_list_place, ready_list_place, tally_place)
-            print("post-run tally within convert: ", tally_place)
+                final_pdf_list.append(pdf_name)
             photo_groups_place[g] = []
             tally_place += 1
     elif groups_num_place == 0:
         print("\nConfirmed: single group")
         if do_custom_names:
             pdf_name = convert_pdf(name_list_place, dummy_list_place, ready_list_place, tally_place, custom_name=True)
+            final_pdf_list.append(pdf_name)
         elif not do_custom_names:
             pdf_name = convert_pdf(name_list_place, dummy_list_place, ready_list_place, tally_place)
+            final_pdf_list.append(pdf_name)
         tally_place += 1
 
     print("Final tally within multi: ", tally_place, '\n')
@@ -288,25 +290,47 @@ def redundancy_check(tally_place, service_place, page_token_place, folder_id_pla
     # this query checks if there's already a file with that name. 'trashed = false', and omits results found in Trash.
     # If no response(no pre-existing file), returns None
     files = response.get('files', [])
+    print("files 2: ", files, "\n")
     if files:
         print("There is already a file with that name in File Transfer")
         # ledB.on()
         return True, True, True
 
     else:
+        print("\nNo files exist with that name. Proceeding...")
         file_metadata = {'name': name_of_uploaded_file, 'parents': [folder_id_place]}
         media = MediaFileUpload(file_to_upload_path, mimetype='application/pdf')
         return False, file_metadata, media,
 
 
 def key_a(names, current, place):
-    cam.capture('/home/pi/Desktop/hw%s.jpg' % (str(i)))
-    photo_id = '/Users/tkmuro/PycharmProjects/tkProgramming/FinalProject/Samples/hw%s.jpeg' % (str(place))
+    cam.capture('/home/pi/Desktop/hw%s.jpg' % (str(place)))
+    photo_id = '/home/pi/Desktop/hw%s.jpg' % (str(place))
     names.append(photo_id)
     current.append(photo_id)
     print(current)
     place += 1
     return photo_id, names, current, place
+
+
+def key_z(current, photo_dict_place, num_place):
+    transition_list = current.copy()
+    photo_dict_place[num_place] = transition_list
+    current.clear()
+    num_place += 1
+    print(photo_dict_place)
+    print()
+    return transition_list, current, photo_dict_place, num_place
+
+
+def key_q(current, photo_dict_place, num_place):
+    if current:  # Auto-save, if you forgot to make a final new group.
+        do_auto_save = user_input(
+            'You have ungrouped photos remaining. Would you like for them to be converted? ',
+            ['y', 'n'])
+        if do_auto_save == 'y':
+            transition_list, current, photo_dict_place, num_place = key_z(current, photo_dict_place, num_place)
+            return transition_list, current, photo_dict_place, num_place
 
 
 def main():
@@ -318,14 +342,17 @@ def main():
     dummy_list = []
     ready_list = []
     image_list = []
+    all_pdfs = []
 
     a_triggered = False
+    z_triggered = False
+    q_triggered = False
     button_list = pygame.sprite.Group()
 
     photo_groups = {}
     groups_num = 0
 
-    size = [200, 200]
+    size = [400, 400]
     screen = pygame.display.set_mode(size)
     pygame.display.set_caption("Window")
 
@@ -334,36 +361,24 @@ def main():
 
     i = 0
     tally = int(read_data(pdf_tally_path))
-    print(tally)
     cam.start_preview(fullscreen=False, window=(300, 200, 640, 480))
 
     while run:
         for event in pygame.event.get():
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_a:
+                    photo_id, name_list, current_photos_list, i = key_a(name_list, current_photos_list, i)
                     a_triggered = True
 
                 elif event.key == pygame.K_z:
-                    transition_list = current_photos_list.copy()
-                    photo_groups[groups_num] = transition_list
-                    current_photos_list.clear()
-                    groups_num += 1
-                    print(photo_groups)
-                    print()
+                    transition_list, current_photos_list, photo_groups, groups_num = key_z(current_photos_list, photo_groups, groups_num)
 
                 elif event.key == pygame.K_q:
-                    if current_photos_list:  # Auto-save, if you forgot to make a final new group.
-                        do_auto_save = user_input(
-                            'You have ungrouped photos remaining. Would you like for them to be converted? ',
-                            ['y', 'n'])
-                        if do_auto_save == 'y':
-                            transition_list = current_photos_list.copy()
-                            photo_groups[groups_num] = transition_list
-                            current_photos_list.clear()
-                            groups_num += 1
-                    run = False
+                    transition_list, current_photos_list, photo_groups, groups_num = key_q(current_photos_list, photo_groups, groups_num)
+                    
                     print('Groups: ', photo_groups)
                     print("num of groups: ", groups_num)
+                    run = False
                     pygame.quit()
                     break
 
@@ -373,8 +388,11 @@ def main():
                     a_triggered = False
 
             if event.type == pygame.MOUSEBUTTONDOWN:
-                if button1x <= mouse[0] <= (button1x + 80) and button1y <= mouse[1] <= (button1y + 40):
+                if button1x <= mouse[0] <= (button1x + 80) and buttonY <= mouse[1] <= (buttonY + 40):
                     photo_id, name_list, current_photos_list, i = key_a(name_list, current_photos_list, i)
+                elif button2x <= mouse[0] <= (button2x + 80) and buttonY <= mouse[1] <= (buttonY + 40):
+                    print("Contact")
+                    transition_list, current_photos_list, photo_groups, groups_num = key_z(current_photos_list, photo_groups, groups_num)
 
         if run:
             mouse = pygame.mouse.get_pos()
@@ -382,7 +400,9 @@ def main():
             my = mouse[1]
 
             screen.fill(GRAY)
-            buttonadd(button1x, button1y, mx, my, button_list, GREEN, screen, a_triggered)
+            buttonadd(button1x, buttonY, mx, my, button_list, GREEN, screen, a_triggered)
+            buttonadd(button2x, buttonY, mx, my, button_list, BLUE, screen, z_triggered)
+            buttonadd(button3x, buttonY, mx, my, button_list, RED, screen, q_triggered)
 
             button_list.update()
             button_list.draw(screen)
@@ -470,12 +490,9 @@ def main():
     print()
     print("pre-multi function tally: ", tally)
     if custom_names.lower() == 'y':
-        tally, pdf_name = multi_convert_check(groups_num, photo_groups, tally,
-                                              name_list, dummy_list, ready_list,
-                                              do_custom_names=True)
+        tally, pdf_name = multi_convert_check(groups_num, photo_groups, tally, name_list, dummy_list, ready_list, all_pdfs, do_custom_names=True)
     elif custom_names.lower() == 'n':
-        tally, pdf_name = multi_convert_check(groups_num, photo_groups, tally,
-                                              name_list, dummy_list, ready_list)
+        tally, pdf_name = multi_convert_check(groups_num, photo_groups, tally, name_list, dummy_list, ready_list, all_pdfs)
     print("post-multi function tally: ", tally)
     print()
 
@@ -490,18 +507,12 @@ def main():
     # only one that worked.
     # From this point forward, Ms. Ifft helped me a lot with the code and figuring out the API.
 
-    '''
+
     service, page_token, folder_id = authenticate_scopes()
     already_file, file_metadata, media = redundancy_check(tally, service, page_token, folder_id, pdf_name)
     if already_file:
         print("Aforementioned error")
     else:
-        # Upload: this is where the program uses the "create" method from the Drive API. If the file is missing it's
-        # ID, or has no size, (which might indicate an upload issue in which content was damaged), the program throws
-        # an error LED.
-        # Communicating with the Drive API to figure out just what error happened, or whether there was an upload
-        # issue, was challenging, so we decided to use this general try/except, so that any issue will
-        # result in the error going off.
         try:
             file = service.files().create(body=file_metadata,
                                           media_body=media,
@@ -514,6 +525,35 @@ def main():
         except:
             # ledA.on()
             print("An error occurred")
+            
+        if groups_num > 1:
+            print("Multiple pdfs confirmed")
+            print("pdf list: ", all_pdfs)
+            print()
+            for pdf in all_pdfs:
+                already_file, file_metadata, media = redundancy_check(tally, service, page_token, folder_id, pdf)
+                
+                if already_file:
+                    print("Aforementioned error")
+                else:
+                    try:
+                        # Upload: this is where the program uses the "create" method from the Drive API. If the file is missing it's
+                        # ID, or has no size, (which might indicate an upload issue in which content was damaged), the program throws
+                        # an error LED.
+                        # Communicating with the Drive API to figure out just what error happened, or whether there was an upload
+                        # issue, was challenging, so we decided to use this general try/except, so that any issue will
+                        # result in the error going off.
+                        file = service.files().create(body=file_metadata, media_body=media, fields='id, size').execute()
+                        if not file.get("id") or file.get("size") == 0:
+                            print("Incomplete Upload")
+                            # ledB.on()
+                            # for x in range(5):
+                            #     ledB.toggle()
+                    except:
+                        # ledA.on()
+                        print("An error occurred")
+            
+            
         sleep(2)
         # for light in PROGRESS_BAR:
         #     light.off()
@@ -523,8 +563,10 @@ def main():
         print(tally)
         tally_rewrite.write(str(tally))
         tally_rewrite.close()
-    '''
+        print("\nProcess Complete\n")
+    
 
 
 if __name__ == '__main__':
     main()
+
