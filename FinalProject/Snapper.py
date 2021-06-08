@@ -1,5 +1,5 @@
-""" API Imports: these are required to interface with the Google Drive API
-https://developers.google.com/drive/api/v3/quickstart/python """
+# API Imports: these are required to interface with the Google Drive API
+# https://developers.google.com/drive/api/v3/quickstart/python
 from __future__ import print_function
 import pickle
 import os.path
@@ -8,28 +8,27 @@ from googleapiclient.discovery import build
 from google_auth_oauthlib.flow import InstalledAppFlow
 from google.auth.transport.requests import Request
 
-# Imports: GPIOZERO for input/output devices, picamera for controlling PiCamera, time for creating
+# Imports: GPIO ZERO for input/output devices, picamera for controlling PiCamera, time for creating
 # pauses (ex. when camera waits to see if user wants to stop), PIL for converting images into PDFs
 from time import sleep
 from PIL import Image
 from picamera import PiCamera
 from gpiozero import Button, LED, LightSensor
 
-# Pygame is used to take in keyboard button inputs.
+# Pygame is used to take in keyboard button inputs, as well as input from digital buttons.
 import pygame
-BLACK = (0, 0, 0)
+
 WHITE = (255, 255, 255)
+GRAY = (52, 52, 52)
+BLACK = (0, 0, 0)
 GREEN = (93, 202, 143)
 RED = (201, 93, 98)
 BLUE = (93, 131, 201)
-ORANGE = (201, 147, 93)
-GRAY = (52, 52, 52)
-YELLOW = (255, 204, 0)
-PURPLE = (102, 0, 204)
 
 mx = 0  # TODO: Do the pass thing.
 my = 0
 
+# These variables are meant to keep track of button coordinates.
 button1x = 40
 button2x = 160
 button3x = 280
@@ -38,12 +37,11 @@ buttonY = 340
 # Devices: These define the different hardware devices used with the Snap, using the GPIO library. The PiCamera
 # required that the rotation setting, which is part of the picamera library, be set to 90 degrees from default due to
 # it's stand mount.
-
-# The LEDs had to be grouped into lists, to make it easier to control large groups of them with fewer lines of code.
-# This also allowed for some fun lighting patterns, such as the upload progress bar and PDF conversion indicator.
 cam = PiCamera()
 cam.rotation = 180
 
+# The LEDs had to be grouped into lists, to make it easier to control large groups of them with fewer lines of code.
+# This also allowed for some fun lighting patterns, such as the upload progress bar and PDF conversion indicator.
 led = LED(17)
 led2 = LED(27)
 led3 = LED(22)
@@ -52,32 +50,28 @@ led5 = LED(23)
 led6 = LED(18)
 led7 = LED(15)
 led8 = LED(24)
-lightlist = [led, led2, led3, led4, led5, led6, led7, led8]
-halflist = [led, led3, led5, led7]
+light_list = [led, led2, led3, led4, led5, led6, led7, led8]
+half_light_list = [led, led3, led5, led7]
 
 ledA = LED(16)
 ledB = LED(12)
 ledC = LED(7)
 ledD = LED(8)
 ledE = LED(25)
-
 PROGRESS_BAR = [ledA, ledB, ledC, ledD, ledE]
 for i in PROGRESS_BAR:
     i.off()
-
 GREEN_LIGHTS = [ledC, ledD, ledE]
 
 ldr = LightSensor(20)
 ldr.threshold = 0.6
 boundary = [0.6, 0.7]
 
-# PDF Conversion lists: these are where the names of each photo taken by the camera will be stored whenever the program is run,
-# so that they're kept in the proper order for conversion into a single PDF. The tally variable adds a random number between 0-500
-# to the end of the pdf's title, to prevent files with the same name from being uploaded.
 pdf_tally_path = '/home/pi/testtest.txt'
 
 
-class Ntrct(pygame.sprite.Sprite):
+# This class makes a relatively simple button which players can interact with.
+class PygameButton(pygame.sprite.Sprite):
     def __init__(self, x_pos, y_pos, color, surface, width=80, height=40, ):
         super().__init__()
         self.image = pygame.Surface([width, height])
@@ -90,7 +84,7 @@ class Ntrct(pygame.sprite.Sprite):
         self.rect.height = height
 
         border_width = 4
-        pygame.draw.line(surface, WHITE, (x_pos, y_pos-2), (x_pos+width, y_pos-2), border_width)
+        pygame.draw.line(surface, WHITE, (x_pos, y_pos - 2), (x_pos + width, y_pos - 2), border_width)
         pygame.draw.line(surface, WHITE, (x_pos, y_pos + height), (x_pos + width, y_pos + height), border_width)
 
         pygame.draw.line(surface, WHITE, (x_pos - 2, y_pos), (x_pos - 2, y_pos + height), border_width)
@@ -99,32 +93,17 @@ class Ntrct(pygame.sprite.Sprite):
         # self.world_raise = 0
 
 
-def buttonadd(x, y, mouse_x, mouse_y, buttons, color, surface, button_key, w=80, h=40):
-    if x <= mouse_x <= (x + w) and y <= mouse_y <= (y + h) or button_key:
-        button = Ntrct(x, y, color, surface, w, h)
+# This function is meant to make it easier to make buttons, and also gives them a bit more life by having two
+# different colors for when the cursor is/isn't in contact.
+def add_button(x, y, mouse_x, mouse_y, buttons, color, surface, w=80, h=40):
+    if x <= mouse_x <= (x + w) and y <= mouse_y <= (y + h):
+        button = PygameButton(x, y, color, surface, w, h)
     else:
-        button = Ntrct(x, y, BLACK, surface, w, h)
+        button = PygameButton(x, y, BLACK, surface, w, h)
     buttons.add(button)
 
 
-def loading(greenlight):
-    c = -1
-    f = 1
-    for i in range(11):
-        sleep(0.2)
-        c += f
-        greenlight[c].on()
-        greenlight[c - f].off()
-        if c >= 2:
-            f = -1
-        elif c <= 0:
-            f = 1
-        sleep(0.2)
-    for b in greenlight:
-        b.off()
-
-
-# This function is just mean to make it easier to put the datasets into a string.
+# This function is just mean to make it easier to read text files into a string.
 def read_data(path):
     file_for_read = open(path)
     content = file_for_read.read()
@@ -132,6 +111,7 @@ def read_data(path):
     return content
 
 
+# An old favorite function, used to validate certain command-line based user inputs, such as y/n questions.
 def user_input(message, options_list, response="", options_message="Valid Inputs: ", print_options=False):
     if print_options:
         print(options_message)
@@ -144,9 +124,10 @@ def user_input(message, options_list, response="", options_message="Valid Inputs
     return entry
 
 
-# Adaptive Lighting: one of my pet peeves is having bad lighting when taking a picture of a homework submission.
-# The Snap gauges the ambient light using the light sensor, and turns on none, some, or all of the while overhead-mounted
-# LEDs accordingly.
+# Adaptive Lighting: a relic from Physical Computing.
+# One of my pet peeves is having bad lighting when taking a picture of a homework submission.
+# The HUT gauges the ambient light using the light sensor, and turns on none, some, or all of the while
+# overhead-mounted LEDs accordingly.
 def adaptive_lighting(lights):
     ldr.wait_for_light(3)
     if boundary[0] >= ldr.value >= 0:
@@ -155,23 +136,18 @@ def adaptive_lighting(lights):
     elif boundary[1] >= ldr.value >= boundary[0]:
         for q in lights:
             q.off()
-        for q in halflist:
+        for q in half_light_list:
             q.on()
     elif ldr.value >= boundary[1]:
         for q in lights:
             q.off()
 
 
-# Image to pdf conversion: this is where the PIL library comes into play. Each photo is defined as an Image, using the names saved from
-# earlier. All images are appended to the ready list, except for the first. Then, the first image is saved as the PDF, while the other
+# Image to pdf conversion: this is where the PIL library comes into play. Each photo is defined as an Image, using the
+# names saved from earlier (either within name_list, or within each value of the photo dictionary. All images are
+# appended to the ready list, except for the first. Then, the first image is saved as the PDF, while the other
 # images are added on. This way, the PDF stays in order.
 def convert_pdf(names, storing_list, ready, tally_placeholder, custom_name=False):
-    # print()
-    # print("--Starting PDF Conversion--")
-    # print('\nStart of function:')
-    # print('Names: ', names)
-    # print('Storing list: ', storing_list)
-    # print('Ready list:', ready)
     for q in names:  # TODO: consider streamlining.
         print(q)
         image = Image.open(str(q))
@@ -189,18 +165,18 @@ def convert_pdf(names, storing_list, ready, tally_placeholder, custom_name=False
 
     storing_list[0].save(r'/home/pi/Desktop/TransferFiles/' + pdf_name + '.pdf',
                          save_all=True, append_images=ready)
-    # print('\nEnd of function:')
-    # print('Names: ', names)
-    # print('Storing list: ', storing_list)
-    # print('Ready list:', ready)
-
+    # Clearing out the different lists allows this function to be reused. Otherwise, the order of the PDFs would be
+    # completely scrambled (hypothetically of course. Definitely wasn't a problem for several days.
     names.clear()
     storing_list.clear()
     ready.clear()
-
     return pdf_name
 
 
+# This function is meant to streamline the process of converting PDFs, given all the new complexities of Version 2.
+# If there's only one group of photos, it only runs the conversion function once. But if there is more than one group,
+# the function loops through every group in the dictionary.
+# this also checks whether or not the user would like to enter custom names.
 def multi_convert_check(groups_num_place, photo_groups_place, tally_place,
                         name_list_place, dummy_list_place, ready_list_place, final_pdf_list,
                         do_custom_names=False):
@@ -208,7 +184,8 @@ def multi_convert_check(groups_num_place, photo_groups_place, tally_place,
         print("\nConfirmed: multiple groups")
         for g in photo_groups_place:
             if do_custom_names:
-                pdf_name = convert_pdf(photo_groups_place[g], dummy_list_place, ready_list_place, tally_place, custom_name=True)
+                pdf_name = convert_pdf(photo_groups_place[g], dummy_list_place, ready_list_place, tally_place,
+                                       custom_name=True)
                 final_pdf_list.append(pdf_name)
             elif not do_custom_names:
                 pdf_name = convert_pdf(photo_groups_place[g], dummy_list_place, ready_list_place, tally_place)
@@ -229,8 +206,10 @@ def multi_convert_check(groups_num_place, photo_groups_place, tally_place,
     return tally_place, pdf_name
 
 
+# Drive API functions: Ms. Ifft helped a lot with these functions last semester.
+# This function is purely organizational, meant to tidy up the Google API code.
 def authenticate_scopes():  # If modifying these scopes, delete the file token.pickle.
-    SCOPES = ['https://www.googleapis.com/auth/drive']
+    scopes = ['https://www.googleapis.com/auth/drive']
     credentials = None
     if os.path.exists('token.pickle'):
         with open('token.pickle', 'rb') as token:
@@ -242,7 +221,7 @@ def authenticate_scopes():  # If modifying these scopes, delete the file token.p
             credentials.refresh(Request())
         else:
             flow = InstalledAppFlow.from_client_secrets_file(
-                'credentials.json', SCOPES)
+                'credentials.json', scopes)
             credentials = flow.run_local_server(port=0)
 
         # Save the credentials for the next run
@@ -277,9 +256,11 @@ def authenticate_scopes():  # If modifying these scopes, delete the file token.p
     return service, page_token, folder_id
 
 
-def redundancy_check(tally_place, service_place, page_token_place, folder_id_place, pdf_name_place):
+# This function is designed to check if there are already files with the same name as the one the user is trying to
+# upload. If there is one, it tells the user and aborts the upload; if not, it proceeds.
+def redundancy_check_upload(service_place, page_token_place, folder_id_place, pdf_name_place):
     # check if file with same name already exists
-    file_to_upload_path = '/home/pi/Desktop/TransferFiles/' + pdf_name_place + '.pdf'  # <<< PDF NAMES
+    file_to_upload_path = '/home/pi/Desktop/TransferFiles/' + pdf_name_place + '.pdf'
     name_of_uploaded_file = (str(pdf_name_place) + '.pdf')
     response = service_place.files().list(
         q="trashed = false and name = '" + name_of_uploaded_file + "' and parents in '" + str(folder_id_place) + "'",
@@ -303,6 +284,9 @@ def redundancy_check(tally_place, service_place, page_token_place, folder_id_pla
         return False, file_metadata, media,
 
 
+# Keyboard functions
+# These functions consolidate the commands associated with each keyboard key, which also allows for the reuse of some
+# actions, as you can see in key_q.
 def key_a(names, current, place):
     cam.capture('/home/pi/Desktop/hw%s.jpg' % (str(place)))
     photo_id = '/home/pi/Desktop/hw%s.jpg' % (str(place))
@@ -336,73 +320,80 @@ def key_q(current, photo_dict_place, num_place):
 def main():
     pygame.init()
 
+    # PDF Conversion lists: these are where the names of each photo taken by the camera will be stored whenever the
+    # program is run so that they're kept in the proper order for conversion into a single PDF. The tally variable
+    # keeps track of how many pdfs have been made, in the event that the user does not want to make a custom name.
     current_photos_list = []
-    photo_list = []
     name_list = []
     dummy_list = []
     ready_list = []
-    image_list = []
     all_pdfs = []
-
-    a_triggered = False
-    z_triggered = False
-    q_triggered = False
-    button_list = pygame.sprite.Group()
-
-    photo_groups = {}
+    # This dictionary is meant to keep track of every group of photos made, so each one can be made into an individual
+    # pdf.
+    photo_groups_dict = {}
     groups_num = 0
 
+    button_list = pygame.sprite.Group()
     size = [400, 400]
     screen = pygame.display.set_mode(size)
-    pygame.display.set_caption("Window")
-
+    pygame.display.set_caption("Homework Upload Tool V2")
     run = True
     clock = pygame.time.Clock()
 
-    i = 0
-    tally = int(read_data(pdf_tally_path))
+    num_photos_taken = 0
+    tally = int(read_data(pdf_tally_path))  # Tally, the total number of PDFs made in the program's lifespan, is
+    # rewritten to a text file after each use to keep track continuously. Upon initialization, this line brings the
+    # program back to where it left off.
     cam.start_preview(fullscreen=False, window=(300, 200, 640, 480))
+    # Theoretically, the user would be able to see what the PiCamera sees through a window. However, there have been
+    # issues with that beyond code.
 
+    # adaptive_lighting(light_list)
+
+    # "Game Loop": as long as run is true, the computer will always respond appropriately when the user presses a key,
+    # or clicks a digital button.
     while run:
         for event in pygame.event.get():
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_a:
-                    photo_id, name_list, current_photos_list, i = key_a(name_list, current_photos_list, i)
-                    a_triggered = True
+                    photo_id, name_list, current_photos_list, num_photos_taken = key_a(name_list,
+                                                                                       current_photos_list,
+                                                                                       num_photos_taken)
 
                 elif event.key == pygame.K_z:
-                    transition_list, current_photos_list, photo_groups, groups_num = key_z(current_photos_list, photo_groups, groups_num)
+                    transition_list, current_photos_list, photo_groups_dict, groups_num = key_z(current_photos_list,
+                                                                                                photo_groups_dict,
+                                                                                                groups_num)
 
                 elif event.key == pygame.K_q:
-                    transition_list, current_photos_list, photo_groups, groups_num = key_q(current_photos_list, photo_groups, groups_num)
-                    
-                    print('Groups: ', photo_groups)
-                    print("num of groups: ", groups_num)
+                    transition_list, current_photos_list, photo_groups_dict, groups_num = key_q(current_photos_list,
+                                                                                                photo_groups_dict,
+                                                                                                groups_num)
+
                     run = False
-                    pygame.quit()
                     break
 
-            # Work in progress
-            if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_a:
-                    a_triggered = False
-
             if event.type == pygame.MOUSEBUTTONDOWN:
-                if button1x <= mouse[0] <= (button1x + 80) and buttonY <= mouse[1] <= (buttonY + 40):
-                    photo_id, name_list, current_photos_list, i = key_a(name_list, current_photos_list, i)
-                elif button2x <= mouse[0] <= (button2x + 80) and buttonY <= mouse[1] <= (buttonY + 40):
+                if button1x <= mx <= (button1x + 80) and buttonY <= my <= (buttonY + 40):
+                    photo_id, name_list, current_photos_list, num_photos_taken = key_a(name_list, current_photos_list,
+                                                                                       num_photos_taken)
+                elif button2x <= mx <= (button2x + 80) and buttonY <= my <= (buttonY + 40):
                     print("Contact")
-                    transition_list, current_photos_list, photo_groups, groups_num = key_z(current_photos_list, photo_groups, groups_num)
+                    transition_list, current_photos_list, photo_groups_dict, groups_num = key_z(current_photos_list,
+                                                                                                photo_groups_dict,
+                                                                                                groups_num)
 
         if run:
+            # These three lines keep track of the cursor's x and y position.
             mouse = pygame.mouse.get_pos()
             mx = mouse[0]
             my = mouse[1]
 
+            # Drawing: this section continuously updates what the pygame window displays.
             screen.fill(GRAY)
-            buttonadd(button1x, buttonY, mx, my, button_list, GREEN, screen, a_triggered)
-            buttonadd(button2x, buttonY, mx, my, button_list, BLUE, screen, z_triggered)
-            buttonadd(button3x, buttonY, mx, my, button_list, RED, screen, q_triggered)
+            add_button(button1x, buttonY, mx, my, button_list, GREEN, screen)
+            add_button(button2x, buttonY, mx, my, button_list, BLUE, screen)
+            add_button(button3x, buttonY, mx, my, button_list, RED, screen)
 
             button_list.update()
             button_list.draw(screen)
@@ -410,95 +401,21 @@ def main():
             pygame.display.flip()
             clock.tick(60)
 
-        # take_pic = keyboard_input(pygame.K_a)
-        # if take_pic:
-        #     print("Button a triggered")
-        #     cam.capture('/home/pi/Desktop/hw%s.jpg' % (str(i)))
-        #     name_list.append('/home/pi/Desktop/hw%s.jpg' % (str(i)))
-        #     i += 1
-        #
-        # user_quits = keyboard_input(pygame.K_q)
-        # if user_quits:
-        #     run = False
-        #     print(run)
-        #     break
-
-    #         adaptive_lighting(lightlist)
-
-    # Capture Loop: every time the left button is pressed, the camera takes a picture, whose name is saved to one
-    # of the PDF Conversion lists for later. Then, the user has three seconds (indicated by the green LEDs) to
-    # either stop the loop by holding the right button, or to let it continue, in which case the program
-    # reevaluates the lighting and re-prompts the user to take a picture.
-
-    # for item in GREEN_LIGHTS:
-    #     item.on()
-
-    # print("\nWaiting for button a.")
-    # sleep(3)
-    # print("Delay period expired")
-    # for event in pygame.event.get():
-    #     if event.type == pygame.QUIT:
-    #         run = False
-    #     if event.type == pygame.KEYDOWN:
-    #         if event.key == pygame.K_a:
-    #             print("Button a Triggered")
-    #             for item in GREEN_LIGHTS:
-    #                 item.off()
-    #             sleep(1)
-    #             cam.capture('/home/pi/Desktop/hw%s.jpg' % (str(i)))
-    #             namelist.append('/home/pi/Desktop/hw%s.jpg' % (str(i)))
-    #             i += 1
-    #     else:
-    #         print("Event not triggered")
-
-    #         print("\nProceeding 1")
-
-    # for item in GREEN_LIGHTS:
-    #     sleep(1)
-    #     item.on()
-
-    # print("Waiting for button s")
-    # sleep(3)
-    # print("Delay period expired")
-    # for event in pygame.event.get():
-    #     if event.type == pygame.QUIT:
-    #         run = False
-    #     if event.type == pygame.KEYDOWN:
-    #         if event.key == pygame.K_s:
-    #             print("Button S Triggered")
-    #             run = False
-    #             for item in GREEN_LIGHTS:
-    #                 item.on()
-    #             sleep(1)
-    #         else:
-    #             print("\nProceeding 2. Looping program.")
-
-    #     print("\nProceeding 2. Looping program.")
-
     cam.stop_preview()
     cam.close()
     print("\nCamera Off")
 
-    # for item in lightlist:
-    #     item.off()
-    # for item in GREEN_LIGHTS:
+    # for item in light_list:
     #     item.off()
 
     custom_names = user_input('Would you like to enter a custom name? (y/n) ', ['y', 'n'],
                               response='That is not a valid answer.')
-
-    print()
-    print("pre-multi function tally: ", tally)
     if custom_names.lower() == 'y':
-        tally, pdf_name = multi_convert_check(groups_num, photo_groups, tally, name_list, dummy_list, ready_list, all_pdfs, do_custom_names=True)
+        tally, pdf_name = multi_convert_check(groups_num, photo_groups_dict, tally, name_list, dummy_list, ready_list,
+                                              all_pdfs, do_custom_names=True)
     elif custom_names.lower() == 'n':
-        tally, pdf_name = multi_convert_check(groups_num, photo_groups, tally, name_list, dummy_list, ready_list, all_pdfs)
-    print("post-multi function tally: ", tally)
-    print()
-
-    # TODO: conversion can probably be streamlined.
-
-    # loading(GREEN_LIGHTS)
+        tally, pdf_name = multi_convert_check(groups_num, photo_groups_dict, tally, name_list, dummy_list, ready_list,
+                                              all_pdfs)
 
     # Drive API Credentials: this is where the user is authorized to use the Drive API. If they don't have token.pickle
     # (if they've never used the Snap before), they will be prompted to log into their google account. A new
@@ -506,10 +423,8 @@ def main():
     # does and does not have permission to do. Although the scope can be narrowed down, this broad-access one was the
     # only one that worked.
     # From this point forward, Ms. Ifft helped me a lot with the code and figuring out the API.
-
-
     service, page_token, folder_id = authenticate_scopes()
-    already_file, file_metadata, media = redundancy_check(tally, service, page_token, folder_id, pdf_name)
+    already_file, file_metadata, media = redundancy_check_upload(service, page_token, folder_id, pdf_name)
     if already_file:
         print("Aforementioned error")
     else:
@@ -519,54 +434,41 @@ def main():
                                           fields='id, size').execute()
             if not file.get("id") or file.get("size") == 0:
                 print("Incomplete Upload")
-                # ledB.on()
-                # for x in range(5):
-                #     ledB.toggle()
         except:
-            # ledA.on()
             print("An error occurred")
-            
+
         if groups_num > 1:
             print("Multiple pdfs confirmed")
             print("pdf list: ", all_pdfs)
             print()
             for pdf in all_pdfs:
-                already_file, file_metadata, media = redundancy_check(tally, service, page_token, folder_id, pdf)
-                
+                already_file, file_metadata, media = redundancy_check_upload(service, page_token, folder_id, pdf)
+
                 if already_file:
                     print("Aforementioned error")
                 else:
                     try:
-                        # Upload: this is where the program uses the "create" method from the Drive API. If the file is missing it's
-                        # ID, or has no size, (which might indicate an upload issue in which content was damaged), the program throws
-                        # an error LED.
-                        # Communicating with the Drive API to figure out just what error happened, or whether there was an upload
-                        # issue, was challenging, so we decided to use this general try/except, so that any issue will
-                        # result in the error going off.
+                        # Upload: this is where the program uses the "create" method from the Drive API. If the file is
+                        # missing it's ID, or has no size, (which might indicate an upload issue in which content was
+                        # damaged), the program states that a general error has occurred.
+                        # Communicating with the Drive API to figure out just what error happened, or whether there was
+                        # an upload issue, was challenging, so we decided to use this general try/except, so that any
+                        # issue will result in the error going off.
                         file = service.files().create(body=file_metadata, media_body=media, fields='id, size').execute()
                         if not file.get("id") or file.get("size") == 0:
                             print("Incomplete Upload")
-                            # ledB.on()
-                            # for x in range(5):
-                            #     ledB.toggle()
                     except:
-                        # ledA.on()
                         print("An error occurred")
-            
-            
-        sleep(2)
-        # for light in PROGRESS_BAR:
-        #     light.off()
-    
-    
+
+        # Here is where the tally of PDFs made is rewritten, so that the program can start from the same place the next
+        # time it's run.
         tally_rewrite = open(pdf_tally_path, 'w')
         print(tally)
         tally_rewrite.write(str(tally))
         tally_rewrite.close()
+        pygame.quit()
         print("\nProcess Complete\n")
-    
 
 
 if __name__ == '__main__':
     main()
-
