@@ -89,8 +89,6 @@ class PygameButton(pygame.sprite.Sprite):
 
         pygame.draw.line(surface, WHITE, (x_pos - 2, y_pos), (x_pos - 2, y_pos + height), border_width)
         pygame.draw.line(surface, WHITE, (x_pos + width, y_pos), (x_pos + width, y_pos + height), border_width)
-        # self.world_shift = 0
-        # self.world_raise = 0
 
 
 # This function is meant to make it easier to make buttons, and also gives them a bit more life by having two
@@ -177,32 +175,19 @@ def convert_pdf(names, storing_list, ready, tally_placeholder, custom_name=False
 # If there's only one group of photos, it only runs the conversion function once. But if there is more than one group,
 # the function loops through every group in the dictionary.
 # this also checks whether or not the user would like to enter custom names.
-def multi_convert_check(groups_num_place, photo_groups_place, tally_place,
-                        name_list_place, dummy_list_place, ready_list_place, final_pdf_list,
+def multi_convert_check(photo_groups_place, tally_place, dummy_list_place, ready_list_place, final_pdf_list,
                         do_custom_names=False):
-    if groups_num_place > 0:
-        print("\nConfirmed: multiple groups")
-        for g in photo_groups_place:
-            if do_custom_names:
-                pdf_name = convert_pdf(photo_groups_place[g], dummy_list_place, ready_list_place, tally_place,
-                                       custom_name=True)
-                final_pdf_list.append(pdf_name)
-            elif not do_custom_names:
-                pdf_name = convert_pdf(photo_groups_place[g], dummy_list_place, ready_list_place, tally_place)
-                final_pdf_list.append(pdf_name)
-            photo_groups_place[g] = []
-            tally_place += 1
-    elif groups_num_place == 0:
-        print("\nConfirmed: single group")
+    print("\nConfirmed: multiple groups")
+    for g in photo_groups_place:
         if do_custom_names:
-            pdf_name = convert_pdf(name_list_place, dummy_list_place, ready_list_place, tally_place, custom_name=True)
+            pdf_name = convert_pdf(photo_groups_place[g], dummy_list_place, ready_list_place, tally_place,
+                                   custom_name=True)
             final_pdf_list.append(pdf_name)
         elif not do_custom_names:
-            pdf_name = convert_pdf(name_list_place, dummy_list_place, ready_list_place, tally_place)
+            pdf_name = convert_pdf(photo_groups_place[g], dummy_list_place, ready_list_place, tally_place)
             final_pdf_list.append(pdf_name)
+        photo_groups_place[g] = []
         tally_place += 1
-
-    print("Final tally within multi: ", tally_place, '\n')
     return tally_place, pdf_name
 
 
@@ -274,7 +259,6 @@ def redundancy_check_upload(service_place, page_token_place, folder_id_place, pd
     print("files 2: ", files, "\n")
     if files:
         print("There is already a file with that name in File Transfer")
-        # ledB.on()
         return True, True, True
 
     else:
@@ -315,6 +299,7 @@ def key_q(current, photo_dict_place, num_place):
         if do_auto_save == 'y':
             transition_list, current, photo_dict_place, num_place = key_z(current, photo_dict_place, num_place)
             return transition_list, current, photo_dict_place, num_place
+    return [], current, photo_dict_place, num_place
 
 
 def main():
@@ -411,10 +396,10 @@ def main():
     custom_names = user_input('Would you like to enter a custom name? (y/n) ', ['y', 'n'],
                               response='That is not a valid answer.')
     if custom_names.lower() == 'y':
-        tally, pdf_name = multi_convert_check(groups_num, photo_groups_dict, tally, name_list, dummy_list, ready_list,
+        tally, pdf_name = multi_convert_check(photo_groups_dict, tally, dummy_list, ready_list,
                                               all_pdfs, do_custom_names=True)
     elif custom_names.lower() == 'n':
-        tally, pdf_name = multi_convert_check(groups_num, photo_groups_dict, tally, name_list, dummy_list, ready_list,
+        tally, pdf_name = multi_convert_check(photo_groups_dict, tally, dummy_list, ready_list,
                                               all_pdfs)
 
     # Drive API Credentials: this is where the user is authorized to use the Drive API. If they don't have token.pickle

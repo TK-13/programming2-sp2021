@@ -53,6 +53,7 @@ def convert_pdf(names, storing_list, ready, tally_placeholder, custom_name=False
 
     return tally_placeholder, pdf_name
 
+
 # CHANGED
 def multi_convert_check(groups_num_place, photo_groups_place, tally_place, do_custom_names=False):
     if groups_num_place > 0:
