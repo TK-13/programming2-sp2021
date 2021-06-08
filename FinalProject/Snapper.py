@@ -53,16 +53,6 @@ led8 = LED(24)
 light_list = [led, led2, led3, led4, led5, led6, led7, led8]
 half_light_list = [led, led3, led5, led7]
 
-ledA = LED(16)
-ledB = LED(12)
-ledC = LED(7)
-ledD = LED(8)
-ledE = LED(25)
-PROGRESS_BAR = [ledA, ledB, ledC, ledD, ledE]
-for i in PROGRESS_BAR:
-    i.off()
-GREEN_LIGHTS = [ledC, ledD, ledE]
-
 ldr = LightSensor(20)
 ldr.threshold = 0.6
 boundary = [0.6, 0.7]
@@ -295,7 +285,9 @@ def key_z(current, photo_dict_place, num_place):
     return transition_list, current, photo_dict_place, num_place
 
 
-def key_q(current, photo_dict_place, num_place):
+def key_q(current, photo_dict_place, num_place, light_place):
+    for l in light_place:
+        l.off()
     if current:  # Auto-save, if you forgot to make a final new group.
         do_auto_save = user_input(
             'You have ungrouped photos remaining. Would you like for them to be converted? ',
@@ -303,6 +295,8 @@ def key_q(current, photo_dict_place, num_place):
         if do_auto_save == 'y':
             transition_list, current, photo_dict_place, num_place = key_z(current, photo_dict_place, num_place)
             return transition_list, current, photo_dict_place, num_place
+    else:
+        pass
     return [], current, photo_dict_place, num_place
 
 
@@ -357,7 +351,7 @@ def main():
                 elif event.key == pygame.K_q:
                     transition_list, current_photos_list, photo_groups_dict, groups_num = key_q(current_photos_list,
                                                                                                 photo_groups_dict,
-                                                                                                groups_num)
+                                                                                                groups_num, light_list)
 
                     run = False
                     break
@@ -374,7 +368,7 @@ def main():
                 elif button3x <= mx <= (button3x + 80) and buttonY <= my <= (buttonY + 40):
                     transition_list, current_photos_list, photo_groups_dict, groups_num = key_q(current_photos_list,
                                                                                                 photo_groups_dict,
-                                                                                                groups_num)
+                                                                                                groups_num, light_list)
 
         if run:
             # These three lines keep track of the cursor's x and y position.
